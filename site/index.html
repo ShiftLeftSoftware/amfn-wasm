@@ -1,0 +1,136 @@
+<!doctype html>
+<html class="max-height">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+        <link href="node_modules/toastify-js/src/toastify.css" rel="stylesheet">
+        <link href="index.css" rel="stylesheet">
+        <title>AmFn Wasm</title>
+    </head>
+    <body class="d-flex flex-column max-height">
+
+        <div id="divBackground" class="modal div-backdrop" tabindex="-1">
+        </div>
+
+        <div id="divSpinner" class="modal div-spinner" tabindex="-1">
+            <div class="mx-auto d-flex flex-column align-items-center justify-content-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="mt-1">
+                    Loading AmFn Engine...
+                </div>                
+            </div>            
+        </div>
+
+        <div id="divModal" class="modal-dialog modal-dialog-scrollable div-modal" tabindex="-1">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 id="modalTitle" class="modal-title"></h5>
+                    <button id="modalClose" type="button" class="btn-close"></button>
+                </div>
+                <div id="modalBody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button id="modalCancel" type="button" class="btn btn-secondary">Cancel</button>
+                    <button id="modalOK" type="button" class="btn btn-primary">OK</button>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi-file-earmark"></i> File
+                            </a>
+                            <ul class="dropdown-menu multi-level" aria-labelledby="navbarDropdown">
+                                <li class="nav-item dropdown-submenu">
+                                    <a class="dropdown-item" href="#">
+                                        <i class="bi-file-earmark"></i> Examples
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a id="menuBasicLoan" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i> Open Basic Loan</a></li>
+                                        <li><a id="menuBiWeeklyLoan" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i> Open Bi-weekly Loan</a></li>
+                                        <li><a id="menuStandardAnnuity" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i> Open Standard Annuity</a></li>
+                                        <li><a id="menuStandardBond" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i> Open Standard Bond</a></li>
+                                        <li><a id="menuStandardCashflow" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i> Open Standard Cashflow</a></li>
+                                        <li><a id="menuStandardInvestment" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i> Open Standard Investment</a></li>
+                                        <li><a id="menuStandardLoan" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i> Open Standard Loan</a></li>
+                                    </ul>
+                                </li>                                  
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a id="menuOpen" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i> Open Cashflow</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a id="menuClose" class="dropdown-item disabled" href="#"><i class="bi-x"></i> Close Cashflow</a></li>
+                                <li><a id="menuSave" class="dropdown-item disabled" href="#"><i class="bi-file-earmark-arrow-down"></i> Save Cashflow</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a id="menuCashflow" class="nav-link dropdown-toggle disabled" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi-file-ruled"></i> Cashflow
+                            </a>
+                            <ul class="dropdown-menu multi-level" aria-labelledby="navbarDropdown">
+                                <li><a id="menuExpand" class="dropdown-item" href="#"><i class="bi-arrows-expand"></i> Expand Am</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a id="menuSummary" class="dropdown-item" href="#"><i class="bi-receipt-cutoff"></i> Cashflow Summary</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                    <li class="nav-item dropdown-submenu">
+                                        <a class="dropdown-item" href="#">
+                                            <i class="bi-graph-up"></i> Cashflow Charts
+                                        </a>
+                                        <ul id="chartDefsMenu" class="dropdown-menu">
+                                        </ul>
+                                    </li>                                  
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <button type="button" id="btnExpand" class="btn btn-outline-primary disabled"><i class="bi-arrows-expand"></i> Expand</button>                            
+                    <button type="button" id="btnSummary" class="btn btn-outline-primary disabled"><i class="bi-receipt-cutoff"></i> Summary</button>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary disabled dropdown-toggle" id="btnCharts" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi-graph-up"></i> Charts
+                        </button>
+                        <ul id="chartDefsBtn" class="dropdown-menu dropdown-menu-end" aria-labelledby="btnCharts">
+                        </ul>
+                    </div>                            
+                </div>
+            </div>
+        </nav>
+
+        <ul id="ulTabs" class="nav nav-tabs" role="tablist">
+        </ul>
+
+        <content class="flex-grow-1 max-height">
+            <section class="container-fluid d-flex flex-column max-height">
+                <div id="divEvents" class="vertical-resize">
+                </div>
+                <div id="divAms" class="flex-grow-1">
+                </div>
+            </section>
+        </content>
+
+        <footer class="mt-auto">
+            <div id="divStatus">                
+            </div>
+        </footer>
+
+        <input type="file" class="display-none" id="fileInput" accept=".json"/>
+
+        <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="node_modules/ag-grid-community/dist/ag-grid-community.min.js"></script>
+        <script src="node_modules/chart.js/dist/Chart.bundle.min.js"></script>
+        <script src="node_modules/toastify-js/src/toastify.js"></script>
+        <script src="node_modules/amfnwasm/amfnwasm.js"></script>
+        <script src="./utility.js"></script>
+        <script src="./index.js"></script>
+    </body>
+</html>

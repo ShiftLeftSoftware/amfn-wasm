@@ -1,0 +1,23 @@
+[package]
+name = "amfnwasm"
+version = "0.2.0"
+authors = ["ShiftLeft Software"]
+description = "Amortization Functions (AmFn) Web Assembly"
+homepage = "https://shiftleftsoftware.com"
+documentation = "https://docs.rs/amfnwasm"
+repository = "https://github.com/ShiftLeftSoftware/amfn-wasm"
+keywords = ["amortization", "calculator"]
+categories = ["mathematics"]
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+edition = "2018"
+
+[lib]
+name = "amfnwasm"
+crate-type = ["cdylib"]
+
+[dependencies]
+rust_decimal = "~1.10"
+wasm-bindgen = "~0.2"
+js-sys = "~0.3"
+amfnengine = { path  = "../amfn-engine", version = "~0.2" }

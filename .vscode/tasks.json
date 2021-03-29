@@ -1,0 +1,41 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build",
+            "type": "process",
+            "command": "${workspaceFolder}/build/build.bat",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "BuildProd",
+            "type": "process",
+            "command": "${workspaceFolder}/build/buildprod.bat",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "RunServe",
+            "type": "process",
+            "command": "${workspaceFolder}/build/runserve.bat",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "RunBrowser",
+            "type": "process",
+            "command": "Chrome",
+            "windows": {
+                "command": "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
+            },
+            "args": [
+                "http://localhost:8080"
+            ]
+        }
+    ]
+}
