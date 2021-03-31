@@ -863,10 +863,10 @@ impl Engine {
 
         match result_symbol.sym_type() {
             amfnengine::TokenType::Integer => {
-                self.engine.format_integer(result_symbol.sym_integer())
+                self.engine.format_integer_out(result_symbol.sym_integer())
             }
             amfnengine::TokenType::Decimal => {
-                self.engine.format_decimal(result_symbol.sym_decimal())
+                self.engine.format_decimal_out(result_symbol.sym_decimal())
             }
             _ => String::from(result_symbol.sym_string()),
         }
@@ -951,8 +951,7 @@ impl Engine {
         }
 
         let calc_mgr = self.engine.calc_mgr();
-        let mgr = calc_mgr.mgr();
-        let locale = mgr.list_locale();
+        let locale = calc_mgr.list_locale();
         let format_in = locale.format_in(false);
 
         format!(
@@ -987,8 +986,7 @@ impl Engine {
             return String::from("");
         }
 
-        let mgr = calc_mgr.mgr();
-        let locale = mgr.list_locale();
+        let locale = calc_mgr.list_locale();
         let cashflow_locale_str = locale.cashflow_locale().locale_str();
 
         let mut status = self.engine.calc_mgr().descriptor_value(

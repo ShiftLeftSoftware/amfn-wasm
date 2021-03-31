@@ -510,7 +510,7 @@ class CashflowManager {
         result = this.engine.init_cashflow(index);
         
         let init_parts = result.split('|');
-        if (init_parts.length != 9) {
+        if (init_parts.length !== 9) {
             Toast.toastError("Cannot open cashflow");
             return;
         }

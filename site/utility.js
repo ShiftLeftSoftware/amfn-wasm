@@ -36,6 +36,8 @@ const chartColors = [
  */
 class ParseFn {
 
+    static SERIAL_BASE_CENTURY = 73;
+
     /**
      * Fill leading zeros for a number.
      * @param {number} number The number to zero fill.
@@ -49,30 +51,37 @@ class ParseFn {
     }
     
     /**
-     * Parse a date and return the internal format.
+     * Format a date and return the internal format.
      * @param {object} tab The tab structure.
      * @param {string} display_val The display value.
      * @return {string} The resulting date string.
      */    
-     static parse_date(tab, display_val) {
+     static format_date_in(tab, display_val) {
         let regexStr = tab.localeFormat.date_regex;
         let replaceStr = tab.localeFormat.date_replace;
         
         let regex = new RegExp(regexStr);
 
         let dd = display_val.replace(regex, replaceStr).split('-');
-        if (dd.length != 3) return new Date();
+        if (dd.length !== 3) return new Date();
 
-        return ParseFn.zerofill(dd[0], 4) + "-" + ParseFn.zerofill(dd[1], 2) + "-" + ParseFn.zerofill(dd[2], 2);
+        let year = dd[0];
+        if (year.length < 3) {
+            year = (parseInt(year) < ParseFn.SERIAL_BASE_CENTURY ? "20" : "19") + ParseFn.zerofill(year, 2);
+        }
+
+        if (year.length !== 4) return new Date();
+
+        return year + "-" + ParseFn.zerofill(dd[1], 2) + "-" + ParseFn.zerofill(dd[2], 2);
     }
 
     /**
-     * Parse an integer and return the internal format.
+     * Format an integer and return the internal format.
      * @param {object} tab The tab structure.
      * @param {string} display_val The display value.
      * @return {string} The resulting integer string.
      */    
-     static parse_integer(tab, display_val) {
+     static format_integer_in(tab, display_val) {
         let regex = tab.localeFormat.integer_regex;
         let replaceStr = tab.localeFormat.integer_replace;
 
@@ -80,12 +89,12 @@ class ParseFn {
     }
 
     /**
-     * Parse a decimal and return the internal format.
+     * Format a decimal and return the internal format.
      * @param {object} tab The tab structure.
      * @param {string} display_val The display value.
      * @return {string} The resulting decimal string.
      */    
-     static parse_decimal(tab, display_val) {
+     static format_decimal_in(tab, display_val) {
         let regex = tab.localeFormat.decimal_regex;
         let replaceStr = tab.localeFormat.decimal_replace;
 
@@ -93,12 +102,12 @@ class ParseFn {
     }
 
     /**
-     * Parse a currency and return the internal format.
+     * Format a currency and return the internal format.
      * @param {object} tab The tab structure.
      * @param {string} display_val The display value.
      * @return {string} The resulting currency string.
      */    
-     static parse_currency(tab, display_val) {
+     static format_currency_in(tab, display_val) {
         let regex = tab.localeFormat.currency_regex;
         let replaceStr = tab.localeFormat.currency_replace;
 
@@ -132,7 +141,7 @@ class ChartUtility {
             let date = null;
             for (let key in row) {
                 if (key === "Date") {
-                    date = new Date(ParseFn.parse_date(tab, row[key]));
+                    date = new Date(ParseFn.format_date_in(tab, row[key]));
                     break;
                 }
             }
@@ -142,18 +151,18 @@ class ChartUtility {
                 if (key === name) {
                     switch (format) {
                         case FORMAT_DATE:
-                            val = new Date(ParseFn.parse_date(tab, row[key]));
+                            val = new Date(ParseFn.format_date_in(tab, row[key]));
                             break;
                         case FORMAT_INTEGER:
-                            val = parseInt(ParseFn.parse_integer(tab, row[key]));
+                            val = parseInt(ParseFn.format_integer_in(tab, row[key]));
                             break;
                         case FORMAT_DECIMAL:
                             // Approximate for charting
-                            val = parseFloat(ParseFn.parse_decimal(tab, row[key]));
+                            val = parseFloat(ParseFn.format_decimal_in(tab, row[key]));
                             break;
                         case FORMAT_CURRENCY:                    
                             // Approximate for charting
-                            val = parseFloat(ParseFn.parse_currency(tab, row[key]));
+                            val = parseFloat(ParseFn.format_currency_in(tab, row[key]));
                             break;
                         default:
                             val = row[key];
@@ -302,7 +311,7 @@ class ChartUtility {
                 chartDef.columns = new Array();
                 for (let index = 1; index < defs.length; ++index) {
                     let def = defs[index].split('~');
-                    if (def.length != 2) continue;
+                    if (def.length !== 2) continue;
     
                     let chartCol = {
                         name: def[0],
