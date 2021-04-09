@@ -11,10 +11,10 @@
     </head>
     <body class="d-flex flex-column max-height">
 
-        <div id="divBackground" class="modal div-backdrop" tabindex="-1">
+        <div id="divBackground" class="modal div-backdrop">
         </div>
 
-        <div id="divSpinner" class="modal div-spinner" tabindex="-1">
+        <div id="divSpinner" class="modal div-spinner">
             <div class="mx-auto d-flex flex-column align-items-center justify-content-center">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
@@ -25,11 +25,11 @@
             </div>            
         </div>
 
-        <div id="divModal" class="modal-dialog modal-dialog-scrollable div-modal" tabindex="-1">
+        <div id="divModal" class="modal-dialog modal-dialog-scrollable div-modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 id="modalTitle" class="modal-title"></h5>
-                    <button id="modalClose" type="button" class="btn-close"></button>
+                    <button id="modalClose" type="button" class="btn-close" tabindex="-1"></button>
                 </div>
                 <div id="modalBody" class="modal-body">
                 </div>
@@ -42,7 +42,7 @@
         
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" tabindex="-1" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -78,6 +78,8 @@
                                 <i class="bi-file-ruled"></i> Cashflow
                             </a>
                             <ul class="dropdown-menu multi-level" aria-labelledby="navbarDropdown">
+                                <li><a id="menuCalculate" class="dropdown-item disabled" href="#"><i class="bi-calculator"></i> Calculate</a></li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li><a id="menuExpand" class="dropdown-item" href="#"><i class="bi-arrows-expand"></i> Expand Am</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a id="menuSummary" class="dropdown-item" href="#"><i class="bi-receipt-cutoff"></i> Cashflow Summary</a></li>
@@ -93,10 +95,11 @@
                             </ul>
                         </li>
                     </ul>
-                    <button type="button" id="btnExpand" class="btn btn-outline-primary disabled"><i class="bi-arrows-expand"></i> Expand</button>                            
-                    <button type="button" id="btnSummary" class="btn btn-outline-primary disabled"><i class="bi-receipt-cutoff"></i> Summary</button>
+                    <button type="button" id="btnCalculate" class="btn btn-outline-primary disabled" tabindex="-1"><i class="bi-calculator"></i> Calculate</button>                            
+                    <button type="button" id="btnExpand" class="btn btn-outline-primary disabled" tabindex="-1"><i class="bi-arrows-expand"></i> Expand</button>                            
+                    <button type="button" id="btnSummary" class="btn btn-outline-primary disabled" tabindex="-1"><i class="bi-receipt-cutoff"></i> Summary</button>
                     <div class="dropdown">
-                        <button class="btn btn-outline-primary disabled dropdown-toggle" id="btnCharts" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn btn-outline-primary disabled dropdown-toggle" id="btnCharts" tabindex="-1" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi-graph-up"></i> Charts
                         </button>
                         <ul id="chartDefsBtn" class="dropdown-menu dropdown-menu-end" aria-labelledby="btnCharts">

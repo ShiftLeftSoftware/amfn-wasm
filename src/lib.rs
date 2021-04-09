@@ -8,6 +8,7 @@
 // except according to those terms.
 
 use js_sys::Array;
+use rust_decimal::prelude::*;
 use wasm_bindgen::prelude::*;
 
 use amfnengine::core::*;
@@ -366,18 +367,14 @@ pub struct WasmElemColumn {
     col_type: String,
     /// Code of the descriptor.
     code: String,
-    /// Column empty value (Enabled when >= 0).
-    col_empty_value: String,
     /// Format of the column.
     format: u32,
     /// Number of significant decimal digits.
     decimal_digits: u32,
     /// Width of column.
     col_width: u32,
-    /// Column exclude.
-    col_exclude: bool,
-    /// Column empty.
-    col_empty: bool,
+    /// Column editable.
+    col_editable: bool
 }
 
 /// Wasm column element implementation.
@@ -387,20 +384,18 @@ impl WasmElemColumn {
     ///
     /// # Arguments
     ///
-    /// * `col_name_param` - The descriptor group.
-    /// * `col_name_index_param` - The descriptor name.
-    /// * `col_header_param` - The descriptor type.
-    /// * `col_description_param` - The descriptor code.
-    /// * `group_param` - The descriptor code.
-    /// * `name_param` - The descriptor code.
-    /// * `col_type_param` - The descriptor code.
-    /// * `code_param` - The descriptor value.
-    /// * `col_empty_value_param` - The descriptor value expression.
-    /// * `format_param` - The descriptor propagate.
-    /// * `decimal_digits_param` - The event list index.
-    /// * `col_width_param` - The event list index.
-    /// * `col_exclude_param` - The event list index.
-    /// * `col_empty_param` - The event list index.
+    /// * `col_name_param` - Column name.
+    /// * `col_name_index_param` - Column index.
+    /// * `col_header_param` - Column header.
+    /// * `col_description_param` - Column description.
+    /// * `group_param` - Group parameter.
+    /// * `name_param` - Name parameter.
+    /// * `col_type_param` - Column type.
+    /// * `code_param` - Code parameter.
+    /// * `format_param` - Column format.
+    /// * `decimal_digits_param` - Decimal digits.
+    /// * `column_width_param` - Column width.
+    /// * `column_editable` - Column editable.
     ///
     /// # Return
     ///
@@ -417,12 +412,10 @@ impl WasmElemColumn {
         name_param: &str,
         col_type_param: &str,
         code_param: &str,
-        col_empty_value_param: &str,
         format_param: u32,
         decimal_digits_param: u32,
         col_width_param: u32,
-        col_exclude_param: bool,
-        col_empty_param: bool,
+        col_editable_param: bool
     ) -> WasmElemColumn {
         WasmElemColumn {
             col_name: String::from(col_name_param),
@@ -433,12 +426,10 @@ impl WasmElemColumn {
             name: String::from(name_param),
             col_type: String::from(col_type_param),
             code: String::from(code_param),
-            col_empty_value: String::from(col_empty_value_param),
             format: format_param,
             decimal_digits: decimal_digits_param,
             col_width: col_width_param,
-            col_exclude: col_exclude_param,
-            col_empty: col_empty_param,
+            col_editable: col_editable_param
         }
     }
 
@@ -538,18 +529,6 @@ impl WasmElemColumn {
         self.code = code;
     }
 
-    /// Getter for col_empty_value property
-    #[wasm_bindgen(getter)]
-    pub fn col_empty_value(&self) -> String {
-        String::from(self.col_empty_value.as_str())
-    }
-
-    /// Setter for col_empty_value property
-    #[wasm_bindgen(setter)]
-    pub fn set_col_empty_value(&mut self, col_empty_value: String) {
-        self.col_empty_value = col_empty_value;
-    }
-
     /// Getter for format property
     #[wasm_bindgen(getter)]
     pub fn format(&self) -> u32 {
@@ -586,28 +565,16 @@ impl WasmElemColumn {
         self.col_width = col_width;
     }
 
-    /// Getter for col_exclude property
+    /// Getter for col_editable property
     #[wasm_bindgen(getter)]
-    pub fn col_exclude(&self) -> bool {
-        self.col_exclude
+    pub fn col_editable(&self) -> bool {
+        self.col_editable
     }
 
-    /// Setter for col_exclude property
+    /// Setter for col_editable property
     #[wasm_bindgen(setter)]
-    pub fn set_col_exclude(&mut self, col_exclude: bool) {
-        self.col_exclude = col_exclude;
-    }
-
-    /// Getter for col_empty property
-    #[wasm_bindgen(getter)]
-    pub fn col_empty(&self) -> bool {
-        self.col_empty
-    }
-
-    /// Setter for col_empty property
-    #[wasm_bindgen(setter)]
-    pub fn set_col_empty(&mut self, col_empty: bool) {
-        self.col_empty = col_empty;
+    pub fn set_col_editable(&mut self, col_editable: bool) {
+        self.col_editable = col_editable;
     }
 }
 
@@ -807,6 +774,296 @@ impl Engine {
         format!("{}|{}|{}", locale_str, encoding, decimal_digits)
     }
 
+    /// Calculates the value for an event.
+    /// Calculates either an interest amount or a principal amount
+    /// (depending upon the selected event type) that will satisfy
+    /// the condition that the remaining balance of the cashflow
+    /// is the smallest amount greater than or equal to the given
+    /// parameter value.
+    ///
+    /// # Arguments
+    ///
+    /// * `cf_index` - The cashflow index.
+    /// * `index` - The event index of the cashflow.
+    /// * `target_value` - See description.
+    ///
+    /// # Return
+    ///
+    /// * The results from this method or an error code.
+
+    pub fn calculate_value(
+        &self,
+        cf_index: u32,
+        index: u32,
+        target_value: &str,
+    ) -> String {
+        {
+            let calc_mgr = self.engine.calc_mgr();
+
+            if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
+                return String::from("");
+            }
+
+            match calc_mgr.list_cashflow().list_event() {
+                None => { return String::from(""); }
+                Some(o) => {
+                    if !o.get_element(index as usize) {
+                        return String::from("");
+                    }
+                }
+            }
+        }
+
+        let target;
+        match target_value.parse::<Decimal>() {
+            Err(_e) => return String::from(""),
+            Ok(o) => target = o
+        }
+
+        match self.engine.calculate_value(target) {
+            Err(_e) => String::from(""),
+            Ok(o) => o.result_decimal().to_string()
+        }
+    }
+
+    /// Calculates the periods for an event.
+    /// Calculates the number of periods that will satisfy the
+    /// condition that the remaining balance of the cashflow
+    /// is the smallest amount greater than or equal to the given
+    /// parameter value.
+    ///
+    /// # Arguments
+    ///
+    /// * `cf_index` - The cashflow index.
+    /// * `index` - The event index of the cashflow.
+    /// * `target_value` - See description.
+    ///
+    /// # Return
+    ///
+    /// * The results from this method or an error code.
+
+    pub fn calculate_periods(
+        &self,
+        cf_index: u32,
+        index: u32,
+        target_value: &str
+    ) -> i32 {
+        {
+            let calc_mgr = self.engine.calc_mgr();
+
+            if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
+                return 0;
+            }
+
+            match calc_mgr.list_cashflow().list_event() {
+                None => { return 0; }
+                Some(o) => {
+                    if !o.get_element(index as usize) {
+                        return 0;
+                    }
+                }
+            }
+        }
+
+        let target;
+        match target_value.parse::<Decimal>() {
+            Err(_e) => return 0,
+            Ok(o) => target = o
+        }
+
+        match self.engine.calculate_periods(target) {
+            Err(_e) => 0,
+            Ok(o) => o.result_integer()
+        }
+    }
+
+    /// Calculates number of intervals between two dates.
+    /// If intDate2 is greater than or equal to intDate1,
+    /// the result will be positive, otherwise the result
+    /// will be negative.
+    ///
+    /// # Arguments
+    ///
+    /// * `date1` - First date in YYYYMMDD format.
+    /// * `date2` - Second date in YYYYMMDD format.
+    /// * `frequency` - Date frequency.
+    /// * `intervals` - Number of intervals of frequency.
+    /// * `eom_param` - Adjust successive dates to end of month.
+    ///
+    /// # Return
+    ///
+    /// * Number of intervals (positive or negative).
+
+    pub fn date_diff(
+        date1: &str,
+        date2: &str,
+        frequency: &str,
+        intervals: u32,
+        eom_param: bool,
+    ) -> i32 {
+
+        let freq = CoreUtility::get_frequency(frequency);
+
+        CoreUtility::date_diff(
+            CoreUtility::parse_date(date1), 
+            CoreUtility::parse_date(date2), 
+            freq, 
+            intervals as usize, 
+            eom_param) as i32
+    }
+
+    /// Calculates a new date based upon a given date and number of intervals.
+    ///
+    /// # Arguments
+    ///
+    /// * `orig_date` - Optional original date in YYYYMMDD format,
+    ///     otherwise zero. Used for the half-month (semi-monthly) frequency
+    ///     and when bolEOM is true.
+    /// * `date` - Date in YYYYMMDD format.
+    /// * `frequency` - Date frequency.
+    /// * `intervals` - Number of intervals of frequency.
+    /// * `eom_param` - Adjust successive dates to end of month.
+    ///
+    /// # Return
+    ///
+    /// * New date in YYYYMMDD format.
+    pub fn date_new(&self, 
+        orig_date: &str,
+        date: &str,
+        frequency: &str,
+        intervals: u32,
+        eom_param: bool) -> String {
+
+        let freq = CoreUtility::get_frequency(frequency);
+
+        let new_date = CoreUtility::date_new(
+            CoreUtility::parse_date(orig_date), 
+            CoreUtility::parse_date(date), 
+            freq, 
+            intervals as usize, 
+            eom_param);
+
+        format!("{:04}-{:02}-{:02}", new_date / 10000, new_date / 100 % 100, new_date % 100)
+    }
+    
+    /// Format a date and return the internal format.
+    ///
+    /// # Arguments
+    ///
+    /// * `display_val` - The display value to parse.
+    ///
+    /// # Return
+    ///
+    /// * See description.
+
+    pub fn format_date_in(&self, display_val: &str) -> String {
+        self.engine.format_date_in(display_val)
+    }
+
+    /// Format an integer and return the internal format.
+    ///
+    /// # Arguments
+    ///
+    /// * `display_val` - The display value to parse.
+    ///
+    /// # Return
+    ///
+    /// * See description.
+
+    pub fn format_integer_in(&self, display_val: &str) -> String {
+        self.engine.format_integer_in(display_val)
+    }
+
+    /// Format a decimal and return the internal format.
+    ///
+    /// # Arguments
+    ///
+    /// * `display_val` - The display value to parse.
+    ///
+    /// # Return
+    ///
+    /// * See description.
+
+    pub fn format_decimal_in(&self, display_val: &str) -> String {
+        self.engine.format_decimal_in(display_val)
+    }
+
+    /// Format a currency and return the internal format.
+    ///
+    /// # Arguments
+    ///
+    /// * `display_val` - The display value to parse.
+    ///
+    /// # Return
+    ///
+    /// * See description.
+
+    pub fn format_currency_in(&self, display_val: &str) -> String {
+        self.engine.format_currency_in(display_val)
+    }
+
+    /// Format and return a date string.
+    ///
+    /// # Arguments
+    ///
+    /// * `val` - The usize date value to format.
+    ///
+    /// # Return
+    ///
+    /// * See description.
+
+    pub fn format_date_out(&self, val: &str) -> String {
+        self.engine.format_date_out(CoreUtility::parse_date(val))
+    }
+
+    /// Format and return an integer string.
+    ///
+    /// # Arguments
+    ///
+    /// * `val` - The usize value to format.
+    ///
+    /// # Return
+    ///
+    /// * See description.
+
+    pub fn format_integer_out(&self, val: u32) -> String {
+        self.engine.format_integer_out(val as usize)
+    }
+
+    /// Format and return a decimal string.
+    ///
+    /// # Arguments
+    ///
+    /// * `val` - The decimal value to format.
+    ///
+    /// # Return
+    ///
+    /// * See description.
+
+    pub fn format_decimal_out(&self, val: &str) -> String {
+        match val.parse::<Decimal>() {
+            Err(_e) => String::from("0.0"),
+            Ok(o) => self.engine.format_decimal_out(o)
+        }
+    }
+
+    /// Format and return a currency string.
+    ///
+    /// # Arguments
+    ///
+    /// * `val` - The currency value to format.
+    ///
+    /// # Return
+    ///
+    /// * See description.
+
+    pub fn format_currency_out(&self, val: &str) -> String {
+        match val.parse::<Decimal>() {
+            Err(_e) => String::from("0.0"),
+            Ok(o) => self.engine.format_currency_out(o)
+        }
+    }
+
     /// Deserialize and ingest the json input.
     ///
     /// # Arguments
@@ -883,14 +1140,14 @@ impl Engine {
     /// * Returns an array of chart definition elements.
 
     pub fn get_chart_definitions(&self, cf_index: u32) -> Array {
-        let mgr = self.engine.calc_mgr();
+        let calc_mgr = self.engine.calc_mgr();
 
-        if !mgr.list_cashflow().get_element(cf_index as usize) {
+        if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
             return Array::new();
         }
 
         let mut ary_chart: Vec<WasmElemChart> = Vec::new();
-        let list_descriptor = mgr.preferences().list_descriptor();
+        let list_descriptor = calc_mgr.preferences().list_descriptor();
         let mut index: usize = 0;
 
         loop {
@@ -908,7 +1165,7 @@ impl Engine {
             index += 1;
         }
 
-        match mgr.list_cashflow().preferences() {
+        match calc_mgr.list_cashflow().preferences() {
             None => {}
             Some(o) => {
                 let list_descriptor = o.list_descriptor();
@@ -943,7 +1200,7 @@ impl Engine {
     ///
     /// # Return
     ///
-    /// * Returns the user locale's input format information.
+    /// * Returns the cashflow's name.
 
     pub fn init_cashflow(&self, cf_index: u32) -> String {
         if !self.engine.init_cashflow(cf_index) {
@@ -951,21 +1208,7 @@ impl Engine {
         }
 
         let calc_mgr = self.engine.calc_mgr();
-        let locale = calc_mgr.list_locale();
-        let format_in = locale.format_in(false);
-
-        format!(
-            "{}|{}|{}|{}|{}|{}|{}|{}|{}",
-            calc_mgr.list_cashflow().name(),
-            format_in.date_regex(),
-            format_in.date_replace(),
-            format_in.integer_regex(),
-            format_in.integer_replace(),
-            format_in.decimal_regex(),
-            format_in.decimal_replace(),
-            format_in.currency_regex(),
-            format_in.currency_replace()
-        )
+        String::from(calc_mgr.list_cashflow().name())
     }
 
     /// Initialize and return the selected cashflow's
@@ -1026,9 +1269,9 @@ impl Engine {
     /// * See description.
 
     pub fn parse_columns(&self, cf_index: u32, table_type_param: u32) -> Array {
-        let mgr = self.engine.calc_mgr();
+        let calc_mgr = self.engine.calc_mgr();
 
-        if !mgr.list_cashflow().get_element(cf_index as usize) {
+        if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
             return Array::new();
         }
 
@@ -1043,7 +1286,7 @@ impl Engine {
         }
 
         let mut ary_column: Vec<WasmElemColumn> = Vec::new();
-        let list_column = mgr.util_parse_columns(table_type);
+        let list_column = calc_mgr.util_parse_columns(table_type);
         let mut index: usize = 0;
 
         loop {
@@ -1059,13 +1302,11 @@ impl Engine {
                 list_column.group(),
                 list_column.name(),
                 list_column.col_type(),
-                list_column.column_empty_value().to_string().as_str(),
                 list_column.col_name(),
                 list_column.format() as u32,
                 list_column.decimal_digits() as u32,
                 list_column.column_width() as u32,
-                list_column.column_exclude(),
-                list_column.column_empty(),
+                list_column.column_editable()
             ));
 
             index += 1;
@@ -1087,14 +1328,14 @@ impl Engine {
     /// * See description.
 
     pub fn parse_descriptors(&self, cf_index: u32, index: u32, table_type_param: u32) -> Array {
-        let mgr = self.engine.calc_mgr();
+        let calc_mgr = self.engine.calc_mgr();
 
-        if !mgr.list_cashflow().get_element(cf_index as usize) {
+        if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
             return Array::new();
         }
 
         match table_type_param {
-            TABLE_AM => match mgr.list_cashflow().list_amortization() {
+            TABLE_AM => match calc_mgr.list_cashflow().list_amortization() {
                 None => Array::new(),
                 Some(o) => {
                     if !o.get_element(index as usize) {
@@ -1122,7 +1363,7 @@ impl Engine {
                     }
                 }
             },
-            _ => match mgr.list_cashflow().list_event() {
+            _ => match calc_mgr.list_cashflow().list_event() {
                 None => Array::new(),
                 Some(o) => {
                     if !o.get_element(index as usize) {
@@ -1166,14 +1407,14 @@ impl Engine {
     /// * See description.
 
     pub fn parse_parameters(&self, cf_index: u32, index: u32, table_type_param: u32) -> Array {
-        let mgr = self.engine.calc_mgr();
+        let calc_mgr = self.engine.calc_mgr();
 
-        if !mgr.list_cashflow().get_element(cf_index as usize) {
+        if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
             return Array::new();
         }
 
         match table_type_param {
-            TABLE_AM => match mgr.list_cashflow().list_amortization() {
+            TABLE_AM => match calc_mgr.list_cashflow().list_amortization() {
                 None => Array::new(),
                 Some(o) => {
                     if !o.get_element(index as usize) {
@@ -1198,7 +1439,7 @@ impl Engine {
                     }
                 }
             },
-            _ => match mgr.list_cashflow().list_event() {
+            _ => match calc_mgr.list_cashflow().list_event() {
                 None => Array::new(),
                 Some(o) => {
                     if !o.get_element(index as usize) {
@@ -1237,14 +1478,14 @@ impl Engine {
     /// * See description.
 
     pub fn parse_summary(&self, cf_index: u32) -> Array {
-        let mgr = self.engine.calc_mgr();
+        let calc_mgr = self.engine.calc_mgr();
 
-        if !mgr.list_cashflow().get_element(cf_index as usize) {
+        if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
             return Array::new();
         }
 
         let mut ary_summary: Vec<WasmElemSummary> = Vec::new();
-        let list_summary = mgr.util_parse_summary();
+        let list_summary = calc_mgr.util_parse_summary();
         let mut index: usize = 0;
 
         loop {
@@ -1266,7 +1507,7 @@ impl Engine {
         ary_summary.into_iter().map(JsValue::from).collect()
     }
 
-    /// Remove the selected cashflow.
+    /// Remove the indicated cashflow.
     ///
     /// # Arguments
     ///
@@ -1278,14 +1519,49 @@ impl Engine {
 
     pub fn remove_cashflow(&self, cf_index: u32) -> bool {
         {
-            let mgr = self.engine.calc_mgr();
+            let calc_mgr = self.engine.calc_mgr();
 
-            if !mgr.list_cashflow().get_element(cf_index as usize) {
+            if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
                 return false;
             }
         }
 
-        self.engine.calc_mgr_mut().list_cashflow_mut().remove()
+        self.engine.calc_mgr_mut().list_cashflow_mut().remove()        
+    }
+
+    /// Remove the indicated event for the selected cashflow.
+    ///
+    /// # Arguments
+    ///
+    /// * `cf_index` - The cashflow index.
+    /// * `index` - The event index.
+    ///
+    /// # Return
+    ///
+    /// * True if successful.
+
+    pub fn remove_event(&self, cf_index: u32, index: u32) -> bool {
+        {
+            let calc_mgr = self.engine.calc_mgr();
+
+            if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
+                return false;
+            }
+
+            match calc_mgr.list_cashflow().list_event() {
+                None => { return false; }
+                Some(o) => { 
+                    if !o.get_element(index as usize) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        match self.engine.calc_mgr_mut().list_cashflow_mut().list_event_mut() {
+            None => false,
+            Some(o) => o.remove()
+        }
     }
 
     /// Serialize and return the selected cashflow.
@@ -1314,53 +1590,118 @@ impl Engine {
         json.serialize(options as usize)
     }
 
-    /// Return the extension information for the ElemExtension.
+    /// Set the appropriate event list value and 
+    /// return it as a string.
     ///
     /// # Arguments
     ///
-    /// * `ext` - The ElemExtension.
+    /// * `col_name_index_param` - Column name index.
+    /// * `type_param` - Column type.
+    /// * `code_param` - Column code.
+    /// * `cf_index_param` - The cashflow index.
+    /// * `index_param` - Event row index.
+    /// * `value_param` - Value to set as a string.
     ///
     /// # Return
     ///
     /// * See description.
 
-    fn table_extension(&self, ext: &ElemExtension) -> String {
-        match ext.extension_type() {
-            amfnengine::ExtensionType::CurrentValue => {
-                format!(
-                    "\"Extension\":{{\"Type\":\"CurrentValue\",\"Eom\":\"{}\",\"Passive\":\"{}\",\"Present\":\"{}\"}}",
-                    ext.cv_eom(),
-                    ext.cv_passive(),
-                    ext.cv_present())
+    pub fn set_event_value(
+        &self, 
+        col_name_index_param: u32,
+        type_param: &str,
+        code_param: &str,
+        cf_index_param: u32,
+        index_param: u32,
+        value_param: &str
+    ) -> String {
+        {
+            let calc_mgr = self.engine.calc_mgr();
+
+            if !calc_mgr.list_cashflow().get_element(cf_index_param as usize) {
+                return String::from("");
             }
-            amfnengine::ExtensionType::InterestChange => {
-                format!(
-                    "\"Extension\":{{\"Type\":\"InterestChange\",\"Method\":\"{}\",\"DayCount\":\"{}\",\"DaysInYear\":\"{}\",\"EffFreq\":\"{}\",\"IntFreq\":\"{}\",\"RoundBal\":\"{}\",\"RoundDD\":\"{}\"}}",
-                    amfnengine::core::CoreUtility::get_interest_method_mnemonic(ext.ic_method()),
-                    amfnengine::core::CoreUtility::get_day_count_basis_mnemonic(ext.ic_day_count_basis()),
-                    ext.ic_days_in_year(),
-                    amfnengine::core::CoreUtility::get_frequency_mnemonic(ext.ic_effective_frequency()),
-                    amfnengine::core::CoreUtility::get_frequency_mnemonic(ext.ic_interest_frequency()),
-                    amfnengine::core::CoreUtility::get_round_balance(ext.ic_round_balance()),
-                    ext.ic_round_decimal_digits().to_string())
+        }
+
+        let result = CalcManager::util_set_event_value(
+            self.engine.calc_manager(), col_name_index_param as usize, 
+            type_param, code_param, index_param as usize, value_param);
+        
+        match self.engine.balance_cashflow() {
+            Err(_e) => String::from(""),
+            Ok(_o) => result
+        }
+    }
+
+    /// Set the appropriate event list extension values.
+    ///
+    /// # Arguments
+    ///
+    /// * `cf_index_param` - The cashflow index.
+    /// * `index_param` - Event row index.
+    /// * `ext_param` - Extension values to set.
+    ///
+    /// # Return
+    ///
+    /// * True if successful, otherwise false.
+
+    pub fn set_extension_values(
+        &self, 
+        cf_index_param: u32,
+        index_param: u32,
+        ext_param: &str
+    ) -> String {        
+        {
+            let calc_mgr = self.engine.calc_mgr();
+
+            if !calc_mgr.list_cashflow().get_element(cf_index_param as usize) {
+                return String::from("");
             }
-            amfnengine::ExtensionType::StatisticValue => {
-                format!(
-                    "\"Extension\":{{\"Type\":\"StatisticValue\",\"Name\":\"{}\",\"Eom\":\"{}\",\"Final\":\"{}\"}}",
-                    ext.sv_name(),
-                    ext.sv_eom(),
-                    ext.sv_is_final())
+        }
+
+        let ext: ElemExtension;
+
+        {
+            let json = CalcJsonDeserialize::new(self.engine.calc_manager());
+            match json.deserialize_extension_from_str(ext_param) {
+                Err(_e) => { 
+                    return String::from(""); 
+                }
+                Ok(o) => { 
+                    ext = o;
+                }
             }
-            _ => {
-                format!(
-                    "\"Extension\":{{\"Type\":\"PrincipalChange\",\"PcType\":\"{}\",\"Eom\":\"{}\",\"PrinFirst\":\"{}\",\"BalStats\":\"{}\",\"Auxiliary\":\"{}\",\"AuxPassive\":\"{}\"}}",
-                    amfnengine::core::CoreUtility::get_principal_type_mnemonic(ext.pc_type()),
-                    ext.pc_eom(),
-                    ext.pc_principal_first(),
-                    ext.pc_balance_statistics(),
-                    ext.pc_auxiliary(),
-                    ext.pc_aux_passive())
+        }
+
+        if !CalcManager::util_set_extension_values(
+            self.engine.calc_manager(), index_param as usize, &ext) { 
+            return String::from(""); 
+        }
+
+        self.engine.evaluate_cashflow_event_type_all();
+
+        let mut result = String::from("");
+        
+        {
+            let calc_mgr = self.engine.calc_mgr();
+            let list_cashflow = calc_mgr.list_cashflow();
+            let list_event_opt = list_cashflow.list_event();
+
+            match list_event_opt {
+                None => { }
+                Some(o) => { 
+                    let orig_index = o.index();
+                    if o.get_element(index_param as usize) {
+                        result = String::from(o.event_type());
+                        o.get_element(orig_index);
+                    }
+                }
             }
+        }
+
+        match self.engine.balance_cashflow() {
+            Err(_e) => String::from(""),
+            Ok(_o) => result
         }
     }
 
@@ -1376,9 +1717,9 @@ impl Engine {
     /// * Return a string that can be directly loaded into ag-grid.
 
     pub fn table_values(&self, cf_index: u32, table_type_param: u32) -> String {
-        let mgr = self.engine.calc_mgr();
+        let calc_mgr = self.engine.calc_mgr();
 
-        if !mgr.list_cashflow().get_element(cf_index as usize) {
+        if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
             return String::from("");
         }
 
@@ -1392,13 +1733,15 @@ impl Engine {
             }
         }
 
-        let list_column = mgr.util_parse_columns(table_type);
+        let list_column =calc_mgr.util_parse_columns(table_type);
+
+        let json = CalcJsonSerialize::new(self.engine.calc_manager());
 
         match table_type_param {
             TABLE_AM => {
                 let mut list_am: ListAmortization;
                 let mut cresult = String::from("");
-                match mgr
+                match calc_mgr
                     .list_cashflow()
                     .create_cashflow_output(true, false, false, false, true)
                 {
@@ -1415,10 +1758,10 @@ impl Engine {
                     if !list_am.get_element(row_index as usize) {
                         break;
                     }
-                    let mut row = self.table_extension(list_am.elem_extension());
+                    let mut row = json.serialize_extension(list_am.elem_extension(), false, true);
 
                     for column in list_column.list() {
-                        let val = mgr.util_am_value(column, &list_am);
+                        let val =calc_mgr.util_am_value(column, &list_am);
                         row = format!("{},\"{}\":\"{}\"", row, column.col_name(), val);
                     }
 
@@ -1431,7 +1774,7 @@ impl Engine {
                 cresult = format!("\"compressed\": [{}]", cresult);
 
                 let mut eresult = String::from("");
-                match mgr
+                match calc_mgr
                     .list_cashflow()
                     .create_cashflow_output(false, false, false, false, true)
                 {
@@ -1448,10 +1791,10 @@ impl Engine {
                     if !list_am.get_element(row_index as usize) {
                         break;
                     }
-                    let mut row = self.table_extension(list_am.elem_extension());
+                    let mut row = json.serialize_extension(list_am.elem_extension(), false, true);
 
                     for column in list_column.list() {
-                        let val = mgr.util_am_value(column, &list_am);
+                        let val =calc_mgr.util_am_value(column, &list_am);
                         row = format!("{},\"{}\":\"{}\"", row, column.col_name(), val);
                     }
 
@@ -1470,7 +1813,7 @@ impl Engine {
                 let mut row_index: usize = 0;
                 loop {
                     let mut row = String::from("");
-                    match mgr.list_cashflow().list_event() {
+                    match calc_mgr.list_cashflow().list_event() {
                         None => {
                             String::from("");
                         }
@@ -1478,12 +1821,12 @@ impl Engine {
                             if !o.get_element(row_index as usize) {
                                 break;
                             }
-                            row = self.table_extension(o.elem_extension());
+                            row = json.serialize_extension(o.elem_extension(), false, true);
                         }
                     }
 
                     for column in list_column.list() {
-                        let val = mgr.util_event_value(column);
+                        let val = calc_mgr.util_event_value(column);
                         row = format!("{},\"{}\":\"{}\"", row, column.col_name(), val);
                     }
 

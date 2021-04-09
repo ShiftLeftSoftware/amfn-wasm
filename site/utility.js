@@ -9,6 +9,11 @@
     except according to those terms.
 */
 
+// Table type event.
+const TABLE_EVENT = 0;
+// Table type amortization.
+const TABLE_AM = 1;
+
 // Format - string.
 const FORMAT_STRING = 0;
 // Format - date.
@@ -32,96 +37,13 @@ const chartColors = [
 ];
 
 /**
- * Parse functions class.
- */
-class ParseFn {
-
-    static SERIAL_BASE_CENTURY = 73;
-
-    /**
-     * Fill leading zeros for a number.
-     * @param {number} number The number to zero fill.
-     * @param {number} size The number of digits.
-     * @return {string} The resulting zero filled string.
-     */    
-     static zerofill(number, size) {
-        number = number.toString();
-        while (number.length < size) number = "0" + number;
-        return number;
-    }
-    
-    /**
-     * Format a date and return the internal format.
-     * @param {object} tab The tab structure.
-     * @param {string} display_val The display value.
-     * @return {string} The resulting date string.
-     */    
-     static format_date_in(tab, display_val) {
-        let regexStr = tab.localeFormat.date_regex;
-        let replaceStr = tab.localeFormat.date_replace;
-        
-        let regex = new RegExp(regexStr);
-
-        let dd = display_val.replace(regex, replaceStr).split('-');
-        if (dd.length !== 3) return new Date();
-
-        let year = dd[0];
-        if (year.length < 3) {
-            year = (parseInt(year) < ParseFn.SERIAL_BASE_CENTURY ? "20" : "19") + ParseFn.zerofill(year, 2);
-        }
-
-        if (year.length !== 4) return new Date();
-
-        return year + "-" + ParseFn.zerofill(dd[1], 2) + "-" + ParseFn.zerofill(dd[2], 2);
-    }
-
-    /**
-     * Format an integer and return the internal format.
-     * @param {object} tab The tab structure.
-     * @param {string} display_val The display value.
-     * @return {string} The resulting integer string.
-     */    
-     static format_integer_in(tab, display_val) {
-        let regex = tab.localeFormat.integer_regex;
-        let replaceStr = tab.localeFormat.integer_replace;
-
-        return display_val.replace(regex, replaceStr);
-    }
-
-    /**
-     * Format a decimal and return the internal format.
-     * @param {object} tab The tab structure.
-     * @param {string} display_val The display value.
-     * @return {string} The resulting decimal string.
-     */    
-     static format_decimal_in(tab, display_val) {
-        let regex = tab.localeFormat.decimal_regex;
-        let replaceStr = tab.localeFormat.decimal_replace;
-
-        return display_val.replace(regex, replaceStr);
-    }
-
-    /**
-     * Format a currency and return the internal format.
-     * @param {object} tab The tab structure.
-     * @param {string} display_val The display value.
-     * @return {string} The resulting currency string.
-     */    
-     static format_currency_in(tab, display_val) {
-        let regex = tab.localeFormat.currency_regex;
-        let replaceStr = tab.localeFormat.currency_replace;
-
-        return display_val.replace(regex, replaceStr);
-    }
-}
-
-/**
  * Chart utility class.
  */
 class ChartUtility {
 
     /**
      * Create a chart line dataset.
+     * @param {object} self The self object.
      * @param {object} tab The tab structure.
      * @param {string} name The dataset name.
      * @param {number} format The dataset format.
@@ -133,7 +55,7 @@ class ChartUtility {
      *      (for multiple cashflow charts).
      * @return {object} The resulting dataset.
      */    
-     static createChartLineDataSet(tab, name, format, accum, color, colorBk, fill, useCFLabels) {
+     static createChartLineDataSet(self, tab, name, format, accum, color, colorBk, fill, useCFLabels) {
         let data = [];
         let value = null;
 
@@ -141,7 +63,7 @@ class ChartUtility {
             let date = null;
             for (let key in row) {
                 if (key === "Date") {
-                    date = new Date(ParseFn.format_date_in(tab, row[key]));
+                    date = new Date(self.engine.format_date_in(row[key]));
                     break;
                 }
             }
@@ -151,18 +73,18 @@ class ChartUtility {
                 if (key === name) {
                     switch (format) {
                         case FORMAT_DATE:
-                            val = new Date(ParseFn.format_date_in(tab, row[key]));
+                            val = new Date(self.engine.format_date_in(row[key]));
                             break;
                         case FORMAT_INTEGER:
-                            val = parseInt(ParseFn.format_integer_in(tab, row[key]));
+                            val = parseInt(self.engine.format_integer_in(row[key]));
                             break;
                         case FORMAT_DECIMAL:
                             // Approximate for charting
-                            val = parseFloat(ParseFn.format_decimal_in(tab, row[key]));
+                            val = parseFloat(self.engine.format_decimal_in(row[key]));
                             break;
                         case FORMAT_CURRENCY:                    
                             // Approximate for charting
-                            val = parseFloat(ParseFn.format_currency_in(tab, row[key]));
+                            val = parseFloat(self.engine.format_currency_in(row[key]));
                             break;
                         default:
                             val = row[key];
@@ -203,15 +125,16 @@ class ChartUtility {
 
     /**
      * Create chart line datasets.
-     * @param {object} options The options structure.
+     * @param {object} inputData The inputData structure.
      * @param {number} index The tab index.
      * @param {bool} useCFLabels Use the cashflow labels 
      *      (for multiple cashflow charts).
      * @return {object} The resulting datasets.
      */    
-     static createChartLineDataSets(options, index, useCFLabels) {
-        let tab = options.tabs[index];
-        let chartDef = options.chartDef
+     static createChartLineDataSets(inputData, index, useCFLabels) {
+        let self = inputData.self;
+        let tab = self.tabs[index];
+        let chartDef = inputData.chartDef
         let colorOffset = chartDef.colorOffset;
         let fill = chartDef.fill;
         let datasets = [];
@@ -219,10 +142,10 @@ class ChartUtility {
         for (let column of chartDef.columns) {
             let name = column.name;
             let accum = column.accumulate;
-            let color = chartColors[(options.dsIndex + colorOffset) % chartColors.length].medium;
-            let colorBk = chartColors[(options.dsIndex + colorOffset) % chartColors.length].light;
+            let color = chartColors[(inputData.dsIndex + colorOffset) % chartColors.length].medium;
+            let colorBk = chartColors[(inputData.dsIndex + colorOffset) % chartColors.length].light;
 
-            let amColumns = options.tabs[index].amColumns;
+            let amColumns = self.tabs[index].amColumns;
             let colIndex = 0;
             for (; colIndex < amColumns.length; ++colIndex) {
                 if (name === amColumns[colIndex].col_name) break;
@@ -232,9 +155,9 @@ class ChartUtility {
 
             let format = tab.amColumns[colIndex].format;
             
-            datasets.push(ChartUtility.createChartLineDataSet(tab, name, format, accum, color, colorBk, fill, useCFLabels));
+            datasets.push(ChartUtility.createChartLineDataSet(self, tab, name, format, accum, color, colorBk, fill, useCFLabels));
             
-            ++options.dsIndex;
+            ++inputData.dsIndex;
         }
 
         return datasets;
@@ -242,18 +165,19 @@ class ChartUtility {
 
     /**
      * Create chart line structure.
-     * @param {object} options The options structure.
+     * @param {object} inputData The inputData structure.
      * @return {object} The resulting structure.
      */    
-    static inputChartFn(options) {
+    static inputChartFn(inputData) {
+        let self = inputData.self;
         let dataSets = [];
-        options.dsIndex = 0;
+        inputData.dsIndex = 0;
 
-        if (!options.chartDef.allCashflows) {
-            dataSets = ChartUtility.createChartLineDataSets(options, options.activeTabIndex, false);
+        if (!inputData.chartDef.allCashflows) {
+            dataSets = ChartUtility.createChartLineDataSets(inputData, self.activeTabIndex, false);
         } else {
-            for (let index = 0; index < options.tabs.length; ++index) {
-                for (let ds of ChartUtility.createChartLineDataSets(options, index, true)) {
+            for (let index = 0; index < self.tabs.length; ++index) {
+                for (let ds of ChartUtility.createChartLineDataSets(inputData, index, true)) {
                     dataSets.push(ds);
                 }
             }
@@ -323,6 +247,110 @@ class ChartUtility {
             }
         }
     }
+}
+
+/**
+ * Updater helper class.
+ */
+ class Updater {
+
+    /**
+     * Focus the event grid and the last focused cell.
+     * @param {object} tab Tab object.
+     */    
+    static focusEventGrid(tab) {        
+        tab.grdEvent.focus();
+        if (!tab.lastFocusedColDef) return;
+
+        tab.grdEventOptions.api.setFocusedCell(tab.lastFocusedRowIndex, tab.lastFocusedColumn);
+
+        if (tab.lastFocusedColDef.col_editable) {
+            tab.grdEventOptions.api.startEditingCell({
+                rowIndex: tab.lastFocusedRowIndex,
+                colKey: tab.lastFocusedColumn
+            });
+        }
+    }
+
+    /**
+     * Get the eom by extension.
+     * @param {object} self Self object.
+     * @param {number} rowIndex Row index.
+     * @param {number} tableType The type of table.
+     */    
+     static getEom(self, rowIndex, tableType) {
+        let extension;
+
+        if (tableType === TABLE_EVENT) {
+            extension = self.tabs[self.activeTabIndex].eventValues[rowIndex].extension;
+        } else if (self.tabs[self.activeTabIndex].expanded) {
+            extension = self.tabs[self.activeTabIndex].amValues.expanded[rowIndex].extension;
+        } else {
+            extension = self.tabs[self.activeTabIndex].amValues.compressed[rowIndex].extension;
+        }
+        
+        if ("current-value" in extension) {
+            let ext = extension["current-value"];
+            return ext["eom"] === "true";
+        }
+        
+        if ("interest-change" in extension) {
+            let ext = extension["interest-change"];
+            return false;
+        }
+        
+        if ("statistic-value" in extension) {
+            let ext = extension["statistic-value"];
+            return ext["eom"] === "true";
+        }
+
+        let ext = extension["principal-change"];
+        return ext["eom"] === "true";
+    }
+
+    /**
+     * Refresh amortization results.
+     * @param {object} self Self object.
+     */
+     static refreshAmResults(self) {
+        let tab = self.tabs[self.activeTabIndex];
+
+        tab.amValues = JSON.parse(self.engine.table_values(self.activeTabIndex, TABLE_AM));        
+
+        if (tab.expanded) {
+            tab.grdAmOptions.api.setRowData(tab.amValues.expanded);  
+        } else {
+            tab.grdAmOptions.api.setRowData(tab.amValues.compressed);  
+        }      
+
+        Updater.refreshStatusLine(self);  
+    }
+
+    /**
+     * Refresh status line.
+     * @param {object} self Self object.
+     */
+     static refreshStatusLine(self) {
+        let divStatus = document.getElementById("divStatus");
+
+        divStatus.innerText = self.engine.get_cashflow_status(
+            self.activeTabIndex, self.tabs[self.activeTabIndex].status);  
+    }
+                    
+    /**
+     * Update the tab label.
+     * @param {bool} savePending Save pending.
+     */    
+     static updateTabLabel(self, savePending) {
+        if (self.activeTabIndex < 0) return;
+
+        let tab = self.tabs[self.activeTabIndex];
+        tab.savePending = savePending;
+
+        let spanLabel = tab.divTab.querySelector(".tabLabel");
+        spanLabel.innerHTML = tab.label + (savePending ? "*" : "") + " ";
+    }
+
 }
 
 /**
@@ -409,11 +437,10 @@ class ModalDialog {
 
     /**
      * Show a chart in a modal dialog.
-     * @param {number} activeTabIndex The active tab index.
-     * @param {object} tabs The tabs structure.
+     * @param {object} self Self object.
      * @param {object} chartDef The chart definition.
      */    
-     static showChart(activeTabIndex, tabs, chartDef) {
+     static showChart(self, chartDef) {
         let body =
             `<canvas id="canvasChart" class="max-element"></canvas>`;
 
@@ -421,21 +448,38 @@ class ModalDialog {
             largeModal: true,
             inputFn: ChartUtility.inputChartFn,
             inputData: {
-                activeTabIndex: activeTabIndex,
-                tabs: tabs,
+                self: self,
                 chartDef: chartDef
             } 
         });    
     }
 
     /**
-     * Show a descriptor list in a modal dialog.
-     * @param {object} engine The engine object.
-     * @param {number} activeTabIndex The active tab index.
-     * @param {number} rowIndex The row index.
-     * @param {number} tableType The tyep of table.
+     * Show a confirmation modal dialog.
+     * @param {object} self Self object.
+     * @param {string} text The confirmation text.
+     * @param {object} confirmFn The function to call if OK.
+     * @param {number} index The tab index.
      */    
-     static showDescriptors(engine, activeTabIndex, rowIndex, tableType) {
+     static showConfirm(self, text, confirmFn, index) {
+
+        ModalDialog.modalShow("Confirmation", text, { 
+            textCancel: "No",
+            textOK: "Yes",
+            outputFn: (isOK) => {
+                if (!isOK) return;
+                confirmFn(self, index);
+            }
+        });    
+    }
+
+    /**
+     * Show a descriptor list in a modal dialog.
+     * @param {object} self Self object.
+     * @param {number} rowIndex The row index.
+     * @param {number} tableType The type of table.
+     */    
+     static showDescriptors(self, rowIndex, tableType) {
         let body =
             `<div class="row">
                 <div class="col-2">
@@ -458,7 +502,7 @@ class ModalDialog {
                 </div>
             </div>`;
 
-        let list = engine.parse_descriptors(activeTabIndex, rowIndex, tableType);
+        let list = self.engine.parse_descriptors(self.activeTabIndex, rowIndex, tableType);
         
         for (let elem of list) {
             body +=
@@ -489,242 +533,358 @@ class ModalDialog {
 
     /**
      * Show an extension in a modal dialog.
-     * @param {object} extension The extension to show.
+     * @param {object} self Self object.
+     * @param {number} rowIndex Row index.
+     * @param {number} tableType The type of table.
+     * @param {object} options The options structure.
      */    
-     static showExtension(extension) {
-        switch (extension.Type) {
-            case "CurrentValue":
-                ModalDialog.modalShow("Current Value", 
-                    `<div class="row">
-                        <div class="col-6">
-                            <label for="cvEom" class="col-form-label">Eom</label>
-                        </div>
-                        <div class="col-6">
-                            <input class="form-check-input" type="checkbox" value="" id="cvEom" ${extension.Eom === 'true' ? 'checked' : ''} disabled>
-                        </div>
+    static showExtension(self, rowIndex, tableType, options = {}) {
+        let enable = tableType === TABLE_EVENT;
+        let extension;
+
+        if (tableType === TABLE_EVENT) {
+            extension = self.tabs[self.activeTabIndex].eventValues[rowIndex].extension;
+        } else if (self.tabs[self.activeTabIndex].expanded) {
+            extension = self.tabs[self.activeTabIndex].amValues.expanded[rowIndex].extension;
+        } else {
+            extension = self.tabs[self.activeTabIndex].amValues.compressed[rowIndex].extension;
+        }
+
+        if ("current-value" in extension) {
+            let ext = extension["current-value"];
+            ModalDialog.modalShow("Current Value", 
+                `<div class="row">
+                    <div class="col-6">
+                        <label for="cvEom" class="col-form-label">Eom</label>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="cvPassive" class="col-form-label">Passive</label>
-                        </div>
-                        <div class="col-6">
-                            <input class="form-check-input" type="checkbox" value="" id="cvPassive" ${extension.Passive === 'true' ? 'checked' : ''} disabled>
-                        </div>
+                    <div class="col-6">
+                        <input class="form-check-input" type="checkbox" id="cvEom" ${ext["eom"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="cvPresent" class="col-form-label">Present</label>
-                        </div>
-                        <div class="col-6">
-                            <input class="form-check-input" type="checkbox" value="" id="cvPresent" ${extension.Present === 'true' ? 'checked' : ''} disabled>
-                        </div>
-                    </div>`
-                );
-                break;
-            case "InterestChange":
-                ModalDialog.modalShow("Interest Change", 
-                    `<div class="row">
-                        <div class="col-6">
-                            <label for="icMethod" class="col-form-label">Method</label>
-                        </div>
-                        <div class="col-6">
-                            <select id="icMethod" class="form-select form-select-sm" disabled>
-                                <option ${extension.Method === 'actuarial' ? 'selected' : ''}>actuarial</option>
-                                <option ${extension.Method === 'simple-interest' ? 'selected' : ''}>simple-interest</option>
-                            </select>
-                        </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label for="cvPassive" class="col-form-label">Passive</label>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="icDayCount" class="col-form-label">Day count</label>
-                        </div>
-                        <div class="col-6">
-                            <select id="icDayCount" class="form-select form-select-sm" disabled>
-                                <option ${extension.DayCount === 'periodic' ? 'selected' : ''}>periodic</option>
-                                <option ${extension.DayCount === 'rule-of-78' ? 'selected' : ''}>rule-of-78</option>
-                                <option ${extension.DayCount === 'actual-actual-isma' ? 'selected' : ''}>actual-actual-isma</option>
-                                <option ${extension.DayCount === 'actual-actual-afb' ? 'selected' : ''}>actual-actual-afb</option>
-                                <option ${extension.DayCount === 'up' ? 'selected' : ''}>up</option>
-                                <option ${extension.DayCount === 'actual-365L' ? 'selected' : ''}>actual-365L</option>
-                                <option ${extension.DayCount === '30' ? 'selected' : ''}>30</option>
-                                <option ${extension.DayCount === '30E' ? 'selected' : ''}>30E</option>
-                                <option ${extension.DayCount === '30EP' ? 'selected' : ''}>30EP</option>
-                            </select>
-                        </div>
+                    <div class="col-6">
+                        <input class="form-check-input" type="checkbox" id="cvPassive" ${ext["passive"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="icDaysInYear" class="col-form-label">Days in year</label>
-                        </div>
-                        <div class="col-6">
-                            <input type="text" id="icDaysInYear" class="form-control" value="${extension.DaysInYear}" disabled>
-                        </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label for="cvPresent" class="col-form-label">Present</label>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="icEffFreq" class="col-form-label">Effective frequency</label>
-                        </div>
-                        <div class="col-6">
-                            <select id="icEffFreq" class="form-select form-select-sm" disabled>
-                                <option ${extension.EffFreq === 'none' ? 'selected' : ''}>none</option>
-                                <option ${extension.EffFreq === '1-year' ? 'selected' : ''}>1-year</option>
-                                <option ${extension.EffFreq === '6-months' ? 'selected' : ''}>6-months</option>
-                                <option ${extension.EffFreq === '4-months' ? 'selected' : ''}>4-months</option>
-                                <option ${extension.EffFreq === '3-months' ? 'selected' : ''}>3-months</option>
-                                <option ${extension.EffFreq === '2-months' ? 'selected' : ''}>2-months</option>
-                                <option ${extension.EffFreq === '1-month' ? 'selected' : ''}>1-months</option>
-                                <option ${extension.EffFreq === 'half-month' ? 'selected' : ''}>half-month</option>
-                                <option ${extension.EffFreq === '4-weeks' ? 'selected' : ''}>4-weeks</option>
-                                <option ${extension.EffFreq === '2-weeks' ? 'selected' : ''}>2-weeks</option>
-                                <option ${extension.EffFreq === '1-week' ? 'selected' : ''}>1-week</option>
-                                <option ${extension.EffFreq === '1-day' ? 'selected' : ''}>1-day</option>
-                                <option ${extension.EffFreq === 'continuous' ? 'selected' : ''}>continuous</option>
-                            </select>
-                        </div>
+                    <div class="col-6">
+                        <input class="form-check-input" type="checkbox" id="cvPresent" ${ext["present"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="icIntFreq" class="col-form-label">Interest frequency</label>
-                        </div>
-                        <div class="col-6">
-                            <select id="icIntFreq" class="form-select form-select-sm" disabled>
-                                <option ${extension.IntFreq === 'none' ? 'selected' : ''}>none</option>
-                                <option ${extension.IntFreq === '1-year' ? 'selected' : ''}>1-year</option>
-                                <option ${extension.IntFreq === '6-months' ? 'selected' : ''}>6-months</option>
-                                <option ${extension.IntFreq === '4-months' ? 'selected' : ''}>4-months</option>
-                                <option ${extension.IntFreq === '3-months' ? 'selected' : ''}>3-months</option>
-                                <option ${extension.IntFreq === '2-months' ? 'selected' : ''}>2-months</option>
-                                <option ${extension.IntFreq === '1-month' ? 'selected' : ''}>1-months</option>
-                                <option ${extension.IntFreq === 'half-month' ? 'selected' : ''}>half-month</option>
-                                <option ${extension.IntFreq === '4-weeks' ? 'selected' : ''}>4-weeks</option>
-                                <option ${extension.IntFreq === '2-weeks' ? 'selected' : ''}>2-weeks</option>
-                                <option ${extension.IntFreq === '1-week' ? 'selected' : ''}>1-week</option>
-                                <option ${extension.IntFreq === '1-day' ? 'selected' : ''}>1-day</option>
-                                <option ${extension.IntFreq === 'continuous' ? 'selected' : ''}>continuous</option>
-                            </select>
-                        </div>
+                </div>`,
+                options
+            );
+            return;
+        }
+
+        if ("interest-change" in extension) {
+            let ext = extension["interest-change"];
+            ModalDialog.modalShow("Interest Change", 
+                `<div class="row">
+                    <div class="col-6">
+                        <label for="icMethod" class="col-form-label">Method</label>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="icRoundBal class="col-form-label">Round balance</label>
-                        </div>
-                        <div class="col-6">
-                            <select id="icRoundBal" class="form-select form-select-sm" disabled>
-                                <option ${extension.RoundBal === 'none' ? 'selected' : ''}>none</option>
-                                <option ${extension.RoundBal === 'bankers' ? 'selected' : ''}>bankers</option>
-                                <option ${extension.RoundBal === 'bias-up' ? 'selected' : ''}>bias-up</option>
-                                <option ${extension.RoundBal === 'bias-down' ? 'selected' : ''}>bias-down</option>
-                                <option ${extension.RoundBal === 'up' ? 'selected' : ''}>up</option>
-                                <option ${extension.RoundBal === 'truncate' ? 'selected' : ''}>truncate</option>
-                            </select>
-                        </div>
+                    <div class="col-6">
+                        <select id="icMethod" class="form-select form-select-sm" ${enable ? '' : 'disabled'}>
+                            <option ${ext["interest-method"] === 'actuarial' ? 'selected' : ''}>actuarial</option>
+                            <option ${ext["interest-method"] === 'simple-interest' ? 'selected' : ''}>simple-interest</option>
+                        </select>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="icRoundDD" class="col-form-label">Round decimal digits</label>
-                        </div>
-                        <div class="col-6">
-                            <input type="text" id="icRoundDD" class="form-control" value="${extension.RoundDD}" disabled>
-                        </div>
-                    </div>`
-                );
-                break;
-            case "StatisticValue":
-                ModalDialog.modalShow("Statistic Value", 
-                    `<div class="row">
-                        <div class="col-6">
-                            <label for="svName" class="col-form-label">Name</label>
-                        </div>
-                        <div class="col-6">
-                            <input type="text" id="svName" class="form-control" value="${extension.Name}" disabled>
-                        </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label for="icDayCount" class="col-form-label">Day count</label>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="svEom" class="col-form-label">Eom</label>
-                        </div>
-                        <div class="col-6">
-                            <input class="form-check-input" type="checkbox" value="" id="svEom" ${extension.Eom === 'true' ? 'checked' : ''} disabled>
-                        </div>
+                    <div class="col-6">
+                        <select id="icDayCount" class="form-select form-select-sm" ${enable ? '' : 'disabled'}>
+                            <option ${ext["day-count-basis"] === 'periodic' ? 'selected' : ''}>periodic</option>
+                            <option ${ext["day-count-basis"] === 'rule-of-78' ? 'selected' : ''}>rule-of-78</option>
+                            <option ${ext["day-count-basis"] === 'actual-actual-isma' ? 'selected' : ''}>actual-actual-isma</option>
+                            <option ${ext["day-count-basis"] === 'actual-actual-afb' ? 'selected' : ''}>actual-actual-afb</option>
+                            <option ${ext["day-count-basis"] === 'up' ? 'selected' : ''}>up</option>
+                            <option ${ext["day-count-basis"] === 'actual-365L' ? 'selected' : ''}>actual-365L</option>
+                            <option ${ext["day-count-basis"] === '30' ? 'selected' : ''}>30</option>
+                            <option ${ext["day-count-basis"] === '30E' ? 'selected' : ''}>30E</option>
+                            <option ${ext["day-count-basis"] === '30EP' ? 'selected' : ''}>30EP</option>
+                        </select>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="svFinal" class="col-form-label">Final</label>
-                        </div>
-                        <div class="col-6">
-                            <input class="form-check-input" type="checkbox" value="" id="svFinal" ${extension.Final === 'true' ? 'checked' : ''} disabled>
-                        </div>
-                    </div>`
-                );
-                break;
-            default:
-                ModalDialog.modalShow("Principal Change", 
-                    `<div class="row">
-                        <div class="col-6">
-                            <label for="pcType" class="col-form-label">Type</label>
-                        </div>
-                        <div class="col-6">
-                            <select id="pcType" class="form-select form-select-sm" disabled>
-                                <option ${extension.PcType === 'positive' ? 'selected' : ''}>positive</option>
-                                <option ${extension.PcType === 'negative' ? 'selected' : ''}>negative</option>
-                                <option ${extension.PcType === 'increase' ? 'selected' : ''}>increase</option>
-                                <option ${extension.PcType === 'decrease' ? 'selected' : ''}>decrease</option>
-                            </select>
-                        </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label for="icDaysInYear" class="col-form-label">Days in year</label>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="pcEom" class="col-form-label">Eom</label>
-                        </div>
-                        <div class="col-6">
-                            <input class="form-check-input" type="checkbox" value="" id="pcEom" ${extension.Eom === 'true' ? 'checked' : ''} disabled>
-                        </div>
+                    <div class="col-6">
+                        <input type="text" id="icDaysInYear" class="form-control form-control-sm" value="${ext["days-in-year"]}" ${enable ? '' : 'disabled'}>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="pcPrinFirst" class="col-form-label">Principal first</label>
-                        </div>
-                        <div class="col-6">
-                            <input class="form-check-input" type="checkbox" value="" id="pcPrinFirst" ${extension.PrinFirst === 'true' ? 'checked' : ''} disabled>
-                        </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label for="icEffFreq" class="col-form-label">Effective frequency</label>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="pcBalStats" class="col-form-label">Balance statistics</label>
-                        </div>
-                        <div class="col-6">
-                            <input class="form-check-input" type="checkbox" value="" id="pcBalStats" ${extension.BalStats === 'true' ? 'checked' : ''} disabled>
-                        </div>
+                    <div class="col-6">
+                        <select id="icEffFreq" class="form-select form-select-sm" ${enable ? '' : 'disabled'}>
+                            <option ${ext["effective-frequency"] === 'none' ? 'selected' : ''}>none</option>
+                            <option ${ext["effective-frequency"] === '1-year' ? 'selected' : ''}>1-year</option>
+                            <option ${ext["effective-frequency"] === '6-months' ? 'selected' : ''}>6-months</option>
+                            <option ${ext["effective-frequency"] === '4-months' ? 'selected' : ''}>4-months</option>
+                            <option ${ext["effective-frequency"] === '3-months' ? 'selected' : ''}>3-months</option>
+                            <option ${ext["effective-frequency"] === '2-months' ? 'selected' : ''}>2-months</option>
+                            <option ${ext["effective-frequency"] === '1-month' ? 'selected' : ''}>1-months</option>
+                            <option ${ext["effective-frequency"] === 'half-month' ? 'selected' : ''}>half-month</option>
+                            <option ${ext["effective-frequency"] === '4-weeks' ? 'selected' : ''}>4-weeks</option>
+                            <option ${ext["effective-frequency"] === '2-weeks' ? 'selected' : ''}>2-weeks</option>
+                            <option ${ext["effective-frequency"] === '1-week' ? 'selected' : ''}>1-week</option>
+                            <option ${ext["effective-frequency"] === '1-day' ? 'selected' : ''}>1-day</option>
+                            <option ${ext["effective-frequency"] === 'continuous' ? 'selected' : ''}>continuous</option>
+                        </select>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="pcAuxiliary" class="col-form-label">Auxiliary</label>
-                        </div>
-                        <div class="col-6">
-                            <input class="form-check-input" type="checkbox" value="" id="pcAuxiliary" ${extension.Auxiliary === 'true' ? 'checked' : ''} disabled>
-                        </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label for="icIntFreq" class="col-form-label">Interest frequency</label>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="pcAuxPassive" class="col-form-label">Auxiliary passive</label>
-                        </div>
-                        <div class="col-6">
-                            <input class="form-check-input" type="checkbox" value="" id="pcAuxPassive" ${extension.AuxPassive === 'true' ? 'checked' : ''} disabled>
-                        </div>
-                    </div>`
-                );
-                break;
+                    <div class="col-6">
+                        <select id="icIntFreq" class="form-select form-select-sm" ${enable ? '' : 'disabled'}>
+                            <option ${ext["interest-frequency"] === 'none' ? 'selected' : ''}>none</option>
+                            <option ${ext["interest-frequency"] === '1-year' ? 'selected' : ''}>1-year</option>
+                            <option ${ext["interest-frequency"] === '6-months' ? 'selected' : ''}>6-months</option>
+                            <option ${ext["interest-frequency"] === '4-months' ? 'selected' : ''}>4-months</option>
+                            <option ${ext["interest-frequency"] === '3-months' ? 'selected' : ''}>3-months</option>
+                            <option ${ext["interest-frequency"] === '2-months' ? 'selected' : ''}>2-months</option>
+                            <option ${ext["interest-frequency"] === '1-month' ? 'selected' : ''}>1-months</option>
+                            <option ${ext["interest-frequency"] === 'half-month' ? 'selected' : ''}>half-month</option>
+                            <option ${ext["interest-frequency"] === '4-weeks' ? 'selected' : ''}>4-weeks</option>
+                            <option ${ext["interest-frequency"] === '2-weeks' ? 'selected' : ''}>2-weeks</option>
+                            <option ${ext["interest-frequency"] === '1-week' ? 'selected' : ''}>1-week</option>
+                            <option ${ext["interest-frequency"] === '1-day' ? 'selected' : ''}>1-day</option>
+                            <option ${ext["interest-frequency"] === 'continuous' ? 'selected' : ''}>continuous</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label for="icRoundBal" class="col-form-label">Round balance</label>
+                    </div>
+                    <div class="col-6">
+                        <select id="icRoundBal" class="form-select form-select-sm" ${enable ? '' : 'disabled'}>
+                            <option ${ext["round-balance"] === 'none' ? 'selected' : ''}>none</option>
+                            <option ${ext["round-balance"] === 'bankers' ? 'selected' : ''}>bankers</option>
+                            <option ${ext["round-balance"] === 'bias-up' ? 'selected' : ''}>bias-up</option>
+                            <option ${ext["round-balance"] === 'bias-down' ? 'selected' : ''}>bias-down</option>
+                            <option ${ext["round-balance"] === 'up' ? 'selected' : ''}>up</option>
+                            <option ${ext["round-balance"] === 'truncate' ? 'selected' : ''}>truncate</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label for="icRoundDD" class="col-form-label">Round decimal digits</label>
+                    </div>
+                    <div class="col-6">
+                        <input type="text" id="icRoundDD" class="form-control form-control-sm" value="${ext["round-decimal-digits"]}" ${enable ? '' : 'disabled'}>
+                    </div>
+                </div>`,
+                options
+            );
+            return;
+        }
+        
+        if ("statistic-value" in extension) {
+            let ext = extension["statistic-value"];
+            ModalDialog.modalShow("Statistic Value", 
+                `<div class="row">
+                    <div class="col-6">
+                        <label for="svName" class="col-form-label">Name</label>
+                    </div>
+                    <div class="col-6">
+                        <input type="text" id="svName" class="form-control form-control-sm" value="${ext["name"]}" ${enable ? '' : 'disabled'}>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label for="svEom" class="col-form-label">Eom</label>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-check-input" type="checkbox" id="svEom" ${ext["eom"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label for="svFinal" class="col-form-label">Final</label>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-check-input" type="checkbox" id="svFinal" ${ext["final"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                    </div>
+                </div>`,
+                options
+            );
+            return;
+        }
+
+        let ext = extension["principal-change"];
+        ModalDialog.modalShow("Principal Change", 
+            `<div class="row">
+                <div class="col-6">
+                    <label for="pcType" class="col-form-label">Type</label>
+                </div>
+                <div class="col-6">
+                    <select id="pcType" class="form-select form-select-sm" ${enable ? '' : 'disabled'}>
+                        <option ${ext["principal-type"] === 'positive' ? 'selected' : ''}>positive</option>
+                        <option ${ext["principal-type"] === 'negative' ? 'selected' : ''}>negative</option>
+                        <option ${ext["principal-type"] === 'increase' ? 'selected' : ''}>increase</option>
+                        <option ${ext["principal-type"] === 'decrease' ? 'selected' : ''}>decrease</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label for="pcEom" class="col-form-label">Eom</label>
+                </div>
+                <div class="col-6">
+                    <input class="form-check-input" type="checkbox" id="pcEom" ${ext["eom"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label for="pcPrinFirst" class="col-form-label">Principal first</label>
+                </div>
+                <div class="col-6">
+                    <input class="form-check-input" type="checkbox" id="pcPrinFirst" ${ext["principal-first"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label for="pcBalStats" class="col-form-label">Balance statistics</label>
+                </div>
+                <div class="col-6">
+                    <input class="form-check-input" type="checkbox" id="pcBalStats" ${ext["statistics"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label for="pcAuxiliary" class="col-form-label">Auxiliary</label>
+                </div>
+                <div class="col-6">
+                    <input class="form-check-input" type="checkbox" id="pcAuxiliary" ${ext["auxiliary"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label for="pcAuxPassive" class="col-form-label">Auxiliary passive</label>
+                </div>
+                <div class="col-6">
+                    <input class="form-check-input" type="checkbox" id="pcAuxPassive" ${ext["passive"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                </div>
+            </div>`,
+            options
+        );
+    }
+    
+    /**
+     * Event type output callback.
+     * @param {object} self Self object.
+     * @param {number} rowIndex Event row index.
+     */
+    static showExtensionOutput(self, rowIndex) {
+        if (self.activeTabIndex < 0) return;
+
+        let tab = self.tabs[self.activeTabIndex];
+        let row = tab.eventValues[rowIndex];
+        let extension = JSON.parse(JSON.stringify(row.extension)); // Copy
+
+        if ("current-value" in extension) {
+            let ext = extension["current-value"];
+
+            let cvEom = document.getElementById("cvEom");
+            ext["eom"] = cvEom.getAttribute("checked") ? true : false;
+
+            let cvPassive = document.getElementById("cvPassive");
+            ext["passive"] = cvPassive.getAttribute("checked") ? true : false;
+
+            let cvPresent = document.getElementById("cvPresent");
+            ext["present"] = cvPresent.getAttribute("checked") ? true : false;
+        } else if ("interest-change" in extension) {
+            let ext = extension["interest-change"];
+
+            let icMethod = document.getElementById("icMethod");
+            ext["interest-method"] = icMethod.options[icMethod.selectedIndex].text;
+
+            let icDayCount = document.getElementById("icDayCount");
+            ext["day-count-basis"] = icDayCount.options[icDayCount.selectedIndex].text;
+
+            let icDaysInYear = document.getElementById("icDaysInYear");
+            let val = parseInt(icDaysInYear.value);
+            ext["days-in-year"] = isNaN(val) ? "0" : val.toString();
+
+            let icEffFreq = document.getElementById("icEffFreq");
+            ext["effective-frequency"] = icEffFreq.options[icEffFreq.selectedIndex].text;
+
+            let icIntFreq = document.getElementById("icIntFreq");
+            ext["interest-frequency"] = icIntFreq.options[icIntFreq.selectedIndex].text;
+
+            let icRoundBal = document.getElementById("icRoundBal");
+            ext["round-balance"] = icRoundBal.options[icRoundBal.selectedIndex].text;
+                    
+            let icRoundDD = document.getElementById("icRoundDD");
+            val = parseFloat(icRoundDD.value);            
+            ext["round-decimal-digits"] = isNaN(val) ? "0" : val.toString();
+        } else if ("statistic-value" in extension) {
+            let ext = extension["statistic-value"];
+
+            let svName = document.getElementById("svName");
+            ext["name"] = svName.value;
+
+            let svEom = document.getElementById("svEom");
+            ext["eom"] = svEom.getAttribute("checked") ? true : false;
+
+            let svFinal = document.getElementById("svFinal");
+            ext["final"] = svFinal.getAttribute("checked") ? true : false;
+        } else {
+            let ext = extension["principal-change"];
+
+            let pcType = document.getElementById("pcType");
+            ext["principal-type"] = pcType.options[pcType.selectedIndex].text;
+
+            let pcEom = document.getElementById("pcEom");
+            ext["eom"] = pcEom.getAttribute("checked") ? true : false;
+
+            let pcPrinFirst = document.getElementById("pcPrinFirst");
+            ext["principal-first"] = pcPrinFirst.getAttribute("checked") ? true : false;
+
+            let pcBalStats = document.getElementById("pcBalStats");
+            ext["statistic"] = pcBalStats.getAttribute("checked") ? true : false;
+
+            let pcAuxiliary = document.getElementById("pcAuxiliary");
+            ext["auxiliary"] = pcAuxiliary.getAttribute("checked") ? true : false;
+
+            let pcAuxPassive = document.getElementById("pcAuxPassive");
+            ext["passive"] = pcAuxPassive.getAttribute("checked") ? true : false;
+        }
+
+        let result = self.engine.set_extension_values(self.activeTabIndex, rowIndex, JSON.stringify(extension));        
+        if (result.length > 0) {
+            row.extension = extension;
+
+            let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(tab.lastFocusedRowIndex);
+            gridRow.setDataValue(tab.lastFocusedColDef.col_name, result);
+
+            Updater.refreshAmResults(self);
+            Updater.updateTabLabel(self, true);
         }
     }
 
     /**
      * Show a parameter list in a modal dialog.
-     * @param {object} engine The engine object.
-     * @param {number} activeTabIndex The active tab index.
+     * @param {object} self Self object.
      * @param {number} rowIndex The row index.
-     * @param {number} tableType The tyep of table.
+     * @param {number} tableType The type of table.
      */    
-     static showParameters(engine, activeTabIndex, rowIndex, tableType) {
+    static showParameters(self, rowIndex, tableType) {
         let body = "";
             `<div class="row">
                 <div class="col-4">
@@ -738,7 +898,7 @@ class ModalDialog {
                 </div>
             </div>`;
 
-        let list = engine.parse_parameters(activeTabIndex, rowIndex, tableType);
+        let list = self.engine.parse_parameters(self.activeTabIndex, rowIndex, tableType);
 
         for (let elem of list) {
             body +=
@@ -762,6 +922,159 @@ class ModalDialog {
         }
 
         ModalDialog.modalShow("Parameter List", body);
+    }
+    
+    /**
+     * Show a frequency list in a modal dialog.
+     * @param {object} self Self object.
+     * @param {number} rowIndex The row index.
+     * @param {number} tableType The type of table.
+     */    
+    static showSkipPeriods(self, rowIndex, tableType) {
+        if (self.activeTabIndex < 0) return;
+
+        let tab = self.tabs[self.activeTabIndex];
+        let enable = tableType === TABLE_EVENT;
+
+        let row;
+        if (tableType === TABLE_EVENT) {
+            row = tab.eventValues[rowIndex];
+        } else {
+            if (tab.expanded) {
+                row = tab.amValues.expanded[rowIndex];
+            } else {
+                row = tab.amValues.compressed[rowIndex];
+            }
+        }
+
+        let startDate = self.engine.format_date_in(row["Date"]);
+        let frequency = row["Frequency"];
+        let intervals = parseInt(self.engine.format_integer_in(row["Intervals"]));
+        let eom = Updater.getEom(self, rowIndex, tableType);
+        let skipPeriods = row["Skip-periods"];
+
+        let body = `
+            <div class="row">
+                <div class="col-11">
+                    <input type="range" class="form-range" min="0" max="128" value="${skipPeriods.length}" id="skipPeriodsRange"  ${enable ? '' : 'disabled'}>
+                </div>
+                <div class="col-1">
+                    <span id="skipPeriodsRangeCount">${skipPeriods.length}</span>
+                </div>
+            </div>
+            <div id="divSkipPeriods"></div>
+        `;        
+
+        let skipPeriodsChangeInfo = {
+            startDate: startDate,
+            frequency: frequency,
+            intervals: intervals,
+            eom: eom,
+            skipPeriods: skipPeriods,
+            newValue: skipPeriods.length,
+            tableType: tableType
+        };
+
+        ModalDialog.modalShow("Skip Periods", body, {
+            textCancel: "Cancel",
+            textOK: "Submit",
+            inputFn: (inputData) => {
+                ModalDialog.showSkipPeriodsRangeChange(inputData.self, skipPeriodsChangeInfo, true);
+
+                document.getElementById("skipPeriodsRange").addEventListener("input", (e) => {
+                    skipPeriodsChangeInfo.newValue = e.target.value;
+                    ModalDialog.showSkipPeriodsRangeChange(inputData.self, skipPeriodsChangeInfo);
+                });    
+            },
+            inputData: {
+                self: self
+            },
+            outputFn: (isOK) => {
+                document.getElementById("skipPeriodsRange").removeEventListener("change", (e) => 
+                    ModalDialog.showSkipPeriodsRangeChange(self, skipPeriodsChangeInfo));    
+
+                if (!isOK) return;       
+
+                for (let colDef of tab.eventColumns) {
+                    if (colDef.col_name === "Skip-periods") {
+                        let skipPeriods = "";
+                        let elems = document.getElementsByClassName("chkSkipPeriods");                
+                        for (let elem of elems) {
+                            skipPeriods += (elem.checked ? "1" : "0");
+                        }                
+                        skipPeriodsChangeInfo.skipPeriods = skipPeriods;
+
+                        let value = self.engine.set_event_value(
+                            colDef.col_name_index, colDef.col_type, colDef.code,
+                            self.activeTabIndex, rowIndex, skipPeriodsChangeInfo.skipPeriods);                        
+                        if (value) {       
+                            let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(tab.lastFocusedRowIndex);
+                            gridRow.setDataValue(tab.lastFocusedColDef.col_name, value);
+
+                            Updater.refreshAmResults(self);
+                            Updater.updateTabLabel(self, true);
+                        }
+                        break;
+                    }
+                }
+            }
+        });    
+    }
+                    
+    /**
+     * Skip periods range change.
+     * @param {object} self Self object.
+     * @param {object} skipPeriodsChangeInfo Skip periods change information.
+     * @param {bool} isInit Initial skip periods.
+     */    
+    static showSkipPeriodsRangeChange(self, skipPeriodsChangeInfo, isInit = false) {
+        let enable = skipPeriodsChangeInfo.tableType === TABLE_EVENT;
+
+        let spanCount = document.getElementById("skipPeriodsRangeCount");
+        spanCount.innerHTML = skipPeriodsChangeInfo.newValue;
+
+        let skipPeriods = "";
+        if (isInit) {
+            skipPeriods = skipPeriodsChangeInfo.skipPeriods;
+        } else {
+            let elems = document.getElementsByClassName("chkSkipPeriods");                
+            for (let elem of elems) {
+                skipPeriods += (elem.checked ? "1" : "0");
+            }
+        }
+
+        if (skipPeriodsChangeInfo.newValue > skipPeriods.length) {
+            skipPeriods = skipPeriods.slice(0, skipPeriodsChangeInfo.newValue - 1);
+        } else {
+            let index = skipPeriodsChangeInfo.newValue - skipPeriods.length;
+            while (index > 0) {
+                skipPeriods += "0";
+                --index;
+            }
+        }
+
+        let newDate = skipPeriodsChangeInfo.startDate;
+        let str = "";
+
+        for (let index = 0; index < skipPeriodsChangeInfo.newValue; ++index) {
+            str += `
+                <div class="row">
+                    <div class="col-6">
+                        <label for="chkSkipPeriods${index}" class="col-form-label">${self.engine.format_date_out(newDate)}</label>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-check-input chkSkipPeriods" type="checkbox" id="chkSkipPeriods${index}" 
+                            ${skipPeriods[index] === '1' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                    </div>
+                </div>
+            `;
+
+            newDate = self.engine.date_new(
+                skipPeriodsChangeInfo.startDate, newDate, skipPeriodsChangeInfo.frequency, 
+                skipPeriodsChangeInfo.intervals, skipPeriodsChangeInfo.eom);
+        }
+
+        document.getElementById("divSkipPeriods").innerHTML = str;
     }
 
     /**
@@ -857,7 +1170,7 @@ class ValueBtnRenderer {
      * Return the UI object.
      * @return {object} The UI object.
      */    
-     getGui() {
+    getGui() {
         return this.eGui;
     }
  
@@ -867,8 +1180,8 @@ class ValueBtnRenderer {
      * @return {string} The value to display.
      */    
      getValueToDisplay(params) {
-        return params.valueFormatted ? params.valueFormatted : params.value;
-    }
+        return params.formatValue ? params.formatValue(params.value) : params.value;
+     }
 
     /**
      * Initialize the renderer.

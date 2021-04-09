@@ -27,11 +27,6 @@ const defaultStandardCashflowUrl = "./default/standard_cashflow.json";
 const defaultStandardInvestmentUrl = "./default/standard_investment.json";
 const defaultStandardLoanUrl = "./default/standard_loan.json";
 
-// Table type event.
-const TABLE_EVENT = 0;
-// Table type amortization.
-const TABLE_AM = 1;
-
 // Serialize user preferences.
 const JSON_SERIALIZE_PREFERENCES = 1;
 /// Serialize templates.
@@ -122,23 +117,7 @@ class CashflowManager {
     descriptorCB(self, rowIndex, gridType) {
         if (self.activeTabIndex < 0 || rowIndex < 0) return;
     
-        ModalDialog.showDescriptors(self.engine, self.activeTabIndex, rowIndex, gridType);
-    }
-    
-    /**
-     * Amortization type callback.
-     * @param {object} self Self object.
-     * @param {number} rowIndex The row index.
-     * @param {number} gridType The type of grid.
-     */
-    amTypeCB(self, rowIndex, gridType) {
-        if (self.activeTabIndex < 0 || rowIndex < 0) return;
-    
-        if (self.tabs[self.activeTabIndex].expanded) {
-            ModalDialog.showExtension(self.tabs[self.activeTabIndex].amValues.expanded[rowIndex].Extension);
-        } else {
-            ModalDialog.showExtension(self.tabs[self.activeTabIndex].amValues.compressed[rowIndex].Extension);
-        }
+        ModalDialog.showDescriptors(self, rowIndex, gridType);
     }
     
     /**
@@ -149,8 +128,24 @@ class CashflowManager {
      */
     eventTypeCB(self, rowIndex, gridType) {
         if (self.activeTabIndex < 0 || rowIndex < 0) return;
+
+        let tab = self.tabs[self.activeTabIndex];
     
-        ModalDialog.showExtension(self.tabs[self.activeTabIndex].eventValues[rowIndex].Extension);
+        if (gridType === TABLE_EVENT) {
+            ModalDialog.showExtension(self, rowIndex, TABLE_EVENT,
+                {
+                    textCancel: "Cancel",
+                    textOK: "Submit",
+                    outputFn: (isOK) => {
+                        if (isOK) ModalDialog.showExtensionOutput(self, rowIndex);
+                        Updater.focusEventGrid(tab);                        
+                    }
+                }
+            );
+            return;
+        }
+
+        ModalDialog.showExtension(self, rowIndex, TABLE_AM);
     }
     
     /**
@@ -162,153 +157,22 @@ class CashflowManager {
     parameterCB(self, rowIndex, gridType) {
         if (self.activeTabIndex < 0 || rowIndex < 0) return;
     
-        ModalDialog.showParameters(self.engine, self.activeTabIndex, rowIndex, gridType);
+        ModalDialog.showParameters(self, rowIndex, gridType);
     }
-
+    
     /**
-     * Create column definitions.
-     * @param {array} columns An array of columns.
-     * @param {bool} isEvent True if event table otherwise amortization.
-     * @param {bool} editable True if table is editable.
-     * @return {array} An array of column definitions.
-     */    
-    createColumns(columns, isEvent, editable) {
-        let colDefs = [];
-    
-        for (let column of columns) {
-    
-            let colType = "";
-            switch (column.format) {
-                case 2:
-                case 3:
-                case 4: 
-                    colType = "numericColumn";
-                    break;
-            }
-    
-            let colRenderer = null;
-            let colCallback = null;
-    
-            switch (column.col_name) {
-                case "Type":
-                    colRenderer = ValueBtnRenderer;
-                    colCallback = isEvent ? this.eventTypeCB : this.amTypeCB;
-                    break;
-                case "Parameter-list":
-                    colRenderer = ValueBtnRenderer;
-                    colCallback = this.parameterCB;
-                    break;
-                case "Descriptor-list":
-                    colRenderer = ValueBtnRenderer;
-                    colCallback = this.descriptorCB;
-                    break;
-            }
-    
-            colDefs.push({ 
-                headerName: column.col_header, 
-                field: column.col_name, 
-                type: colType,
-                editable: editable,
-                resizable: true,
-                width: column.col_width * 2,
-                cellRenderer: colRenderer,
-                cellRendererParams: {
-                    self: this,
-                    gridType: isEvent ? TABLE_EVENT : TABLE_AM,
-                    callback: colCallback
-                } 
-            });
-        }
-    
-        return colDefs;
-    }
+     * Skip periods callback.
+     * @param {object} self Self object.
+     * @param {number} rowIndex The row index.
+     * @param {number} gridType The type of grid.
+     */
+     skipPeriodsCB(self, rowIndex, gridType) {
+        if (self.activeTabIndex < 0 || rowIndex < 0) return;
 
-    /**
-     * Enable or disable a class name.
-     * @param {string} id The id attribute.
-     * @param {string} className The class name.
-     * @param {bool} enable True to enable otherwise disable.
-     */    
-    enableClass(id, className, enable) {
-
-        if (enable) {
-            document.getElementById(id).classList.remove(className);
-        } else {
-            document.getElementById(id).classList.add(className);
-        }
-    }
-
-    /**
-     * Enable or disable the cashflow menu.
-     * @param {bool} enable True to enable otherwise disable.
-     */    
-    enableCashflowMenu(enable) {
-        
-        this.enableClass("menuClose", "disabled", enable);
-        this.enableClass("menuSave", "disabled", enable);
-        this.enableClass("menuCashflow", "disabled", enable);
-        this.enableClass("btnExpand", "disabled", enable);    
-        this.enableClass("btnSummary", "disabled", enable);    
-        this.enableClass("btnCharts", "disabled", enable);        
-    }
-
-    /**
-     * Show a toast message if the engine is not initialized.
-     * @return {array} True if the engine is initialized.
-     */    
-    engineInitialized() {
-        if (!this.initialized) {
-            Toast.toastError("AmFn Engine has not been initialized");
-        }
+        let tab = self.tabs[self.activeTabIndex];
     
-        return this.initialized;
-    }
-        
-    /**
-     * Set the expand/compress state of the active cashflow.
-     * @param {bool} expand True to show expanded, otherwise compressed.
-     */    
-    setExpand(expand) {
-        if (!this.engineInitialized() || this.activeTabIndex < 0) return;
-    
-        let grdAmOptions = this.tabs[this.activeTabIndex].grdAmOptions;
-        let menuExpand = document.getElementById("menuExpand");    
-        let btnExpand = document.getElementById("btnExpand");
-    
-        if (expand) {
-            grdAmOptions.api.setRowData(this.tabs[this.activeTabIndex].amValues.expanded);
-            menuExpand.innerHTML = `<i class="bi-arrows-collapse"></i> Compress Am`;
-            btnExpand.innerHTML = `<i class="bi-arrows-collapse"></i> Compress`;
-            this.tabs[this.activeTabIndex].expanded = true;
-        } else {
-            grdAmOptions.api.setRowData(this.tabs[this.activeTabIndex].amValues.compressed);
-            menuExpand.innerHTML = `<i class="bi-arrows-expand"></i> Expand Am`;
-            btnExpand.innerHTML = `<i class="bi-arrows-expand"></i> Expand`;
-            this.tabs[this.activeTabIndex].expanded = false;
-        }
-    }
-
-    /**
-     * Show the chart by name.
-     * @param {string} name The chart name to show.
-     */    
-    showChartByName(name) {
-        if (!this.engineInitialized() || this.activeTabIndex < 0) return;
-    
-        let chartDef = null;
-        for (let cd of this.tabs[this.activeTabIndex].chartDefs) {
-            if (cd.name === name) {
-                chartDef = cd;
-                break;
-            }
-        }
-    
-        if (!chartDef) {
-            Toast.toastError("Cannot find chart definition: " + name);
-            return;
-        }
-    
-        ModalDialog.showChart(this.activeTabIndex, this.tabs, chartDef);
+        ModalDialog.showSkipPeriods(self, rowIndex, gridType);
+        Updater.focusEventGrid(tab);
     }
 
     /**
@@ -316,7 +180,6 @@ class CashflowManager {
      * @param {object} e The click event.
      */    
     activateTabEvent(e) {
-
         e.stopPropagation();
     
         if (this.activeTabIndex >= 0) {
@@ -372,18 +235,14 @@ class CashflowManager {
         this.tabs[this.activeTabIndex].grdEvent.classList.remove("display-none");
         this.tabs[this.activeTabIndex].grdAm.classList.remove("display-none");
     
-        let divStatus = document.getElementById("divStatus");
-        divStatus.innerText = this.engine.get_cashflow_status(
-            this.activeTabIndex, this.tabs[this.activeTabIndex].status);  
+        Updater.refreshStatusLine(this);  
     }
 
     /**
      * Add a new tab.
      * @param {string} cfName The cashflow name.
      * @param {string} cfLabel The cashflow label.
-     * @param {string} localeFormat The locale's input format.
      * @param {string} divTab The tab's div element.
-     * @param {string} iClose The tab's i close element.
      * @param {string} grdEvent The event grid.
      * @param {string} eventColumns The event columns.
      * @param {string} eventValues The event values.
@@ -394,28 +253,29 @@ class CashflowManager {
      * @param {string} status The status expression.
      * @param {string} chartDefs The chart definitions.
      */    
-     addTab(cfName, cfLabel, localeFormat, divTab, iClose, grdEvent, eventColumns, 
+     addTab(cfName, cfLabel, divTab, grdEvent, eventColumns, 
         eventValues, grdAm, amColumns, amValues, summary, status, chartDefs) {
     
         let eventElem = JSON.parse(eventValues);
         let amElem = JSON.parse(amValues);
     
         let grdEventOptions = {
-            columnDefs: this.createColumns(eventColumns, true, false),
-            rowData: eventElem
+            columnDefs: this.createColumns(eventColumns, true),
+            rowData: eventElem,
+            singleClickEdit: true,
+            onCellFocused: e => EventHelper.eventCellFocused(this, e),
+            onCellValueChanged: e => EventHelper.eventValueChanged(this, e)
         };
     
         let grdAmOptions = {
-            columnDefs: this.createColumns(amColumns, false, false),
+            columnDefs: this.createColumns(amColumns, false),
             rowData: amElem.compressed
         };
     
         this.tabs.push({
             name: cfName,
             label: cfLabel,
-            localeFormat: localeFormat,
             divTab: divTab, 
-            iClose: iClose,
             grdEvent: grdEvent,
             grdEventOptions: grdEventOptions,
             eventColumns: eventColumns,
@@ -427,7 +287,11 @@ class CashflowManager {
             summary: summary,
             status: status,
             chartDefs: chartDefs,
-            expanded: false
+            lastFocusedColDef: null,
+            lastFocusedColumn: null,
+            lastFocusedRowIndex: 0,    
+            expanded: false,
+            savePending: false
         });
     
         new agGrid.Grid(grdEvent, grdEventOptions);
@@ -438,8 +302,7 @@ class CashflowManager {
      * Close the tab that was clicked.
      * @param {object} e The click event.
      */    
-    closeTabEvent(e) {
-    
+    closeTabEvent(e) {    
         e.stopPropagation();
     
         let target = e.target.parentElement.parentElement;
@@ -457,41 +320,153 @@ class CashflowManager {
 
     /**
      * Close the indicated tab.
-     * @param {number} e The tab index to close.
+     * @param {number} index The tab index to close.
      */    
      closeTab(index) {
 
-        if (index >= this.tabs.length) {
+        if (index < 0 || index >= this.tabs.length) {
             Toast.toastError("Cannot close tab; unknown index = " + index);
             return;
         }
-    
-        if (!this.engine.remove_cashflow(index)) {
-            Toast.toastError("Cannot remove cashflow; index = " + index);
+
+        if (this.tabs[index].savePending) {
+            ModalDialog.showConfirm(this,
+                "Changes are pending; do you wish to discard the changes and close this cashflow anyway?", 
+                EventHelper.closeTabFn, index);
             return;
         }
+
+        EventHelper.closeTabFn(this, index);
+    }
+
+    /**
+     * Create column definitions.
+     * @param {array} columns An array of columns.
+     * @param {bool} isEvent True if event table otherwise amortization.
+     * @return {array} An array of column definitions.
+     */    
+     createColumns(columns, isEvent) {
+        let colDefs = [];
     
-        let lastTab = this.tabs.length < 2;
-        if (lastTab) {        
-            this.setExpand(false);
+        for (let column of columns) {
+    
+            let colType = "";
+            switch (column.format) {
+                case 2:
+                case 3:
+                case 4: 
+                    colType = "numericColumn";
+                    break;
+            }
+    
+            let colEditor = null;
+            let colEditorParams = null;
+            let colRenderer = null;
+            let colCallback = null;
+            let colFormatValue = null;
+    
+            switch (column.col_name) {
+                case "Type":
+                    colRenderer = ValueBtnRenderer;
+                    colCallback = this.eventTypeCB;
+                    break;
+                case "Frequency":
+                    if (!isEvent) break;
+                    colEditor = "agSelectCellEditor";
+                    colEditorParams = {
+                        values: [ "1-year", "6-months", "4-months", "3-months",
+                            "1-months", "1-month", "half-month", "4-weeks",
+                            "2-weeks", "1-week", "1-day", "continuous" ]
+                    };
+                    break;
+                case "Skip-periods":
+                    colRenderer = ValueBtnRenderer;
+                    colCallback = this.skipPeriodsCB;
+                    colFormatValue = (value) => {
+                        let vlength = value.length;
+                        if (vlength === 0) return "";
+
+                        let oneBits = 0;
+                        for (let index = 0; index < vlength; ++index) {
+                            if (value[index] === '1') oneBits += 1;
+                        }
+                        
+                        return oneBits + "/" + vlength;
+                    };
+                    break;
+                case "Parameter-list":
+                    colRenderer = ValueBtnRenderer;
+                    colCallback = this.parameterCB;
+                    break;
+                case "Descriptor-list":
+                    colRenderer = ValueBtnRenderer;
+                    colCallback = this.descriptorCB;
+                    break;
+            }
+    
+            colDefs.push({ 
+                headerName: column.col_header, 
+                field: column.col_name, 
+                type: colType,
+                editable: isEvent && column.col_editable,
+                resizable: true,
+                width: column.col_width * 2,
+                cellEditor: colEditor,
+                cellEditorParams: colEditorParams,
+                cellRenderer: colRenderer,
+                cellRendererParams: {
+                    self: this,
+                    gridType: isEvent ? TABLE_EVENT : TABLE_AM,
+                    callback: colCallback,
+                    formatValue: colFormatValue
+                } 
+            });
         }
     
-        this.tabs[index].grdEvent.remove();
-        this.tabs[index].grdAm.remove();
-    
-        this.tabs[index].divTab.removeEventListener("click", e => this.activateTabEvent(e));
-        this.tabs[index].iClose.removeEventListener("click", e => this.closeTabEvent(e));
-    
-        let ulTabs = document.getElementById("ulTabs"); 
-        ulTabs.children[index].remove();
-    
-        this.tabs.splice(index, 1);
-    
-        if (lastTab) {        
-            this.enableCashflowMenu(false);
+        return colDefs;
+    }
+
+    /**
+     * Enable or disable a class name.
+     * @param {string} id The id attribute.
+     * @param {string} className The class name.
+     * @param {bool} enable True to enable otherwise disable.
+     */    
+    enableClass(id, className, enable) {
+
+        if (enable) {
+            document.getElementById(id).classList.remove(className);
         } else {
-            this.tabs[0].divTab.click();        
+            document.getElementById(id).classList.add(className);
         }
+    }
+
+    /**
+     * Enable or disable the cashflow menu.
+     * @param {bool} enable True to enable otherwise disable.
+     */    
+    enableCashflowMenu(enable) {
+        
+        this.enableClass("menuClose", "disabled", enable);
+        this.enableClass("menuSave", "disabled", enable);
+        this.enableClass("menuCashflow", "disabled", enable);
+        this.enableClass("menuCalculate", "disabled", false);
+        this.enableClass("btnCalculate", "disabled", false);    
+        this.enableClass("btnExpand", "disabled", enable);    
+        this.enableClass("btnSummary", "disabled", enable);    
+        this.enableClass("btnCharts", "disabled", enable);        
+    }
+
+    /**
+     * Show a toast message if the engine is not initialized.
+     * @return {array} True if the engine is initialized.
+     */    
+    engineInitialized() {
+        if (!this.initialized) {
+            Toast.toastError("AmFn Engine has not been initialized");
+        }
+    
+        return this.initialized;
     }
 
     /**
@@ -507,26 +482,7 @@ class CashflowManager {
         }
     
         let index = this.tabs.length;
-        result = this.engine.init_cashflow(index);
-        
-        let init_parts = result.split('|');
-        if (init_parts.length !== 9) {
-            Toast.toastError("Cannot open cashflow");
-            return;
-        }
-    
-        let label = init_parts[0];
-        let localeFormat = {
-            date_regex: init_parts[1],
-            date_replace: init_parts[2],
-            integer_regex: init_parts[3],
-            integer_replace: init_parts[4],
-            decimal_regex: init_parts[5],
-            decimal_replace: init_parts[6],
-            currency_regex: init_parts[7],
-            currency_replace: init_parts[8]
-        };
-    
+        let label = this.engine.init_cashflow(index);    
         let status = this.engine.init_cashflow_status(index);
     
         let ulTabs = document.getElementById("ulTabs"); 
@@ -540,8 +496,10 @@ class CashflowManager {
         divTab.setAttribute("data-bs-toggle", "tab");
         divTab.setAttribute("role", "tab");
         divTab.style.cursor = "pointer";
-        let txtLabel = document.createTextNode(label + " ");
-        divTab.appendChild(txtLabel);
+        let spanLabel = document.createElement("span");
+        spanLabel.innerHTML = label + " ";
+        spanLabel.setAttribute("class", "tabLabel");
+        divTab.appendChild(spanLabel);
         let iClose = document.createElement("i");
         iClose.style.cursor = "pointer";
         iClose.setAttribute("class", "bi-x");
@@ -568,7 +526,7 @@ class CashflowManager {
     
         ChartUtility.loadChartDefs(chartDefs);
         
-        this.addTab(name, label, localeFormat, divTab, iClose, grdEvent, eventColumns, 
+        this.addTab(name, label, divTab, grdEvent, eventColumns, 
             eventValues, grdAm, amColumns, amValues, summary, 
             status, chartDefs);   
     
@@ -576,6 +534,8 @@ class CashflowManager {
     
         divTab.addEventListener("click", e => this.activateTabEvent(e));
         iClose.addEventListener("click", e => this.closeTabEvent(e));
+
+        grdEvent.addEventListener("keydown", e => EventHelper.eventKeyDown(this, e));
     
         divTab.click();
     }
@@ -601,13 +561,187 @@ class CashflowManager {
     
         a.click();
         a.remove();
+
+        Updater.updateTabLabel(this, false);
     }    
+        
+    /**
+     * Set the expand/compress state of the active cashflow.
+     * @param {bool} expand True to show expanded, otherwise compressed.
+     */    
+     setExpand(expand) {
+        if (!this.engineInitialized() || this.activeTabIndex < 0) return;
+    
+        let grdAmOptions = this.tabs[this.activeTabIndex].grdAmOptions;
+        let menuExpand = document.getElementById("menuExpand");    
+        let btnExpand = document.getElementById("btnExpand");
+    
+        if (expand) {
+            grdAmOptions.api.setRowData(this.tabs[this.activeTabIndex].amValues.expanded);
+            menuExpand.innerHTML = `<i class="bi-arrows-collapse"></i> Compress Am`;
+            btnExpand.innerHTML = `<i class="bi-arrows-collapse"></i> Compress`;
+            this.tabs[this.activeTabIndex].expanded = true;
+        } else {
+            grdAmOptions.api.setRowData(this.tabs[this.activeTabIndex].amValues.compressed);
+            menuExpand.innerHTML = `<i class="bi-arrows-expand"></i> Expand Am`;
+            btnExpand.innerHTML = `<i class="bi-arrows-expand"></i> Expand`;
+            this.tabs[this.activeTabIndex].expanded = false;
+        }
+    }
+
+    /**
+     * Show the chart by name.
+     * @param {string} name The chart name to show.
+     */    
+     showChartByName(name) {
+        if (!this.engineInitialized() || this.activeTabIndex < 0) return;
+    
+        let chartDef = null;
+        for (let cd of this.tabs[this.activeTabIndex].chartDefs) {
+            if (cd.name === name) {
+                chartDef = cd;
+                break;
+            }
+        }
+    
+        if (!chartDef) {
+            Toast.toastError("Cannot find chart definition: " + name);
+            return;
+        }
+    
+        ModalDialog.showChart(this, chartDef);
+    }
 }
 
 /**
  * Event helper class.
  */
 class EventHelper {
+
+    /**
+     * Close the indicated tab function.
+     * @param {object} self Self object.
+     * @param {number} index The tab index to close.
+     */    
+     static closeTabFn(self, index) {
+    
+        if (!self.engine.remove_cashflow(index)) {
+            Toast.toastError("Cannot remove cashflow; index = " + index);
+            return;
+        }
+    
+        let lastTab = self.tabs.length < 2;
+        if (lastTab) {        
+            self.setExpand(false);
+        }
+    
+        self.tabs[index].grdEvent.removeEventListener("keydown", e => EventHelper.eventKeyDown(self, e));
+        self.tabs[index].grdEvent.remove();
+        self.tabs[index].grdAm.remove();
+    
+        let iClose = self.tabs[index].divTab.querySelector(".bi-x")
+        iClose.removeEventListener("click", e => self.closeTabEvent(e));
+        self.tabs[index].divTab.removeEventListener("click", e => self.activateTabEvent(e));
+    
+        let ulTabs = document.getElementById("ulTabs"); 
+        ulTabs.children[index].remove();
+    
+        self.tabs.splice(index, 1);
+    
+        if (lastTab) {        
+            self.enableCashflowMenu(false);
+        } else {
+            self.tabs[0].divTab.click();        
+        }
+    }
+    
+    /**
+     * Respond to the event cell focus changing.
+     * @param {object} self Self object.
+     * @param {object} e Change event.
+     */    
+     static eventCellFocused(self, e) {
+        if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;
+
+        let tab = self.tabs[self.activeTabIndex];
+        if (tab.lastFocusedColumn === e.column && tab.lastFocusedRowIndex === e.rowIndex) return;
+
+        tab.lastFocusedColDef = null;
+        tab.lastFocusedColumn = e.column;
+        tab.lastFocusedRowIndex = e.rowIndex;
+        let field = e.column.colDef.field;
+
+        for (let colDef of tab.eventColumns) {
+            if (field === colDef.col_name) {
+                tab.lastFocusedColDef = colDef; 
+                break;
+            }
+        }
+
+        if (!tab.lastFocusedColDef) return;
+
+        let enable = field === "Value" || field === "Periods";
+
+        self.enableClass("menuCalculate", "disabled", enable);
+        self.enableClass("btnCalculate", "disabled", enable);    
+
+        if (tab.lastFocusedColDef.col_editable) {
+            tab.grdEventOptions.api.startEditingCell({
+                rowIndex: tab.lastFocusedRowIndex,
+                colKey: tab.lastFocusedColumn
+            });
+        }
+    }
+    
+    /**
+     * Respond to the grid event key down.
+     * @param {object} self Self object.
+     * @param {object} e Keydown event.
+     */    
+     static eventKeyDown(self, e) {
+        if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;    
+
+        if (e.keyCode !== 13 || e.shiftKey || e.ctrlKey || e.altKey) return;
+
+        e.stopPropagation();
+
+        let tab = self.tabs[self.activeTabIndex];
+
+        Updater.focusEventGrid(tab);
+        if (!tab.grdEventOptions.api.tabToNextCell()) {
+            Toast.toastInfo("New event");
+        }
+    }
+
+    /**
+     * Respond to the event grid cell value changing.
+     * @param {object} self Self object.
+     * @param {object} e Change event.
+     */    
+     static eventValueChanged(self, e) {
+        if (!cashflowManager.engineInitialized() || 
+            cashflowManager.activeTabIndex < 0 || e.oldValue === e.newValue) return;
+
+        let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
+        let field = e.column.colDef.field;
+        let row = tab.eventValues[e.rowIndex];
+
+        for (let colDef of tab.eventColumns) {
+            if (field === colDef.col_name) {
+                let value = cashflowManager.engine.set_event_value(
+                    colDef.col_name_index, colDef.col_type, colDef.code, 
+                    cashflowManager.activeTabIndex, e.rowIndex, e.newValue);
+                if (value) {
+                    let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(e.rowIndex);
+                    gridRow.setDataValue(colDef.col_name, value);
+
+                    Updater.refreshAmResults(self);
+                    Updater.updateTabLabel(self, true);
+                }
+                break;
+            }
+        }
+    }
 
     /**
      * Callback for files input.
@@ -682,12 +816,53 @@ class EventHelper {
     }
     
     /**
+     * Respond to the menu cashflow calculate event.
+     */    
+     static menuCalculate() {
+        if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;
+
+        let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
+        if (!tab.lastFocusedColDef) return;
+
+        let result = null;
+        switch (tab.lastFocusedColDef.col_name) {
+            case "Value":
+                result = cashflowManager.engine.calculate_value(
+                    cashflowManager.activeTabIndex, tab.lastFocusedRowIndex, "0.0"); // ##### Split button
+                if ("interest-change" in tab.eventValues[tab.lastFocusedRowIndex].extension) {
+                    result = cashflowManager.engine.format_decimal_out(result);
+                } else {
+                    result = cashflowManager.engine.format_currency_out(result);
+                }
+                break;
+            case "Periods":
+                result = cashflowManager.engine.calculate_periods(
+                    cashflowManager.activeTabIndex, tab.lastFocusedRowIndex, "0.0"); // ##### Split button
+                result = cashflowManager.engine.format_integer_out(result);
+                break;
+        }
+
+        if (!result) return;
+
+        tab.grdEventOptions.api.stopEditing();
+        let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(tab.lastFocusedRowIndex);
+        gridRow.setDataValue(tab.lastFocusedColDef.col_name, result);
+
+        Updater.refreshAmResults(cashflowManager);
+        Updater.updateTabLabel(cashflowManager, true);
+        Updater.focusEventGrid(tab);
+    }
+    
+    /**
      * Respond to the menu expand cashflow event.
      */    
      static menuExpand() {
         if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;
     
-        cashflowManager.setExpand(!cashflowManager.tabs[cashflowManager.activeTabIndex].expanded);
+        let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
+        
+        cashflowManager.setExpand(!tab.expanded);
+        Updater.focusEventGrid(tab);
     }
     
     /**
@@ -696,7 +871,10 @@ class EventHelper {
      static menuSummary() {
         if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;
     
+        let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
+    
         ModalDialog.showSummary(cashflowManager.tabs[cashflowManager.activeTabIndex].summary);
+        Updater.focusEventGrid(tab);
     }
 
     /**
@@ -734,9 +912,11 @@ class EventHelper {
     document.getElementById("menuClose").addEventListener("click", () => EventHelper.menuCloseCashflow());    
     document.getElementById("menuSave").addEventListener("click", () => EventHelper.menuSaveCashflow());    
 
+    document.getElementById("menuCalculate").addEventListener("click", () => EventHelper.menuCalculate());    
     document.getElementById("menuExpand").addEventListener("click", () => EventHelper.menuExpand());    
     document.getElementById("menuSummary").addEventListener("click", () => EventHelper.menuSummary());    
 
+    document.getElementById("btnCalculate").addEventListener("click", () => EventHelper.menuCalculate());
     document.getElementById("btnExpand").addEventListener("click", () => EventHelper.menuExpand());
     document.getElementById("btnSummary").addEventListener("click", () => EventHelper.menuSummary());
 
