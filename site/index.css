@@ -104,6 +104,10 @@ footer {
     height: 100%;
 }
 
+.max-width {
+    width: 100%;
+}
+
 .value-cell {
     flex: 1;
     overflow: hidden;

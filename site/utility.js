@@ -955,11 +955,11 @@ class ModalDialog {
 
         let body = `
             <div class="row">
-                <div class="col-11">
+                <div class="col-10">
                     <input type="range" class="form-range" min="0" max="128" value="${skipPeriods.length}" id="skipPeriodsRange"  ${enable ? '' : 'disabled'}>
                 </div>
-                <div class="col-1">
-                    <span id="skipPeriodsRangeCount">${skipPeriods.length}</span>
+                <div class="col-2">
+                    <input class="max-width" type="number" value="${skipPeriods.length}" id="skipPeriodsRangeValue"  ${enable ? '' : 'disabled'}>
                 </div>
             </div>
             <div id="divSkipPeriods"></div>
@@ -983,6 +983,19 @@ class ModalDialog {
 
                 document.getElementById("skipPeriodsRange").addEventListener("input", (e) => {
                     skipPeriodsChangeInfo.newValue = e.target.value;
+                    
+                    let rangeValue = document.getElementById("skipPeriodsRangeValue");
+                    rangeValue.value = skipPeriodsChangeInfo.newValue;
+
+                    ModalDialog.showSkipPeriodsRangeChange(inputData.self, skipPeriodsChangeInfo);
+                });    
+
+                document.getElementById("skipPeriodsRangeValue").addEventListener("change", (e) => {
+                    skipPeriodsChangeInfo.newValue = e.target.value;
+                    
+                    let range = document.getElementById("skipPeriodsRange");
+                    range.value = skipPeriodsChangeInfo.newValue;
+
                     ModalDialog.showSkipPeriodsRangeChange(inputData.self, skipPeriodsChangeInfo);
                 });    
             },
@@ -990,9 +1003,9 @@ class ModalDialog {
                 self: self
             },
             outputFn: (isOK) => {
-                document.getElementById("skipPeriodsRange").removeEventListener("change", (e) => 
-                    ModalDialog.showSkipPeriodsRangeChange(self, skipPeriodsChangeInfo));    
-
+                document.getElementById("skipPeriodsRange").removeEventListener("input", (e) => {});
+                document.getElementById("skipPeriodsRangeValue").addEventListener("change", (e) => {});
+    
                 if (!isOK) return;       
 
                 for (let colDef of tab.eventColumns) {
@@ -1029,9 +1042,6 @@ class ModalDialog {
      */    
     static showSkipPeriodsRangeChange(self, skipPeriodsChangeInfo, isInit = false) {
         let enable = skipPeriodsChangeInfo.tableType === TABLE_EVENT;
-
-        let spanCount = document.getElementById("skipPeriodsRangeCount");
-        spanCount.innerHTML = skipPeriodsChangeInfo.newValue;
 
         let skipPeriods = "";
         if (isInit) {

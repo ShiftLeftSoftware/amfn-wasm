@@ -215,9 +215,6 @@ class CashflowManager {
                 chartDef.name + `"><i class="` + chartIcon + `"></i> ` + chartDef.description + `</a></li>`;
         }
     
-        let chartDefsMenu = document.getElementById("chartDefsMenu"); 
-        chartDefsMenu.innerHTML = chartDefHtml;
-    
         let chartDefsBtn = document.getElementById("chartDefsBtn"); 
         chartDefsBtn.innerHTML = chartDefHtml;
     
@@ -449,9 +446,9 @@ class CashflowManager {
         
         this.enableClass("menuClose", "disabled", enable);
         this.enableClass("menuSave", "disabled", enable);
-        this.enableClass("menuCashflow", "disabled", enable);
-        this.enableClass("menuCalculate", "disabled", false);
-        this.enableClass("btnCalculate", "disabled", false);    
+        this.enableClass("btnInsert", "disabled", false);    
+        this.enableClass("btnDelete", "disabled", false);    
+        this.enableClass("btnCalculate", "disabled", false);            
         this.enableClass("btnExpand", "disabled", enable);    
         this.enableClass("btnSummary", "disabled", enable);    
         this.enableClass("btnCharts", "disabled", enable);        
@@ -573,18 +570,17 @@ class CashflowManager {
         if (!this.engineInitialized() || this.activeTabIndex < 0) return;
     
         let grdAmOptions = this.tabs[this.activeTabIndex].grdAmOptions;
-        let menuExpand = document.getElementById("menuExpand");    
         let btnExpand = document.getElementById("btnExpand");
     
         if (expand) {
             grdAmOptions.api.setRowData(this.tabs[this.activeTabIndex].amValues.expanded);
-            menuExpand.innerHTML = `<i class="bi-arrows-collapse"></i> Compress Am`;
             btnExpand.innerHTML = `<i class="bi-arrows-collapse"></i> Compress`;
+            btnExpand.title = "Compress Amortization";
             this.tabs[this.activeTabIndex].expanded = true;
         } else {
             grdAmOptions.api.setRowData(this.tabs[this.activeTabIndex].amValues.compressed);
-            menuExpand.innerHTML = `<i class="bi-arrows-expand"></i> Expand Am`;
             btnExpand.innerHTML = `<i class="bi-arrows-expand"></i> Expand`;
+            btnExpand.title = "Expand Amortization";
             this.tabs[this.activeTabIndex].expanded = false;
         }
     }
@@ -682,7 +678,8 @@ class EventHelper {
 
         let enable = field === "Value" || field === "Periods";
 
-        self.enableClass("menuCalculate", "disabled", enable);
+        self.enableClass("btnInsert", "disabled", true);    
+        self.enableClass("btnDelete", "disabled", true);    
         self.enableClass("btnCalculate", "disabled", enable);    
 
         if (tab.lastFocusedColDef.col_editable) {
@@ -709,7 +706,7 @@ class EventHelper {
 
         Updater.focusEventGrid(tab);
         if (!tab.grdEventOptions.api.tabToNextCell()) {
-            Toast.toastInfo("New event");
+            EventHelper.menuInsert();
         }
     }
 
@@ -816,6 +813,37 @@ class EventHelper {
     }
     
     /**
+     * Respond to the menu insert event.
+     */    
+     static menuInsert() {
+        if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;
+
+        Toast.toastInfo("Insert event"); // #####
+    }
+    
+    /**
+     * Respond to the menu delete event.
+     */    
+     static menuDelete() {
+        if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;
+
+        let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
+
+        if (cashflowManager.engine.remove_event(cashflowManager.activeTabIndex, tab.lastFocusedRowIndex)) {
+            tab.grdEventOptions.rowData.splice(tab.lastFocusedRowIndex, 1);
+            tab.grdEventOptions.api.setRowData(tab.grdEventOptions.rowData);
+
+            tab.lastFocusedColDef = null;
+            tab.lastFocusedColumn = null;
+            tab.lastFocusedRowIndex = 0;
+
+            cashflowManager.enableClass("btnInsert", "disabled", false);    
+            cashflowManager.enableClass("btnDelete", "disabled", false);    
+            cashflowManager.enableClass("btnCalculate", "disabled", false);            
+        }
+    }
+    
+    /**
      * Respond to the menu cashflow calculate event.
      */    
      static menuCalculate() {
@@ -912,11 +940,10 @@ class EventHelper {
     document.getElementById("menuClose").addEventListener("click", () => EventHelper.menuCloseCashflow());    
     document.getElementById("menuSave").addEventListener("click", () => EventHelper.menuSaveCashflow());    
 
-    document.getElementById("menuCalculate").addEventListener("click", () => EventHelper.menuCalculate());    
-    document.getElementById("menuExpand").addEventListener("click", () => EventHelper.menuExpand());    
-    document.getElementById("menuSummary").addEventListener("click", () => EventHelper.menuSummary());    
-
+    document.getElementById("btnInsert").addEventListener("click", () => EventHelper.menuInsert());
+    document.getElementById("btnDelete").addEventListener("click", () => EventHelper.menuDelete());
     document.getElementById("btnCalculate").addEventListener("click", () => EventHelper.menuCalculate());
+
     document.getElementById("btnExpand").addEventListener("click", () => EventHelper.menuExpand());
     document.getElementById("btnSummary").addEventListener("click", () => EventHelper.menuSummary());
 

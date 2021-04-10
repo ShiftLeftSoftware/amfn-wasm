@@ -73,38 +73,25 @@
                                 <li><a id="menuSave" class="dropdown-item disabled" href="#"><i class="bi-file-earmark-arrow-down"></i> Save Cashflow</a></li>
                             </ul>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a id="menuCashflow" class="nav-link dropdown-toggle disabled" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi-file-ruled"></i> Cashflow
-                            </a>
-                            <ul class="dropdown-menu multi-level" aria-labelledby="navbarDropdown">
-                                <li><a id="menuCalculate" class="dropdown-item disabled" href="#"><i class="bi-calculator"></i> Calculate</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a id="menuExpand" class="dropdown-item" href="#"><i class="bi-arrows-expand"></i> Expand Am</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a id="menuSummary" class="dropdown-item" href="#"><i class="bi-receipt-cutoff"></i> Cashflow Summary</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                    <li class="nav-item dropdown-submenu">
-                                        <a class="dropdown-item" href="#">
-                                            <i class="bi-graph-up"></i> Cashflow Charts
-                                        </a>
-                                        <ul id="chartDefsMenu" class="dropdown-menu">
-                                        </ul>
-                                    </li>                                  
-                                </li>
-                            </ul>
-                        </li>
                     </ul>
-                    <button type="button" id="btnCalculate" class="btn btn-outline-primary disabled" tabindex="-1"><i class="bi-calculator"></i> Calculate</button>                            
-                    <button type="button" id="btnExpand" class="btn btn-outline-primary disabled" tabindex="-1"><i class="bi-arrows-expand"></i> Expand</button>                            
-                    <button type="button" id="btnSummary" class="btn btn-outline-primary disabled" tabindex="-1"><i class="bi-receipt-cutoff"></i> Summary</button>
-                    <div class="dropdown">
-                        <button class="btn btn-outline-primary disabled dropdown-toggle" id="btnCharts" tabindex="-1" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi-graph-up"></i> Charts
-                        </button>
-                        <ul id="chartDefsBtn" class="dropdown-menu dropdown-menu-end" aria-labelledby="btnCharts">
-                        </ul>
-                    </div>                            
+                    <div class="btn-toolbar" role="toolbar">
+                        <div class="btn-group me-2" role="group">
+                            <button type="button" id="btnInsert" class="btn btn-outline-primary disabled" tabindex="-1" title="Insert Event"><i class="bi-plus-circle"></i> Insert</button>                            
+                            <button type="button" id="btnDelete" class="btn btn-outline-primary disabled" tabindex="-1" title="Delete Event"><i class="bi-dash-circle"></i> Delete</button>                            
+                            <button type="button" id="btnCalculate" class="btn btn-outline-primary disabled" tabindex="-1" title="Calculate Value"><i class="bi-calculator"></i> Calculate</button>                            
+                        </div>
+                    </div>
+                    <div class="btn-toolbar" role="toolbar">
+                        <div class="btn-group me-2" role="group">
+                            <button type="button" id="btnExpand" class="btn btn-outline-primary disabled" tabindex="-1" title="Expand Amortization"><i class="bi-arrows-expand"></i> Expand</button>                            
+                            <button type="button" id="btnSummary" class="btn btn-outline-primary disabled" tabindex="-1" title="Cashflow Summary"><i class="bi-receipt-cutoff"></i> Summary</button>
+                            <button class="btn btn-outline-primary disabled dropdown-toggle" id="btnCharts" tabindex="-1" title="Cashflow Charts" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi-graph-up"></i> Charts
+                            </button>
+                            <ul id="chartDefsBtn" class="dropdown-menu dropdown-menu-end" aria-labelledby="btnCharts">
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
