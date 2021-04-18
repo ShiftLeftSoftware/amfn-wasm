@@ -255,21 +255,47 @@ class ChartUtility {
  class Updater {
 
     /**
+     * Create template events and refresh display.
+     * @param {object} self Self object.
+     * @param {string} event Event name.
+     */    
+     static createTemplateEvents(self, event) {            
+        let tab = self.tabs[self.activeTabIndex];
+            
+        let result = self.engine.create_template_events(
+            tab.group, event, self.activeTabIndex);
+            
+        let events = result.split('|');
+        if (events.length === 0) return;
+        
+        let tokens = events[0].split('~');
+        if (tokens.length !== 3) return;
+
+        let event_date = tokens[0];
+        let sort_order = parseInt(tokens[1]);
+        let param_count = parseInt(tokens[2]);
+        tab.lastFocusedColDef = null; // Start at Date column
+
+        let rowIndex = Updater.refreshEvents(self, event_date, sort_order);
+        Updater.refreshAmResults(self);
+        Updater.updateTabLabel(self, true);
+
+        if (param_count === 0) return;
+
+        setTimeout(function() {
+            ModalDialog.showParameters(self, rowIndex, TABLE_EVENT);
+        }, 500);
+    }
+
+    /**
      * Focus the event grid and the last focused cell.
      * @param {object} tab Tab object.
      */    
-    static focusEventGrid(tab) {        
+    static focusEventGrid(tab) {   
         tab.grdEvent.focus();
         if (!tab.lastFocusedColDef) return;
 
         tab.grdEventOptions.api.setFocusedCell(tab.lastFocusedRowIndex, tab.lastFocusedColumn);
-
-        if (tab.lastFocusedColDef.col_editable) {
-            tab.grdEventOptions.api.startEditingCell({
-                rowIndex: tab.lastFocusedRowIndex,
-                colKey: tab.lastFocusedColumn
-            });
-        }
     }
 
     /**
@@ -306,6 +332,36 @@ class ChartUtility {
 
         let ext = extension["principal-change"];
         return ext["eom"] === "true";
+    }
+
+    /**
+     * Refresh events.
+     * @param {object} self Self object.
+     * @param {string} eventDate Date or null.
+     * @param {number} sortOrder Sort order.
+     * @return {number} The event row index.
+     */
+     static refreshEvents(self, eventDate, sortOrder) {
+        let tab = self.tabs[self.activeTabIndex];
+        tab.grdEventOptions.api.stopEditing();
+        tab.grdEventOptions.api.clearFocusedCell();
+
+        tab.eventValues = JSON.parse(self.engine.table_values(self.activeTabIndex, TABLE_EVENT));        
+
+        tab.grdEventOptions.api.setRowData(tab.eventValues);  
+
+        let rowIndex = self.engine.get_event_by_date(self.activeTabIndex, eventDate, sortOrder);
+
+        let column = null;
+        if (tab.lastFocusedColDef) {
+            column = tab.lastFocusedColumn;
+        } else {
+            column = tab.grdEventOptions.columnApi.getColumn("Date");
+        }
+        if (!column) return rowIndex;        
+
+        tab.grdEventOptions.api.setFocusedCell(rowIndex, column);
+        return rowIndex;
     }
 
     /**
@@ -350,7 +406,6 @@ class ChartUtility {
         let spanLabel = tab.divTab.querySelector(".tabLabel");
         spanLabel.innerHTML = tab.label + (savePending ? "*" : "") + " ";
     }
-
 }
 
 /**
@@ -360,11 +415,14 @@ class ModalDialog {
 
     // The modal output function.
     static modalOutputFn = null;
+    // The modal final function.
+    static modalFinalFn = null;
 
     /**
      * Initialize the modal dialog events.
      */    
      static modalInit() {
+        document.getElementById("modalBody").addEventListener("keyup", e => ModalDialog.modalKeyUp(e));
         document.getElementById("modalClose").addEventListener("click", () => ModalDialog.modalClose(false));
         document.getElementById("modalCancel").addEventListener("click", () => ModalDialog.modalClose(false));
         document.getElementById("modalOK").addEventListener("click", () => ModalDialog.modalClose(true));
@@ -385,6 +443,7 @@ class ModalDialog {
         modalBody.innerHTML = body;
 
         ModalDialog.modalOutputFn = options.outputFn;
+        ModalDialog.modalFinalFn = options.finalFn;
 
         let btnCancel = document.getElementById("modalCancel");
         let btnOK = document.getElementById("modalOK");
@@ -414,6 +473,12 @@ class ModalDialog {
      */    
      static modalClose(isOK) {
 
+        let result = null;
+        if (ModalDialog.modalOutputFn) {
+            result = ModalDialog.modalOutputFn(isOK);
+            if (!result) return;
+        }
+
         let divBackground = document.getElementById("divBackground");
         let divModal = document.getElementById("divModal");
 
@@ -423,16 +488,28 @@ class ModalDialog {
         let modalTitle = document.getElementById("modalTitle");
         let modalBody = document.getElementById("modalBody");
 
-        let result = null;
-        if (ModalDialog.modalOutputFn) {
-            result = ModalDialog.modalOutputFn(isOK);
-        }
-
-        ModalDialog.modalOutputFn = null;
         modalTitle.innerHTML = "";
         modalBody.innerHTML = "";
 
-        return result;
+        let finalFn = ModalDialog.modalFinalFn;
+
+        ModalDialog.modalOutputFn = null;
+        ModalDialog.modalFinalFn = null;
+
+        if (finalFn) {
+            result = finalFn(isOK, result); // A recursive call to modalShow can be done here
+        }
+    }
+
+    /**
+     * Respond to the modal dialog key up.
+     * @param {object} e Event object.
+     */    
+    static modalKeyUp(e) {
+
+        if (e.keyCode !== 13 || e.shiftKey || e.ctrlKey || e.altKey) return;
+
+        ModalDialog.modalClose(true);
     }
 
     /**
@@ -466,7 +543,7 @@ class ModalDialog {
         ModalDialog.modalShow("Confirmation", text, { 
             textCancel: "No",
             textOK: "Yes",
-            outputFn: (isOK) => {
+            finalFn: (isOK) => {
                 if (!isOK) return;
                 confirmFn(self, index);
             }
@@ -879,21 +956,146 @@ class ModalDialog {
     }
 
     /**
+     * Show an insert event modal dialog.
+     * @param {object} self Self object.
+     */    
+     static showInsertEvent(self) {
+        let tab = self.tabs[self.activeTabIndex];
+        let templateEvents = self.engine.get_template_event_names(tab.group);
+
+        let body = "";
+
+        let index = 0;
+        for (let event of templateEvents) {
+            body += `
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="radioEvent" id="radioEvent${index}" value="${event}">
+                    <label class="form-check-label" for="radioEvent${index}">
+                        ${event}
+                    </label>
+                </div>
+            `;
+            ++index;
+        }
+
+        ModalDialog.modalShow("Insert Event", body, {
+            textCancel: "Cancel",
+            textOK: "Submit",
+            outputFn: (isOK) => {
+                if (!isOK) return {};
+
+                let event = "";
+                var radios = document.getElementsByName("radioEvent");
+                for (let radio of radios) {
+                    if (radio.checked) {
+                        event = radio.value;
+                        break;
+                    }
+                }
+
+                let valid = event.length > 0;
+                if (!valid) {
+                    Toast.toastError("Please select a template event");
+                    return null;
+                }
+
+                return {
+                    event: event
+                };
+            },
+            finalFn(isOK, data) {
+                if (!isOK || !data.event) return;
+
+                Updater.createTemplateEvents(self, data.event);
+            }
+        });
+    }
+
+    /**
+     * Show a new cashflow modal dialog.
+     * @param {object} self Self object.
+     */    
+     static showNewCashflow(self) {
+
+        let templateGroups = self.engine.get_template_names();
+
+        let body = 
+            `<div class="row">
+                <div class="col-6">
+                    <label for="cfName" class="col-form-label">Name</label>
+                </div>
+                <div class="col-6">
+                    <input type="text" id="cfName" class="form-control form-control-sm">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label for="cfTemplate" class="col-form-label">Template</label>
+                </div>
+                <div class="col-6">
+                    <select id="cfTemplate" class="form-select form-select-sm">
+            `;
+
+        for (let group of templateGroups) {
+            body += `<option value="${group}">${group}</option>`;
+        }
+
+        body += 
+            `       </select>
+                </div>
+            </div>`;
+
+        ModalDialog.modalShow("New Cashflow", body, {
+            textCancel: "Cancel",
+            textOK: "Submit",
+            outputFn: (isOK) => {
+                if (!isOK) return {};
+
+                let cfName = document.getElementById("cfName").value;
+                let cfTemplate = document.getElementById("cfTemplate").value;
+                
+                let valid = cfName.length > 0 && cfTemplate.length > 0;
+                if (!valid) {
+                    Toast.toastError("Please enter a name and select a cashflow template");
+                    return null;
+                }
+
+                return {
+                    cfName: cfName,
+                    cfTemplate: cfTemplate
+                };
+            },
+            finalFn(isOK, data) {
+                if (!isOK || !data.cfName) return;
+
+                let initialName = self.engine.create_cashflow_from_template_group(data.cfTemplate, data.cfName);
+                if (initialName.length > 0) {
+                    self.loadCashflow(data.cfName);
+                    if (initialName === "*") return;                    
+                    Updater.createTemplateEvents(self, initialName);
+                }
+            }
+        });
+    }
+
+    /**
      * Show a parameter list in a modal dialog.
      * @param {object} self Self object.
      * @param {number} rowIndex The row index.
      * @param {number} tableType The type of table.
      */    
     static showParameters(self, rowIndex, tableType) {
+        let enable = tableType === TABLE_EVENT;
+
         let body = "";
             `<div class="row">
                 <div class="col-4">
                     <strong>Name</strong>
                 </div>
-                <div class="col-2">
+                <div class="col-4">
                     <strong>Type</strong>
                 </div>
-                <div class="col-6">
+                <div class="col-4">
                     <strong>Value</strong>
                 </div>
             </div>`;
@@ -906,22 +1108,50 @@ class ModalDialog {
                     <div class="col-4">
                         ${elem.name}
                     </div>
-                    <div class="col-2">
+                    <div class="col-4">
                         <select id="pcType" class="form-select form-select-sm" disabled>
                             <option ${elem.sym_type === 'integer' ? 'selected' : ''}>integer</option>
                             <option ${elem.sym_type === 'decimal' ? 'selected' : ''}>decimal</option>
                             <option ${elem.sym_type === 'string' ? 'selected' : ''}>string</option>
                         </select>
-                    ${elem.sym_type}
                     </div>
-                    <div class="col-6">
-                        ${elem.sym_type === 'integer' ? elem.int_value : 
-                            elem.sym_type === 'decimal' ? elem.dec_value : elem.str_value}
+                    <div class="col-4">
+                        <input type="text" class="form-control form-control-sm parameter" 
+                            value="${elem.sym_type === 'integer' ? elem.int_value : elem.sym_type === 'decimal' ? elem.dec_value : elem.str_value}" 
+                            ${enable ? '' : 'disabled'}>
                     </div>
                 </div>`;       
         }
 
-        ModalDialog.modalShow("Parameter List", body);
+        ModalDialog.modalShow("Parameter List", body, {
+            textCancel: enable ? "Cancel" : "",
+            textOK: enable ? "Submit" : "OK",
+            outputFn: (isOK) => {
+                if (!enable || !isOK) return {};
+
+                let parameters = document.getElementsByClassName("parameter");
+                let params = "";
+
+                let index = 0;
+                for (let parameter of parameters) {
+                    if (params.length > 0) params += "|";
+                    params += parameter.value;
+                    ++index;
+                } 
+
+                return { 
+                    "parameters": params 
+                };
+            },
+            finalFn: (isOK, data) => {    
+                if (!enable || !isOK || !data.parameters) return;
+
+                if (self.engine.set_parameter_values(self.activeTabIndex, rowIndex, data.parameters)) {
+                    Updater.refreshAmResults(self);
+                    Updater.updateTabLabel(self, true);        
+                }
+            }
+        });
     }
     
     /**
@@ -1006,7 +1236,7 @@ class ModalDialog {
                 document.getElementById("skipPeriodsRange").removeEventListener("input", (e) => {});
                 document.getElementById("skipPeriodsRangeValue").addEventListener("change", (e) => {});
     
-                if (!isOK) return;       
+                if (!isOK) return {};       
 
                 for (let colDef of tab.eventColumns) {
                     if (colDef.col_name === "Skip-periods") {
@@ -1014,21 +1244,31 @@ class ModalDialog {
                         let elems = document.getElementsByClassName("chkSkipPeriods");                
                         for (let elem of elems) {
                             skipPeriods += (elem.checked ? "1" : "0");
-                        }                
-                        skipPeriodsChangeInfo.skipPeriods = skipPeriods;
-
-                        let value = self.engine.set_event_value(
-                            colDef.col_name_index, colDef.col_type, colDef.code,
-                            self.activeTabIndex, rowIndex, skipPeriodsChangeInfo.skipPeriods);                        
-                        if (value) {       
-                            let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(tab.lastFocusedRowIndex);
-                            gridRow.setDataValue(tab.lastFocusedColDef.col_name, value);
-
-                            Updater.refreshAmResults(self);
-                            Updater.updateTabLabel(self, true);
-                        }
-                        break;
+                        } 
+                        
+                        return { skipPeriods: skipPeriods };
                     }
+                }
+
+                return {};
+            },
+            finalFn: (isOK, data) => {    
+                if (!isOK || !data.skipPeriods) return;
+
+                skipPeriodsChangeInfo.skipPeriods = data.skipPeriods;
+
+                let tokens = self.engine.set_event_value(
+                    colDef.col_name_index, colDef.col_type, colDef.code,
+                    self.activeTabIndex, rowIndex, skipPeriodsChangeInfo.skipPeriods).split('|');
+
+                if (tokens.length === 3) {       
+                    let value = tokens[2];
+
+                    let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(tab.lastFocusedRowIndex);
+                    gridRow.setDataValue(tab.lastFocusedColDef.col_name, value);
+
+                    Updater.refreshAmResults(self);
+                    Updater.updateTabLabel(self, true);
                 }
             }
         });    

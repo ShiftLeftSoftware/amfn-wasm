@@ -877,6 +877,95 @@ impl Engine {
         }
     }
 
+    /// Creates the events from the indicated template event list into
+    /// the currently selected cashflow event list.
+    ///
+    /// # Arguments
+    ///
+    /// * `group_param` - The name of the template group.
+    /// * `event_param` - The name of the template event.
+    /// * `cf_index` - Cashflow index.
+    ///
+    /// # Return
+    ///
+    /// * True indicates the last template event index, otherwise false.
+
+    pub fn create_template_events(
+        &self,
+        group_param: &str,
+        event_param: &str,
+        cf_index: u32
+    ) -> String {
+
+        match self.engine.create_template_events(
+            group_param, event_param, cf_index as usize) {
+            Err(_e) => String::from(""),
+            Ok(o) => {
+                let mut events = String::from("");
+                let orig_index = o.index();
+                let mut index: usize = 0;
+                loop {
+                    if !o.get_element(index) { break; }
+                    if !events.is_empty() { events.push('|'); }
+                    let new_date = o.event_date();
+                    events.push_str(format!("{:04}-{:02}-{:02}", new_date / 10000, new_date / 100 % 100, new_date % 100).as_str());
+                    events.push('~');
+                    events.push_str(o.sort_order().to_string().as_str());
+                    events.push('~');
+                    let param_count: usize;
+                    match o.list_parameter() {
+                        None => { param_count = 0; }
+                        Some(o) => { param_count = o.count(); }
+                    }
+                    events.push_str(param_count.to_string().as_str());
+                    index += 1;
+                }
+                o.get_element(orig_index);
+                events
+            }
+        }
+    }
+
+    /// Creates a new cashflow from a named template group.
+    ///
+    /// # Arguments
+    ///
+    /// * `group_param` - The name of the template group.
+    /// * `new_name_param` - The name of the new cashflow.
+    ///
+    /// # Return
+    ///
+    /// * True if successful, otherwise false.
+
+    pub fn create_cashflow_from_template_group(
+        &self,
+        group_param: &str,
+        new_name_param: &str,
+    ) -> String {
+
+        match self.engine.create_cashflow_from_template_group(
+            group_param, new_name_param, group_param) {
+            Err(_e) => String::from(""),
+            Ok(_o) => {
+                let mut initial_name = String::from("*");
+                let calc_mgr = self.engine.calc_mgr();
+                let list_template_event = calc_mgr.list_template_group().list_template_event();
+                let orig_index = list_template_event.index();
+                let mut index: usize = 0;
+                loop {
+                    if !list_template_event.get_element(index) { break; }
+                    if list_template_event.initial_event() {
+                        initial_name = String::from(list_template_event.name());
+                        break;
+                    }
+                    index += 1;
+                }
+                list_template_event.get_element(orig_index);
+                initial_name                        
+            }
+        }
+    }    
+
     /// Calculates number of intervals between two dates.
     /// If intDate2 is greater than or equal to intDate1,
     /// the result will be positive, otherwise the result
@@ -910,40 +999,6 @@ impl Engine {
             freq, 
             intervals as usize, 
             eom_param) as i32
-    }
-
-    /// Calculates a new date based upon a given date and number of intervals.
-    ///
-    /// # Arguments
-    ///
-    /// * `orig_date` - Optional original date in YYYYMMDD format,
-    ///     otherwise zero. Used for the half-month (semi-monthly) frequency
-    ///     and when bolEOM is true.
-    /// * `date` - Date in YYYYMMDD format.
-    /// * `frequency` - Date frequency.
-    /// * `intervals` - Number of intervals of frequency.
-    /// * `eom_param` - Adjust successive dates to end of month.
-    ///
-    /// # Return
-    ///
-    /// * New date in YYYYMMDD format.
-    pub fn date_new(&self, 
-        orig_date: &str,
-        date: &str,
-        frequency: &str,
-        intervals: u32,
-        eom_param: bool) -> String {
-
-        let freq = CoreUtility::get_frequency(frequency);
-
-        let new_date = CoreUtility::date_new(
-            CoreUtility::parse_date(orig_date), 
-            CoreUtility::parse_date(date), 
-            freq, 
-            intervals as usize, 
-            eom_param);
-
-        format!("{:04}-{:02}-{:02}", new_date / 10000, new_date / 100 % 100, new_date % 100)
     }
     
     /// Format a date and return the internal format.
@@ -1192,6 +1247,92 @@ impl Engine {
         ary_chart.into_iter().map(JsValue::from).collect()
     }
 
+    /// Get the event by date and sort order.
+    ///
+    /// # Arguments
+    ///
+    /// * `cf_index` - The cashflow index.
+    /// * `date_param` - The date to select.
+    /// * `sort_param` - The sort order to select.
+    ///
+    /// # Return
+    ///
+    /// * The event index or -1.
+
+    pub fn get_event_by_date(&self, cf_index: u32, date_param: &str, sort_param: u32) -> u32 {
+        let calc_mgr = self.engine.calc_mgr();
+
+        if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
+            return 0;
+        }
+
+        let date_in = CoreUtility::parse_date(self.engine.format_date_in(date_param).as_str());
+
+        match calc_mgr.list_cashflow().list_event() {
+            None => 0,
+            Some(o) => { 
+                if !o.get_element_by_date(date_in, sort_param as usize) { return 0; }
+                o.index() as u32
+            }
+        }
+    }
+
+    /// Get the loaded template names.
+    ///
+    /// # Return
+    ///
+    /// * Returns an array of template group names.
+
+    pub fn get_template_names(&self) -> Array {
+        let calc_mgr = self.engine.calc_mgr();
+        let list_template_group = calc_mgr.list_template_group();
+        let mut ary_template_groups: Vec<String> = Vec::new();
+
+        let orig_index = list_template_group.index();
+        let mut index: usize = 0;
+        loop {
+            if !list_template_group.get_element(index) { break; }
+            ary_template_groups.push(String::from(list_template_group.group()));
+            index += 1;
+        }
+        list_template_group.get_element(orig_index);
+
+        ary_template_groups.into_iter().map(JsValue::from).collect()
+    }
+
+    /// Get the loaded template event names for a template group.
+    ///
+    /// # Arguments
+    ///
+    /// * `group_param` - The template group name.
+    ///
+    /// # Return
+    ///
+    /// * Returns an array of template event names.
+
+    pub fn get_template_event_names(&self, group_param: &str) -> Array {
+        let calc_mgr = self.engine.calc_mgr();
+        let list_template_group = calc_mgr.list_template_group();
+        let list_template_event = list_template_group.list_template_event();
+
+        let mut ary_template_events: Vec<String> = Vec::new();
+
+        if !list_template_group.get_element_by_group(group_param, true) {
+            return ary_template_events.into_iter().map(JsValue::from).collect();
+        }
+
+        let orig_index = list_template_event.index();
+        let mut index: usize = 0;
+        loop {
+            if !list_template_event.get_element(index) { break; }
+            ary_template_events.push(String::from(list_template_event.name()));
+            index += 1;
+        }
+        list_template_event.get_element(orig_index);
+
+        ary_template_events.into_iter().map(JsValue::from).collect()
+    }
+
     /// Initialize the selected cashflow.
     ///
     /// # Arguments
@@ -1208,7 +1349,14 @@ impl Engine {
         }
 
         let calc_mgr = self.engine.calc_mgr();
-        String::from(calc_mgr.list_cashflow().name())
+
+        let group: &str;
+        match calc_mgr.list_cashflow().preferences() {
+            None => group = "",
+            Some(o) => group = o.group()
+        }
+
+        format!("{}|{}", calc_mgr.list_cashflow().name(), group)
     }
 
     /// Initialize and return the selected cashflow's
@@ -1346,18 +1494,23 @@ impl Engine {
                         None => Array::new(),
                         Some(o2) => {
                             let mut list: Vec<WasmDescriptor> = Vec::new();
-                            for param in o2.list() {
+                            let orig_index = o2.index();
+                            let mut index: usize = 0;
+                            loop {
+                                if !o2.get_element(index) { break; }
                                 list.push(WasmDescriptor::new(
-                                    param.group(),
-                                    param.name(),
-                                    param.desc_type(),
-                                    param.code(),
-                                    param.value().as_str(),
-                                    param.value_expr().as_str(),
-                                    param.propagate(),
-                                    param.list_event_index() as u32,
+                                    o2.group(),
+                                    o2.name(),
+                                    o2.desc_type(),
+                                    o2.code(),
+                                    o2.value().as_str(),
+                                    o2.value_expr().as_str(),
+                                    o2.propagate(),
+                                    o2.list_event_index() as u32,
                                 ));
+                                index += 1;
                             }
+                            o2.get_element(orig_index);
                             list.into_iter().map(JsValue::from).collect()
                         }
                     }
@@ -1374,18 +1527,23 @@ impl Engine {
                         None => Array::new(),
                         Some(o2) => {
                             let mut list: Vec<WasmDescriptor> = Vec::new();
-                            for param in o2.list() {
+                            let orig_index = o2.index();
+                            let mut index: usize = 0;
+                            loop {
+                                if !o2.get_element(index) { break; }
                                 list.push(WasmDescriptor::new(
-                                    param.group(),
-                                    param.name(),
-                                    param.desc_type(),
-                                    param.code(),
-                                    param.value().as_str(),
-                                    param.value_expr().as_str(),
-                                    param.propagate(),
-                                    param.list_event_index() as u32,
+                                    o2.group(),
+                                    o2.name(),
+                                    o2.desc_type(),
+                                    o2.code(),
+                                    o2.value().as_str(),
+                                    o2.value_expr().as_str(),
+                                    o2.propagate(),
+                                    o2.list_event_index() as u32,
                                 ));
+                                index += 1;
                             }
+                            o2.get_element(orig_index);
                             list.into_iter().map(JsValue::from).collect()
                         }
                     }
@@ -1425,15 +1583,20 @@ impl Engine {
                         None => Array::new(),
                         Some(o2) => {
                             let mut list: Vec<WasmParameter> = Vec::new();
-                            for param in o2.list() {
+                            let orig_index = o2.index();
+                            let mut index: usize = 0;
+                            loop {
+                                if !o2.get_element(index) { break; }
                                 list.push(WasmParameter::new(
-                                    param.name(),
-                                    CoreUtility::get_param_type(param.param_type()).as_str(),
-                                    param.param_integeri(),
-                                    param.param_decimal().to_string().as_str(),
-                                    param.param_string(),
+                                    o2.name(),
+                                    CoreUtility::get_param_type(o2.param_type()).as_str(),
+                                    o2.param_integeri(),
+                                    o2.param_decimal().to_string().as_str(),
+                                    o2.param_string(),
                                 ));
+                                index += 1;
                             }
+                            o2.get_element(orig_index);
                             list.into_iter().map(JsValue::from).collect()
                         }
                     }
@@ -1450,15 +1613,20 @@ impl Engine {
                         None => Array::new(),
                         Some(o2) => {
                             let mut list: Vec<WasmParameter> = Vec::new();
-                            for param in o2.list() {
+                            let orig_index = o2.index();
+                            let mut index: usize = 0;
+                            loop {
+                                if !o2.get_element(index) { break; }
                                 list.push(WasmParameter::new(
-                                    param.name(),
-                                    CoreUtility::get_param_type(param.param_type()).as_str(),
-                                    param.param_integeri(),
-                                    param.param_decimal().to_string().as_str(),
-                                    param.param_string(),
+                                    o2.name(),
+                                    CoreUtility::get_param_type(o2.param_type()).as_str(),
+                                    o2.param_integeri(),
+                                    o2.param_decimal().to_string().as_str(),
+                                    o2.param_string(),
                                 ));
+                                index += 1;
                             }
+                            o2.get_element(orig_index);
                             list.into_iter().map(JsValue::from).collect()
                         }
                     }
@@ -1621,6 +1789,27 @@ impl Engine {
             if !calc_mgr.list_cashflow().get_element(cf_index_param as usize) {
                 return String::from("");
             }
+
+            match calc_mgr.list_cashflow().list_event() {
+                None => { return String::from(""); }
+                Some(o) => { o.get_element(index_param as usize); }
+            }
+        }
+            
+        let mut event_date = String::from("");
+        let mut sort_order: usize = 0;
+
+        {
+            let calc_mgr = self.engine.calc_mgr();
+            let list_locale = calc_mgr.list_locale();
+
+            match calc_mgr.list_cashflow().list_event() {
+                None => { }
+                Some(o) => { 
+                    event_date = list_locale.format_date_out(o.event_date());
+                    sort_order = o.sort_order();
+                }
+            }
         }
 
         let result = CalcManager::util_set_event_value(
@@ -1629,7 +1818,7 @@ impl Engine {
         
         match self.engine.balance_cashflow() {
             Err(_e) => String::from(""),
-            Ok(_o) => result
+            Ok(_o) => format!("{}|{}|{}", event_date, sort_order, result)
         }
     }
 
@@ -1705,6 +1894,40 @@ impl Engine {
         }
     }
 
+    /// Set the appropriate event list parameter values.
+    ///
+    /// # Arguments
+    ///
+    /// * `cf_index` - The cashflow index.
+    /// * `index_param` - Event row index.
+    /// * `parameters` - Parameters to set.
+    ///
+    /// # Return
+    ///
+    /// * True if successful, otherwise false.
+
+    pub fn set_parameter_values(&self, cf_index: u32, index_param: u32, parameters: &str) -> bool {
+        {
+            let calc_mgr = self.engine.calc_mgr();
+
+            if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
+                return false;
+            }
+        }
+
+        let mut values: Vec<String> = Vec::new();
+        for param in parameters.split('|') {
+            values.push(String::from(param));
+        }
+
+        if !CalcManager::util_set_parameter_values(
+            self.engine.calc_manager(), index_param as usize, values) { 
+            return false; 
+        }
+
+        true
+    }
+
     /// Parse and return the cashflow's event values for the table type.
     ///
     /// # Arguments
@@ -1760,10 +1983,15 @@ impl Engine {
                     }
                     let mut row = json.serialize_extension(list_am.elem_extension(), false, true);
 
-                    for column in list_column.list() {
-                        let val =calc_mgr.util_am_value(column, &list_am);
-                        row = format!("{},\"{}\":\"{}\"", row, column.col_name(), val);
+                    let orig_index = list_column.index();
+                    let mut index: usize = 0;
+                    loop {
+                        if !list_column.get_element(index) { break; }
+                        let val =calc_mgr.util_am_value(list_column.column(), &list_am);
+                        row = format!("{},\"{}\":\"{}\"", row, list_column.col_name(), val);
+                        index += 1;
                     }
+                    list_column.get_element(orig_index);
 
                     let delimiter = if row_index == 0 { "" } else { "," };
                     cresult = format!("{}{}{{{}}}", cresult, delimiter, row);
@@ -1793,10 +2021,15 @@ impl Engine {
                     }
                     let mut row = json.serialize_extension(list_am.elem_extension(), false, true);
 
-                    for column in list_column.list() {
-                        let val =calc_mgr.util_am_value(column, &list_am);
-                        row = format!("{},\"{}\":\"{}\"", row, column.col_name(), val);
+                    let orig_index = list_column.index();
+                    let mut index: usize = 0;
+                    loop {
+                        if !list_column.get_element(index) { break; }
+                        let val =calc_mgr.util_am_value(list_column.column(), &list_am);
+                        row = format!("{},\"{}\":\"{}\"", row, list_column.col_name(), val);
+                        index += 1;
                     }
+                    list_column.get_element(orig_index);
 
                     let delimiter = if row_index == 0 { "" } else { "," };
                     eresult = format!("{}{}{{{}}}", eresult, delimiter, row);
@@ -1813,6 +2046,7 @@ impl Engine {
                 let mut row_index: usize = 0;
                 loop {
                     let mut row = String::from("");
+                    let mut next_name = String::from("");
                     match calc_mgr.list_cashflow().list_event() {
                         None => {
                             String::from("");
@@ -1821,13 +2055,26 @@ impl Engine {
                             if !o.get_element(row_index as usize) {
                                 break;
                             }
+
                             row = json.serialize_extension(o.elem_extension(), false, true);
+                            next_name = String::from(o.next_name());
                         }
                     }
 
-                    for column in list_column.list() {
-                        let val = calc_mgr.util_event_value(column);
-                        row = format!("{},\"{}\":\"{}\"", row, column.col_name(), val);
+                    let mut next_name_seen = false;
+                    let orig_index = list_column.index();
+                    let mut index: usize = 0;
+                    loop {
+                        if !list_column.get_element(index) { break; }
+                        let val = calc_mgr.util_event_value(list_column.column());
+                        row = format!("{},\"{}\":\"{}\"", row, list_column.col_name(), val);
+                        if !next_name_seen { next_name_seen = list_column.col_name() == "Next-name"; }
+                        index += 1;
+                    }
+                    list_column.get_element(orig_index);
+
+                    if !next_name_seen {
+                        row = format!("{},\"{}\":\"{}\"", row, "Next-name", next_name);
                     }
 
                     let delimiter = if row_index == 0 { "" } else { "," };

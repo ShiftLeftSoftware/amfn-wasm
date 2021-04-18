@@ -17,6 +17,7 @@ const amfnWasmRust = "./node_modules/amfnwasm/amfnwasm_bg.wasm";
 // Default locale and preference URLs
 const defaultLocalesUrl = "./default/locales.json";
 const defaultPreferencesUrl = "./default/preferences.json";
+const defaultTemplatesUrl = "./default/templates.json";
 
 // Example cashflow URLs.
 const defaultBasicLoanUrl = "./default/basic_loan.json";
@@ -50,6 +51,8 @@ const JSON_SERIALIZE_AMORTIZATION_LIST_DETAILS = 256;
 const localesUrl = defaultLocalesUrl;
 // User preferences URL (can be customized)
 const preferencesUrl = defaultPreferencesUrl;
+// Templates URL (can be customized)
+const templatesUrl = defaultTemplatesUrl;
 
 // Cashflow manager instance
 let cashflowManager = null;
@@ -73,15 +76,16 @@ class CashflowManager {
             decimalDigits: 2
         };
     
-        this.initEnvironment(preferencesUrl, localesUrl);
+        this.initEnvironment(preferencesUrl, localesUrl, templatesUrl);
     }
 
     /**
      * Initialize the user preferences and locales.
      * @param {string} preferencesUrl The url of the user preferences.
      * @param {string} localesUrl The url of the locales.
+     * @param {string} templatesUrl The url of the templates.
      */    
-    initEnvironment(preferencesUrl, localesUrl) {
+    initEnvironment(preferencesUrl, localesUrl, templatesUrl) {
 
         fetch(preferencesUrl).then(response => {
             response.text().then(text => {
@@ -94,14 +98,29 @@ class CashflowManager {
                 fetch(localesUrl).then(response => {
                     response.text().then(text => {
                         this.engine.deserialize(text);
-                        let initInfo =  this.engine.init("").split('|');
-                        if (initInfo.length === 3) {    
-                            this.config.localeStr = initInfo[0];                
-                            this.config.encoding = initInfo[1];                
-                            this.config.decimalDigits = parseInt(initInfo[2]);                
-                            Toast.toastInfo("Initialized locale: " + this.config.localeStr);
-                            this.initialized = true;
-                        }
+                        if (result.length > 0) {
+                            Toast.toastError(result);
+                            return;
+                        }     
+
+                        fetch(templatesUrl).then(response => {
+                            response.text().then(text => {
+                                this.engine.deserialize(text);
+                                if (result.length > 0) {
+                                    Toast.toastError(result);
+                                    return;
+                                }     
+                
+                                let initInfo =  this.engine.init("").split('|');
+                                if (initInfo.length === 3) {    
+                                    this.config.localeStr = initInfo[0];                
+                                    this.config.encoding = initInfo[1];                
+                                    this.config.decimalDigits = parseInt(initInfo[2]);                
+                                    Toast.toastInfo("Initialized locale: " + this.config.localeStr);
+                                    this.initialized = true;
+                                }
+                            });
+                        });
                     });
                 });
             });
@@ -136,7 +155,7 @@ class CashflowManager {
                 {
                     textCancel: "Cancel",
                     textOK: "Submit",
-                    outputFn: (isOK) => {
+                    finalFn: (isOK) => {
                         if (isOK) ModalDialog.showExtensionOutput(self, rowIndex);
                         Updater.focusEventGrid(tab);                        
                     }
@@ -238,6 +257,7 @@ class CashflowManager {
     /**
      * Add a new tab.
      * @param {string} cfName The cashflow name.
+     * @param {string} cfGroup The cashflow template group.
      * @param {string} cfLabel The cashflow label.
      * @param {string} divTab The tab's div element.
      * @param {string} grdEvent The event grid.
@@ -250,7 +270,7 @@ class CashflowManager {
      * @param {string} status The status expression.
      * @param {string} chartDefs The chart definitions.
      */    
-     addTab(cfName, cfLabel, divTab, grdEvent, eventColumns, 
+     addTab(cfName, cfGroup, cfLabel, divTab, grdEvent, eventColumns, 
         eventValues, grdAm, amColumns, amValues, summary, status, chartDefs) {
     
         let eventElem = JSON.parse(eventValues);
@@ -260,8 +280,8 @@ class CashflowManager {
             columnDefs: this.createColumns(eventColumns, true),
             rowData: eventElem,
             singleClickEdit: true,
-            onCellFocused: e => EventHelper.eventCellFocused(this, e),
-            onCellValueChanged: e => EventHelper.eventValueChanged(this, e)
+            onCellFocused: e => EventHelper.eventCellFocused(e),
+            onCellValueChanged: e => EventHelper.eventValueChanged(e)
         };
     
         let grdAmOptions = {
@@ -271,6 +291,7 @@ class CashflowManager {
     
         this.tabs.push({
             name: cfName,
+            group: cfGroup,
             label: cfLabel,
             divTab: divTab, 
             grdEvent: grdEvent,
@@ -286,7 +307,8 @@ class CashflowManager {
             chartDefs: chartDefs,
             lastFocusedColDef: null,
             lastFocusedColumn: null,
-            lastFocusedRowIndex: 0,    
+            lastFocusedRowIndex: -1,
+            lastFocusedValue: null,    
             expanded: false,
             savePending: false
         });
@@ -416,7 +438,7 @@ class CashflowManager {
                     gridType: isEvent ? TABLE_EVENT : TABLE_AM,
                     callback: colCallback,
                     formatValue: colFormatValue
-                } 
+                }
             });
         }
     
@@ -446,7 +468,7 @@ class CashflowManager {
         
         this.enableClass("menuClose", "disabled", enable);
         this.enableClass("menuSave", "disabled", enable);
-        this.enableClass("btnInsert", "disabled", false);    
+        this.enableClass("btnInsert", "disabled", enable);    
         this.enableClass("btnDelete", "disabled", false);    
         this.enableClass("btnCalculate", "disabled", false);            
         this.enableClass("btnExpand", "disabled", enable);    
@@ -467,19 +489,16 @@ class CashflowManager {
     }
 
     /**
-     * Load the given cashflow.
+     * Load the last cashflow.
      * @param {string} name The name of the cashflow to load.
-     * @param {string} text The serialized cashflow.
      */    
-     loadCashflow(name, text) {
-        let result = this.engine.deserialize(text);
-        if (result.length > 0) {
-            Toast.toastError(result);
-            return;
-        }
-    
+     loadCashflow(name) {
         let index = this.tabs.length;
-        let label = this.engine.init_cashflow(index);    
+
+        let labels = this.engine.init_cashflow(index).split('|'); 
+        let group = labels.length > 1 ? labels[1] : "";
+        let label = labels[0] + "[" + group + "]";
+
         let status = this.engine.init_cashflow_status(index);
     
         let ulTabs = document.getElementById("ulTabs"); 
@@ -523,7 +542,7 @@ class CashflowManager {
     
         ChartUtility.loadChartDefs(chartDefs);
         
-        this.addTab(name, label, divTab, grdEvent, eventColumns, 
+        this.addTab(name, group, label, divTab, grdEvent, eventColumns, 
             eventValues, grdAm, amColumns, amValues, summary, 
             status, chartDefs);   
     
@@ -532,7 +551,7 @@ class CashflowManager {
         divTab.addEventListener("click", e => this.activateTabEvent(e));
         iClose.addEventListener("click", e => this.closeTabEvent(e));
 
-        grdEvent.addEventListener("keydown", e => EventHelper.eventKeyDown(this, e));
+        grdEvent.addEventListener("keyup", e => EventHelper.eventKeyUp(e));
     
         divTab.click();
     }
@@ -631,7 +650,8 @@ class EventHelper {
             self.setExpand(false);
         }
     
-        self.tabs[index].grdEvent.removeEventListener("keydown", e => EventHelper.eventKeyDown(self, e));
+        self.tabs[index].grdEvent.removeEventListener("keyup", e => EventHelper.eventKeyUp(e));
+
         self.tabs[index].grdEvent.remove();
         self.tabs[index].grdAm.remove();
     
@@ -653,23 +673,30 @@ class EventHelper {
     
     /**
      * Respond to the event cell focus changing.
-     * @param {object} self Self object.
      * @param {object} e Change event.
      */    
-     static eventCellFocused(self, e) {
+     static eventCellFocused(e) {
+        if (!(e.column && e.column.colDef && e.column.colDef.field)) return;        
         if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;
 
-        let tab = self.tabs[self.activeTabIndex];
-        if (tab.lastFocusedColumn === e.column && tab.lastFocusedRowIndex === e.rowIndex) return;
+        let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
+        if (tab.lastFocusedColDef && 
+            tab.lastFocusedColumn === e.column && 
+            tab.lastFocusedRowIndex === e.rowIndex &&
+            tab.grdEventOptions.api.getEditingCells().length > 0) return;
 
         tab.lastFocusedColDef = null;
         tab.lastFocusedColumn = e.column;
         tab.lastFocusedRowIndex = e.rowIndex;
+        tab.lastFocusedValue = null;
+        
         let field = e.column.colDef.field;
 
         for (let colDef of tab.eventColumns) {
             if (field === colDef.col_name) {
                 tab.lastFocusedColDef = colDef; 
+                tab.lastFocusedValue = tab.eventValues[
+                    tab.lastFocusedRowIndex][tab.lastFocusedColDef.col_name];
                 break;
             }
         }
@@ -678,11 +705,11 @@ class EventHelper {
 
         let enable = field === "Value" || field === "Periods";
 
-        self.enableClass("btnInsert", "disabled", true);    
-        self.enableClass("btnDelete", "disabled", true);    
-        self.enableClass("btnCalculate", "disabled", enable);    
+        cashflowManager.enableClass("btnDelete", "disabled", true);    
+        cashflowManager.enableClass("btnCalculate", "disabled", enable);    
 
         if (tab.lastFocusedColDef.col_editable) {
+            tab.grdEventOptions.api.stopEditing();
             tab.grdEventOptions.api.startEditingCell({
                 rowIndex: tab.lastFocusedRowIndex,
                 colKey: tab.lastFocusedColumn
@@ -691,53 +718,69 @@ class EventHelper {
     }
     
     /**
-     * Respond to the grid event key down.
-     * @param {object} self Self object.
-     * @param {object} e Keydown event.
+     * Respond to the grid event key up.
+     * @param {object} e Keyup event.
      */    
-     static eventKeyDown(self, e) {
+    static eventKeyUp(e) {
         if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;    
 
-        if (e.keyCode !== 13 || e.shiftKey || e.ctrlKey || e.altKey) return;
+        let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
+        if (e.keyCode !== 13 || e.shiftKey || e.ctrlKey || e.altKey || !tab.lastFocusedColDef) return;
 
-        e.stopPropagation();
-
-        let tab = self.tabs[self.activeTabIndex];
+        if (tab.lastFocusedValue !== tab.eventValues[tab.lastFocusedRowIndex][tab.lastFocusedColDef.col_name]) return;
 
         Updater.focusEventGrid(tab);
         if (!tab.grdEventOptions.api.tabToNextCell()) {
-            EventHelper.menuInsert();
+            EventHelper.nextInsert();
         }
     }
 
     /**
      * Respond to the event grid cell value changing.
-     * @param {object} self Self object.
      * @param {object} e Change event.
      */    
-     static eventValueChanged(self, e) {
+    static eventValueChanged(e) {
         if (!cashflowManager.engineInitialized() || 
             cashflowManager.activeTabIndex < 0 || e.oldValue === e.newValue) return;
 
         let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
         let field = e.column.colDef.field;
-        let row = tab.eventValues[e.rowIndex];
 
-        for (let colDef of tab.eventColumns) {
-            if (field === colDef.col_name) {
-                let value = cashflowManager.engine.set_event_value(
-                    colDef.col_name_index, colDef.col_type, colDef.code, 
-                    cashflowManager.activeTabIndex, e.rowIndex, e.newValue);
-                if (value) {
-                    let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(e.rowIndex);
-                    gridRow.setDataValue(colDef.col_name, value);
-
-                    Updater.refreshAmResults(self);
-                    Updater.updateTabLabel(self, true);
-                }
+        let colDef = null;
+        for (let cd of tab.eventColumns) {
+            if (field === cd.col_name) {
+                colDef = cd;
                 break;
             }
+        }        
+        if (!colDef) return;
+
+        let tokens = cashflowManager.engine.set_event_value(
+            colDef.col_name_index, colDef.col_type, colDef.code, 
+            cashflowManager.activeTabIndex, e.rowIndex, e.newValue).split('|');
+        if (tokens.length !== 3) return;
+
+        let eventDate = tokens[0];
+        let sortOrder = parseInt(tokens[1]);
+        let value = tokens[2];
+
+        if (colDef.col_name === "Date") eventDate = value;
+        if (colDef.col_name === "Sort") sortOrder = value;
+
+        if (colDef.col_name === "Date" || colDef.col_name === "Sort") {
+            Updater.refreshEvents(cashflowManager, eventDate, sortOrder);
+        } else {
+            let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(e.rowIndex);
+            gridRow.setDataValue(colDef.col_name, value);
         }
+
+        Updater.focusEventGrid(tab);
+        if (!tab.grdEventOptions.api.tabToNextCell()) {
+            EventHelper.nextInsert();
+        }
+
+        Updater.refreshAmResults(cashflowManager);
+        Updater.updateTabLabel(cashflowManager, true);
     }
 
     /**
@@ -755,7 +798,13 @@ class EventHelper {
         let fileName = files[0];
     
         reader.onload = (e) => {   
-            cashflowManager.loadCashflow(fileName, reader.result);
+            let result = cashflowManager.engine.deserialize(reader.result);
+            if (result.length > 0) {
+                Toast.toastError(result);
+                return;
+            }  
+
+            cashflowManager.loadCashflow(fileName);
         };
     
         reader.readAsText(fileName, cashflowManager.config.encoding);
@@ -768,6 +817,16 @@ class EventHelper {
         if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;
     
         cashflowManager.closeTab(cashflowManager.activeTabIndex);
+    }
+    
+    /**
+     * Respond to the menu new cashflow event.
+     */    
+     static menuNewCashflow() {
+        
+        if (!cashflowManager.engineInitialized()) return;
+      
+        ModalDialog.showNewCashflow(cashflowManager);
     }
     
     /**
@@ -793,7 +852,13 @@ class EventHelper {
     
         fetch(url).then(response => {
             response.text().then(text => {
-                cashflowManager.loadCashflow(name, text);
+                let result = cashflowManager.engine.deserialize(text);
+                if (result.length > 0) {
+                    Toast.toastError(result);
+                    return;
+                }  
+
+                cashflowManager.loadCashflow(name);
             });
         });
     }
@@ -818,7 +883,10 @@ class EventHelper {
      static menuInsert() {
         if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;
 
-        Toast.toastInfo("Insert event"); // #####
+        let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
+
+        ModalDialog.showInsertEvent(cashflowManager);
+        Updater.focusEventGrid(tab);
     }
     
     /**
@@ -835,11 +903,13 @@ class EventHelper {
 
             tab.lastFocusedColDef = null;
             tab.lastFocusedColumn = null;
-            tab.lastFocusedRowIndex = 0;
+            tab.lastFocusedRowIndex = -1;
+            tab.lastFocusedValue = null;
 
-            cashflowManager.enableClass("btnInsert", "disabled", false);    
             cashflowManager.enableClass("btnDelete", "disabled", false);    
             cashflowManager.enableClass("btnCalculate", "disabled", false);            
+
+            Updater.focusEventGrid(tab);
         }
     }
     
@@ -904,6 +974,24 @@ class EventHelper {
         ModalDialog.showSummary(cashflowManager.tabs[cashflowManager.activeTabIndex].summary);
         Updater.focusEventGrid(tab);
     }
+    
+    /**
+     * Respond to the next insert event.
+     */    
+     static nextInsert() {
+        if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;
+
+        let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
+
+        let nextName = "";
+        if (tab.lastFocusedColDef) {
+            nextName = tab.eventValues[tab.lastFocusedRowIndex]["Next-name"];
+        }
+
+        if (!nextName) return;
+        
+        Updater.createTemplateEvents(cashflowManager, nextName);
+    }
 
     /**
      * Show/hide the spinner.
@@ -936,6 +1024,7 @@ class EventHelper {
     document.getElementById("menuStandardInvestment").addEventListener("click", () => EventHelper.menuOpenExample(defaultStandardInvestmentUrl));    
     document.getElementById("menuStandardLoan").addEventListener("click", () => EventHelper.menuOpenExample(defaultStandardLoanUrl));    
     
+    document.getElementById("menuNew").addEventListener("click", () => EventHelper.menuNewCashflow());    
     document.getElementById("menuOpen").addEventListener("click", () => EventHelper.menuOpenCashflow());    
     document.getElementById("menuClose").addEventListener("click", () => EventHelper.menuCloseCashflow());    
     document.getElementById("menuSave").addEventListener("click", () => EventHelper.menuSaveCashflow());    
