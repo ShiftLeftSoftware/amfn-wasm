@@ -25,6 +25,166 @@ const FORMAT_DECIMAL = 3;
 // Format - currency.
 const FORMAT_CURRENCY = 4;
 
+// Column field names
+const FIELD_TYPE = "Type";
+const FIELD_DATE = "Date";
+const FIELD_SORT = "Sort";
+const FIELD_VALUE = "Value";
+const FIELD_PERIODS = "Periods";
+const FIELD_FREQUENCY = "Frequency";
+const FIELD_SKIP_PERIODS = "Skip-periods";
+const FIELD_PARAMETERS = "Parameter-list";
+const FIELD_DESCRIPTORS = "Descriptor-list";
+
+// Resource button constants.
+const BUTTON_INSERT = "Button_Insert";
+const BUTTON_DELETE = "Button_Delete";
+const BUTTON_CALCULATE = "Button_Calculate";
+const BUTTON_EXPAND = "Button_Expand";
+const BUTTON_COMPRESS = "Button_Compress";
+const BUTTON_SUMMARY = "Button_Summary";
+const BUTTON_CHARTS = "Button_Charts";
+const BUTTON_INSERT2 = "Button_Insert2";
+const BUTTON_DELETE2 = "Button_Delete2";
+const BUTTON_CALCULATE2 = "Button_Calculate2";
+const BUTTON_EXPAND2 = "Button_Expand2";
+const BUTTON_COMPRESS2 = "Button_Compress2";
+const BUTTON_SUMMARY2 = "Button_Summary2";
+const BUTTON_CHARTS2 = "Button_Charts2";
+
+// Resource compute method constants
+const METHOD_ACTUARIAL = "Method_Actuarial";
+const METHOD_SIMPLE_INTEREST = "Method_Simple_Interest";
+
+// Resource day-count constants.
+const DAY_COUNT_PERIODIC = "Day_Count_Basis_Periodic";
+const DAY_COUNT_RULE_OF_78 = "Day_Count_Basis_Rule_Of_78";
+const DAY_COUNT_ACTUAL = "Day_Count_Basis_Actual";
+const DAY_COUNT_ACTUAL_ISMA = "Day_Count_Basis_Actual_Actual_ISMA";
+const DAY_COUNT_ACTUAL_AFB = "Day_Count_Basis_Actual_Actual_AFB";
+const DAY_COUNT_ACTUAL_365L = "Day_Count_Basis_Actual_365L";
+const DAY_COUNT_30 = "Day_Count_Basis_30";
+const DAY_COUNT_30E = "Day_Count_Basis_30E";
+const DAY_COUNT_30EP = "Day_Count_Basis_30EP";
+
+// Resource frequency constants.
+const FREQ_NONE = "Frequency_None";
+const FREQ_1_YEAR = "Frequency_1_Year";
+const FREQ_6_MONTHS = "Frequency_6_Months";
+const FREQ_4_MONTHS = "Frequency_4_Months";
+const FREQ_3_MONTHS = "Frequency_3_Months";
+const FREQ_2_MONTHS = "Frequency_2_Months";
+const FREQ_1_MONTH = "Frequency_1_Month";
+const FREQ_HALF_MONTH = "Frequency_Half_Month";
+const FREQ_4_WEEKS = "Frequency_4_Weeks";
+const FREQ_2_WEEKS = "Frequency_2_Weeks";
+const FREQ_1_WEEK = "Frequency_1_Week";
+const FREQ_1_DAY = "Frequency_1_Day";
+const FREQ_CONTINUOUS = "Frequency_Continuous";
+
+// Resource menu constants.
+const MENU_NEW = "Menu_New";
+const MENU_OPEN = "Menu_Open";
+const MENU_EXAMPLES = "Menu_Examples";
+const MENU_BASIC_LOAN = "Menu_Basic_Loan";
+const MENU_BIWEEKLY_LOAN = "Menu_Biweekly_Loan";
+const MENU_STANDARD_ANNUITY = "Menu_Standard_Annuity";
+const MENU_STANDARD_BOND = "Menu_Standard_Bond";
+const MENU_STANDARD_CASHFLOW = "Menu_Standard_Cashflow";
+const MENU_STANDARD_INVESTMENT = "Menu_Standard_Investment";
+const MENU_STANDARD_LOAN = "Menu_Standard_Loan";
+const MENU_CLOSE = "Menu_Close";
+const MENU_SAVE = "Menu_Save";
+
+// Resource modal constants.
+const MODAL_CANCEL = "Modal_Cancel";
+const MODAL_OK = "Modal_OK";
+const MODAL_SUBMIT = "Modal_Submit";
+const MODAL_CONFIRMATION = "Modal_Confirmation"; 
+const MODAL_NO = "Modal_No"; 
+const MODAL_YES = "Modal_Yes"; 
+
+// Resource modal titles.
+const MODAL_DESCRIPTOR_LIST = "Modal_Descriptor_List";
+const MODAL_CURRENT_VALUE = "Modal_Current_Value";
+const MODAL_INTEREST_CHANGE = "Modal_Interest_Change";
+const MODAL_STATISTIC_CHANGE = "Modal_Statistic_Value";
+const MODAL_PRINCIPAL_CHANGE = "Modal_Principal_Change";
+const MODAL_INSERT_EVENT = "Modal_Insert_Event";
+const MODAL_NEW_CASHFLOW = "Modal_New_Cashflow";
+const MODAL_PARAMETER_LIST = "Modal_Parameter_List";
+const MODAL_SKIP_PERIODS = "Modal_Skip_Periods";
+const MODAL_CASHFLOW_SUMMARY = "Modal_Cashflow_Summary";
+
+// Resource modal descriptors.
+const MODAL_DESC_GROUP = "Modal_Desc_Group";
+const MODAL_DESC_NAME = "Modal_Desc_Name";
+const MODAL_DESC_TYPE = "Modal_Desc_Type";
+const MODAL_DESC_CODE = "Modal_Desc_Code";
+const MODAL_DESC_VALUE = "Modal_Desc_Value";
+const MODAL_DESC_PROPAGATE = "Modal_Desc_Propagate";            
+
+// Resource modal current value.
+const MODAL_CV_EOM = "Modal_Cv_Eom";
+const MODAL_CV_PASSIVE = "Modal_Cv_Passive";
+const MODAL_CV_PRESENT = "Modal_Cv_Present";            
+
+// Resource modal interest change.
+const MODAL_IC_METHOD = "Modal_Ic_Method";
+const MODAL_IC_DAY_COUNT = "Modal_Ic_DayCount";
+const MODAL_IC_DAYS_IN_YEAR = "Modal_Ic_DaysInYear";
+const MODAL_IC_EFF_FREQ = "Modal_Ic_EffFreq";
+const MODAL_IC_INT_FREQ = "Modal_Ic_IntFreq";
+const MODAL_IC_ROUND_BAL = "Modal_Ic_RoundBal";
+const MODAL_IC_ROUND_DD = "Modal_Ic_RoundDD";            
+
+// Resource modal principal change.
+const MODAL_PC_TYPE = "Modal_Pc_Type";
+const MODAL_PC_EOM = "Modal_Pc_Eom";
+const MODAL_PC_PRIN_FIRST = "Modal_Pc_PrinFirst";
+const MODAL_PC_BAL_STAT = "Modal_Pc_BalStat";
+const MODAL_PC_AUXILIARY = "Modal_Pc_Auxiliary";
+const MODAL_PC_AUX_PASSIVE = "Modal_Pc_AuxPassive";
+
+// Resource modal statistic value.
+const MODAL_SV_NAME = "Modal_Sv_Name";
+const MODAL_SV_EOM = "Modal_Sv_Eom";
+const MODAL_SV_FINAL = "Modal_Sv_Final";            
+
+// Resource modal new cashflow.
+const MODAL_NC_NAME = "Modal_Nc_Name";
+const MODAL_NC_TEMPLATE = "Modal_Nc_Template";
+
+// Resource modal parameters.
+const MODAL_PARAM_NAME = "Modal_Param_Name";
+const MODAL_PARAM_TYPE = "Modal_Param_Type";
+const MODAL_PARAM_VALUE = "Modal_Param_Value";
+
+// Resource message constants.
+const MSG_SELECT_FILE = "Msg_Select_File";
+const MSG_SELECT_TEMPLATE_EVENT = "Msg_Select_Template_Event";
+const MSG_SELECT_CASHFLOW_TEMPLATE = "Msg_Select_Cashflow_Template";
+const MSG_TAB_INDEX = "Msg_Tab_Index";
+const MSG_CHART_DEF = "Msg_Chart_Def";
+const MSG_ENGINE = "Msg_Engine";
+
+// Resource navigation constants.
+const NAV_FILE = "Nav_File";
+
+// Principal type constants
+const PRIN_TYPE_INCREASE = "Principal_Type_Increase";
+const PRIN_TYPE_DECREASE = "Principal_Type_Decrease";
+const PRIN_TYPE_POSITIVE = "Principal_Type_Positive";
+const PRIN_TYPE_NEGATIVE = "Principal_Type_Negative";
+
+// Rounding constants
+const ROUNDING_NONE = "Rounding_None";
+const ROUNDING_BIAS_UP = "Rounding_Bias_Up";
+const ROUNDING_BIAS_DOWN = "Rounding_Bias_Down";
+const ROUNDING_UP = "Rounding_Up";
+const ROUNDING_TRUNCATE = "Rounding_Truncate";
+const ROUNDING_BANKERS = "Rounding_Bankers";
+
 // From the book "Show Me the Numbers: Designing Tables and Graphs to Enlighten" 
 const chartColors = [
 	{ medium: "#5DA5DA", light: "#88BDE6"},
@@ -62,7 +222,7 @@ class ChartUtility {
         for (let row of tab.amValues.expanded) {
             let date = null;
             for (let key in row) {
-                if (key === "Date") {
+                if (key === FIELD_DATE) {
                     date = new Date(self.engine.format_date_in(row[key]));
                     break;
                 }
@@ -274,7 +434,7 @@ class ChartUtility {
         let event_date = tokens[0];
         let sort_order = parseInt(tokens[1]);
         let param_count = parseInt(tokens[2]);
-        tab.lastFocusedColDef = null; // Start at Date column
+        tab.lastFocused.colDef = null; // Start at Date column
 
         let rowIndex = Updater.refreshEvents(self, event_date, sort_order);
         Updater.refreshAmResults(self);
@@ -293,9 +453,9 @@ class ChartUtility {
      */    
     static focusEventGrid(tab) {   
         tab.grdEvent.focus();
-        if (!tab.lastFocusedColDef) return;
+        if (!tab.lastFocused.colDef) return;
 
-        tab.grdEventOptions.api.setFocusedCell(tab.lastFocusedRowIndex, tab.lastFocusedColumn);
+        tab.grdEventOptions.api.setFocusedCell(tab.lastFocused.rowIndex, tab.lastFocused.column);
     }
 
     /**
@@ -335,6 +495,15 @@ class ChartUtility {
     }
 
     /**
+     * Get string resource.
+     * @param {object} self Self object.
+     * @param {string} name Resource name.
+     */
+    static getResource(self, name) {
+       return self.engine.get_resource(self.activeTabIndex, name);
+    }
+
+    /**
      * Refresh events.
      * @param {object} self Self object.
      * @param {string} eventDate Date or null.
@@ -353,10 +522,10 @@ class ChartUtility {
         let rowIndex = self.engine.get_event_by_date(self.activeTabIndex, eventDate, sortOrder);
 
         let column = null;
-        if (tab.lastFocusedColDef) {
-            column = tab.lastFocusedColumn;
+        if (tab.lastFocused.colDef) {
+            column = tab.lastFocused.column;
         } else {
-            column = tab.grdEventOptions.columnApi.getColumn("Date");
+            column = tab.grdEventOptions.columnApi.getColumn(FIELD_DATE);
         }
         if (!column) return rowIndex;        
 
@@ -540,9 +709,9 @@ class ModalDialog {
      */    
      static showConfirm(self, text, confirmFn, index) {
 
-        ModalDialog.modalShow("Confirmation", text, { 
-            textCancel: "No",
-            textOK: "Yes",
+        ModalDialog.modalShow(Updater.getResource(self, MODAL_CONFIRMATION), text, { 
+            textCancel: Updater.getResource(self, MODAL_NO),
+            textOK: Updater.getResource(self, MODAL_YES),
             finalFn: (isOK) => {
                 if (!isOK) return;
                 confirmFn(self, index);
@@ -560,25 +729,25 @@ class ModalDialog {
         let body =
             `<div class="row">
                 <div class="col-2">
-                    <strong>Group</strong>
+                    <strong>${Updater.getResource(self, MODAL_DESC_GROUP)}</strong>
                 </div>
                 <div class="col-2">
-                    <strong>Name</strong>
+                    <strong>${Updater.getResource(self, MODAL_DESC_NAME)}</strong>
                 </div>
                 <div class="col-1">
-                    <strong>Type</strong>
+                    <strong>${Updater.getResource(self, MODAL_DESC_TYPE)}</strong>
                 </div>
                 <div class="col-1">
-                    <strong>Code</strong>
+                    <strong>${Updater.getResource(self, MODAL_DESC_CODE)}</strong>
                 </div>
                 <div class="col-5">
-                    <strong>Value</strong>
+                    <strong>${Updater.getResource(self, MODAL_DESC_VALUE)}</strong>
                 </div>
                 <div class="col-1">
-                    <strong>Prop</strong>
+                    <strong>${Updater.getResource(self, MODAL_DESC_PROPAGATE)}</strong>
                 </div>
             </div>`;
-
+            
         let list = self.engine.parse_descriptors(self.activeTabIndex, rowIndex, tableType);
         
         for (let elem of list) {
@@ -605,7 +774,7 @@ class ModalDialog {
                 </div>`;
         }
 
-        ModalDialog.modalShow("Descriptor List", body, { largeModal: true });    
+        ModalDialog.modalShow(Updater.getResource(self, MODAL_DESCRIPTOR_LIST), body, { largeModal: true });    
     }
 
     /**
@@ -626,13 +795,13 @@ class ModalDialog {
         } else {
             extension = self.tabs[self.activeTabIndex].amValues.compressed[rowIndex].extension;
         }
-
+        
         if ("current-value" in extension) {
             let ext = extension["current-value"];
-            ModalDialog.modalShow("Current Value", 
+            ModalDialog.modalShow(Updater.getResource(self, MODAL_CURRENT_VALUE), 
                 `<div class="row">
                     <div class="col-6">
-                        <label for="cvEom" class="col-form-label">Eom</label>
+                        <label for="cvEom" class="col-form-label">${Updater.getResource(self, MODAL_CV_EOM)}</label>
                     </div>
                     <div class="col-6">
                         <input class="form-check-input" type="checkbox" id="cvEom" ${ext["eom"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
@@ -640,7 +809,7 @@ class ModalDialog {
                 </div>
                 <div class="row">
                     <div class="col-6">
-                        <label for="cvPassive" class="col-form-label">Passive</label>
+                        <label for="cvPassive" class="col-form-label">${Updater.getResource(self, MODAL_CV_PASSIVE)}</label>
                     </div>
                     <div class="col-6">
                         <input class="form-check-input" type="checkbox" id="cvPassive" ${ext["passive"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
@@ -648,7 +817,7 @@ class ModalDialog {
                 </div>
                 <div class="row">
                     <div class="col-6">
-                        <label for="cvPresent" class="col-form-label">Present</label>
+                        <label for="cvPresent" class="col-form-label">${Updater.getResource(self, MODAL_CV_PRESENT)}</label>
                     </div>
                     <div class="col-6">
                         <input class="form-check-input" type="checkbox" id="cvPresent" ${ext["present"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
@@ -661,39 +830,39 @@ class ModalDialog {
 
         if ("interest-change" in extension) {
             let ext = extension["interest-change"];
-            ModalDialog.modalShow("Interest Change", 
+            ModalDialog.modalShow(Updater.getResource(self, MODAL_INTEREST_CHANGE), 
                 `<div class="row">
                     <div class="col-6">
-                        <label for="icMethod" class="col-form-label">Method</label>
+                        <label for="icMethod" class="col-form-label">${Updater.getResource(self, MODAL_IC_METHOD)}</label>
                     </div>
                     <div class="col-6">
                         <select id="icMethod" class="form-select form-select-sm" ${enable ? '' : 'disabled'}>
-                            <option ${ext["interest-method"] === 'actuarial' ? 'selected' : ''}>actuarial</option>
-                            <option ${ext["interest-method"] === 'simple-interest' ? 'selected' : ''}>simple-interest</option>
+                            <option value="actuarial" ${ext["interest-method"] === 'actuarial' ? 'selected' : ''}>${Updater.getResource(self, METHOD_ACTUARIAL)}</option>
+                            <option value="simple-interest" ${ext["interest-method"] === 'simple-interest' ? 'selected' : ''}>${Updater.getResource(self, METHOD_SIMPLE_INTEREST)}</option>
                         </select>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-6">
-                        <label for="icDayCount" class="col-form-label">Day count</label>
+                        <label for="icDayCount" class="col-form-label">${Updater.getResource(self, MODAL_IC_DAY_COUNT)}</label>
                     </div>
                     <div class="col-6">
                         <select id="icDayCount" class="form-select form-select-sm" ${enable ? '' : 'disabled'}>
-                            <option ${ext["day-count-basis"] === 'periodic' ? 'selected' : ''}>periodic</option>
-                            <option ${ext["day-count-basis"] === 'rule-of-78' ? 'selected' : ''}>rule-of-78</option>
-                            <option ${ext["day-count-basis"] === 'actual-actual-isma' ? 'selected' : ''}>actual-actual-isma</option>
-                            <option ${ext["day-count-basis"] === 'actual-actual-afb' ? 'selected' : ''}>actual-actual-afb</option>
-                            <option ${ext["day-count-basis"] === 'up' ? 'selected' : ''}>up</option>
-                            <option ${ext["day-count-basis"] === 'actual-365L' ? 'selected' : ''}>actual-365L</option>
-                            <option ${ext["day-count-basis"] === '30' ? 'selected' : ''}>30</option>
-                            <option ${ext["day-count-basis"] === '30E' ? 'selected' : ''}>30E</option>
-                            <option ${ext["day-count-basis"] === '30EP' ? 'selected' : ''}>30EP</option>
+                            <option value="periodic" ${ext["day-count-basis"] === 'periodic' ? 'selected' : ''}>${Updater.getResource(self, DAY_COUNT_PERIODIC)}</option>
+                            <option value="rule-of-78" ${ext["day-count-basis"] === 'rule-of-78' ? 'selected' : ''}>${Updater.getResource(self, DAY_COUNT_RULE_OF_78)}</option>
+                            <option value="actual" ${ext["day-count-basis"] === 'actual' ? 'selected' : ''}>${Updater.getResource(self, DAY_COUNT_ACTUAL)}</option>
+                            <option value="actual-actual-isma" ${ext["day-count-basis"] === 'actual-actual-isma' ? 'selected' : ''}>${Updater.getResource(self, DAY_COUNT_ACTUAL_ISMA)}</option>
+                            <option value="actual-actual-afb" ${ext["day-count-basis"] === 'actual-actual-afb' ? 'selected' : ''}>${Updater.getResource(self, DAY_COUNT_ACTUAL_AFB)}</option>
+                            <option value="actual-365L" ${ext["day-count-basis"] === 'actual-365L' ? 'selected' : ''}>${Updater.getResource(self, DAY_COUNT_ACTUAL_365L)}</option>
+                            <option value="30" ${ext["day-count-basis"] === '30' ? 'selected' : ''}>${Updater.getResource(self, DAY_COUNT_30)}</option>
+                            <option value="30E" ${ext["day-count-basis"] === '30E' ? 'selected' : ''}>${Updater.getResource(self, DAY_COUNT_30E)}</option>
+                            <option value="30EP" ${ext["day-count-basis"] === '30EP' ? 'selected' : ''}>${Updater.getResource(self, DAY_COUNT_30EP)}</option>
                         </select>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-6">
-                        <label for="icDaysInYear" class="col-form-label">Days in year</label>
+                        <label for="icDaysInYear" class="col-form-label">${Updater.getResource(self, MODAL_IC_DAYS_IN_YEAR)}</label>
                     </div>
                     <div class="col-6">
                         <input type="text" id="icDaysInYear" class="form-control form-control-sm" value="${ext["days-in-year"]}" ${enable ? '' : 'disabled'}>
@@ -701,66 +870,66 @@ class ModalDialog {
                 </div>
                 <div class="row">
                     <div class="col-6">
-                        <label for="icEffFreq" class="col-form-label">Effective frequency</label>
+                        <label for="icEffFreq" class="col-form-label">${Updater.getResource(self, MODAL_IC_EFF_FREQ)}</label>
                     </div>
                     <div class="col-6">
                         <select id="icEffFreq" class="form-select form-select-sm" ${enable ? '' : 'disabled'}>
-                            <option ${ext["effective-frequency"] === 'none' ? 'selected' : ''}>none</option>
-                            <option ${ext["effective-frequency"] === '1-year' ? 'selected' : ''}>1-year</option>
-                            <option ${ext["effective-frequency"] === '6-months' ? 'selected' : ''}>6-months</option>
-                            <option ${ext["effective-frequency"] === '4-months' ? 'selected' : ''}>4-months</option>
-                            <option ${ext["effective-frequency"] === '3-months' ? 'selected' : ''}>3-months</option>
-                            <option ${ext["effective-frequency"] === '2-months' ? 'selected' : ''}>2-months</option>
-                            <option ${ext["effective-frequency"] === '1-month' ? 'selected' : ''}>1-months</option>
-                            <option ${ext["effective-frequency"] === 'half-month' ? 'selected' : ''}>half-month</option>
-                            <option ${ext["effective-frequency"] === '4-weeks' ? 'selected' : ''}>4-weeks</option>
-                            <option ${ext["effective-frequency"] === '2-weeks' ? 'selected' : ''}>2-weeks</option>
-                            <option ${ext["effective-frequency"] === '1-week' ? 'selected' : ''}>1-week</option>
-                            <option ${ext["effective-frequency"] === '1-day' ? 'selected' : ''}>1-day</option>
-                            <option ${ext["effective-frequency"] === 'continuous' ? 'selected' : ''}>continuous</option>
+                            <option value="none" ${ext["day-count-basis"] === 'none' ? 'selected' : ''}>${Updater.getResource(self, FREQ_NONE)}</option>
+                            <option value="1-year" ${ext["day-count-basis"] === '1-year' ? 'selected' : ''}>${Updater.getResource(self, FREQ_1_YEAR)}</option>
+                            <option value="6-months" ${ext["day-count-basis"] === '6-months' ? 'selected' : ''}>${Updater.getResource(self, FREQ_6_MONTHS)}</option>
+                            <option value="4-months" ${ext["day-count-basis"] === '4-months' ? 'selected' : ''}>${Updater.getResource(self, FREQ_4_MONTHS)}</option>
+                            <option value="3-months" ${ext["day-count-basis"] === '3-months' ? 'selected' : ''}>${Updater.getResource(self, FREQ_3_MONTHS)}</option>
+                            <option value="2-months" ${ext["day-count-basis"] === '2-months' ? 'selected' : ''}>${Updater.getResource(self, FREQ_2_MONTHS)}</option>
+                            <option value="1-month" ${ext["day-count-basis"] === '1-month' ? 'selected' : ''}>${Updater.getResource(self, FREQ_1_MONTH)}</option>
+                            <option value="half-month" ${ext["day-count-basis"] === 'half-month' ? 'selected' : ''}>${Updater.getResource(self, FREQ_HALF_MONTH)}</option>
+                            <option value="4-weeks" ${ext["day-count-basis"] === '4-weeks' ? 'selected' : ''}>${Updater.getResource(self, FREQ_4_WEEKS)}</option>
+                            <option value="2-weeks" ${ext["day-count-basis"] === '2-weeks' ? 'selected' : ''}>${Updater.getResource(self, FREQ_2_WEEKS)}</option>
+                            <option value="1-week" ${ext["day-count-basis"] === '1-week' ? 'selected' : ''}>${Updater.getResource(self, FREQ_1_WEEK)}</option>
+                            <option value="1-day" ${ext["day-count-basis"] === '1-day' ? 'selected' : ''}>${Updater.getResource(self, FREQ_1_DAY)}</option>
+                            <option value="continuous" ${ext["day-count-basis"] === 'continuous' ? 'selected' : ''}>${Updater.getResource(self, FREQ_CONTINUOUS)}</option>
                         </select>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-6">
-                        <label for="icIntFreq" class="col-form-label">Interest frequency</label>
+                        <label for="icIntFreq" class="col-form-label">${Updater.getResource(self, MODAL_IC_INT_FREQ)}</label>
                     </div>
                     <div class="col-6">
                         <select id="icIntFreq" class="form-select form-select-sm" ${enable ? '' : 'disabled'}>
-                            <option ${ext["interest-frequency"] === 'none' ? 'selected' : ''}>none</option>
-                            <option ${ext["interest-frequency"] === '1-year' ? 'selected' : ''}>1-year</option>
-                            <option ${ext["interest-frequency"] === '6-months' ? 'selected' : ''}>6-months</option>
-                            <option ${ext["interest-frequency"] === '4-months' ? 'selected' : ''}>4-months</option>
-                            <option ${ext["interest-frequency"] === '3-months' ? 'selected' : ''}>3-months</option>
-                            <option ${ext["interest-frequency"] === '2-months' ? 'selected' : ''}>2-months</option>
-                            <option ${ext["interest-frequency"] === '1-month' ? 'selected' : ''}>1-months</option>
-                            <option ${ext["interest-frequency"] === 'half-month' ? 'selected' : ''}>half-month</option>
-                            <option ${ext["interest-frequency"] === '4-weeks' ? 'selected' : ''}>4-weeks</option>
-                            <option ${ext["interest-frequency"] === '2-weeks' ? 'selected' : ''}>2-weeks</option>
-                            <option ${ext["interest-frequency"] === '1-week' ? 'selected' : ''}>1-week</option>
-                            <option ${ext["interest-frequency"] === '1-day' ? 'selected' : ''}>1-day</option>
-                            <option ${ext["interest-frequency"] === 'continuous' ? 'selected' : ''}>continuous</option>
-                        </select>
+                        <option value="none" ${ext["day-count-basis"] === 'none' ? 'selected' : ''}>${Updater.getResource(self, FREQ_NONE)}</option>
+                        <option value="1-year" ${ext["day-count-basis"] === '1-year' ? 'selected' : ''}>${Updater.getResource(self, FREQ_1_YEAR)}</option>
+                        <option value="6-months" ${ext["day-count-basis"] === '6-months' ? 'selected' : ''}>${Updater.getResource(self, FREQ_6_MONTHS)}</option>
+                        <option value="4-months" ${ext["day-count-basis"] === '4-months' ? 'selected' : ''}>${Updater.getResource(self, FREQ_4_MONTHS)}</option>
+                        <option value="3-months" ${ext["day-count-basis"] === '3-months' ? 'selected' : ''}>${Updater.getResource(self, FREQ_3_MONTHS)}</option>
+                        <option value="2-months" ${ext["day-count-basis"] === '2-months' ? 'selected' : ''}>${Updater.getResource(self, FREQ_2_MONTHS)}</option>
+                        <option value="1-month" ${ext["day-count-basis"] === '1-month' ? 'selected' : ''}>${Updater.getResource(self, FREQ_1_MONTH)}</option>
+                        <option value="half-month" ${ext["day-count-basis"] === 'half-month' ? 'selected' : ''}>${Updater.getResource(self, FREQ_HALF_MONTH)}</option>
+                        <option value="4-weeks" ${ext["day-count-basis"] === '4-weeks' ? 'selected' : ''}>${Updater.getResource(self, FREQ_4_WEEKS)}</option>
+                        <option value="2-weeks" ${ext["day-count-basis"] === '2-weeks' ? 'selected' : ''}>${Updater.getResource(self, FREQ_2_WEEKS)}</option>
+                        <option value="1-week" ${ext["day-count-basis"] === '1-week' ? 'selected' : ''}>${Updater.getResource(self, FREQ_1_WEEK)}</option>
+                        <option value="1-day" ${ext["day-count-basis"] === '1-day' ? 'selected' : ''}>${Updater.getResource(self, FREQ_1_DAY)}</option>
+                        <option value="continuous" ${ext["day-count-basis"] === 'continuous' ? 'selected' : ''}>${Updater.getResource(self, FREQ_CONTINUOUS)}</option>
+                    </select>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-6">
-                        <label for="icRoundBal" class="col-form-label">Round balance</label>
+                        <label for="icRoundBal" class="col-form-label">${Updater.getResource(self, MODAL_IC_ROUND_BAL)}</label>
                     </div>
                     <div class="col-6">
                         <select id="icRoundBal" class="form-select form-select-sm" ${enable ? '' : 'disabled'}>
-                            <option ${ext["round-balance"] === 'none' ? 'selected' : ''}>none</option>
-                            <option ${ext["round-balance"] === 'bankers' ? 'selected' : ''}>bankers</option>
-                            <option ${ext["round-balance"] === 'bias-up' ? 'selected' : ''}>bias-up</option>
-                            <option ${ext["round-balance"] === 'bias-down' ? 'selected' : ''}>bias-down</option>
-                            <option ${ext["round-balance"] === 'up' ? 'selected' : ''}>up</option>
-                            <option ${ext["round-balance"] === 'truncate' ? 'selected' : ''}>truncate</option>
+                            <option value="none" ${ext["day-count-basis"] === 'none' ? 'selected' : ''}>${Updater.getResource(self, ROUNDING_NONE)}</option>
+                            <option value="bankers" ${ext["day-count-basis"] === 'bankers' ? 'selected' : ''}>${Updater.getResource(self, ROUNDING_BANKERS)}</option>
+                            <option value="bias-up" ${ext["day-count-basis"] === 'bias-up' ? 'selected' : ''}>${Updater.getResource(self, ROUNDING_BIAS_UP)}</option>
+                            <option value="bias-down" ${ext["day-count-basis"] === 'bias-down' ? 'selected' : ''}>${Updater.getResource(self, ROUNDING_BIAS_DOWN)}</option>
+                            <option value="up" ${ext["day-count-basis"] === 'up' ? 'selected' : ''}>${Updater.getResource(self, ROUNDING_UP)}</option>
+                            <option value="truncate" ${ext["day-count-basis"] === 'truncate' ? 'selected' : ''}>${Updater.getResource(self, ROUNDING_TRUNCATE)}</option>
                         </select>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-6">
-                        <label for="icRoundDD" class="col-form-label">Round decimal digits</label>
+                        <label for="icRoundDD" class="col-form-label">${Updater.getResource(self, MODAL_IC_ROUND_DD)}</label>
                     </div>
                     <div class="col-6">
                         <input type="text" id="icRoundDD" class="form-control form-control-sm" value="${ext["round-decimal-digits"]}" ${enable ? '' : 'disabled'}>
@@ -773,10 +942,10 @@ class ModalDialog {
         
         if ("statistic-value" in extension) {
             let ext = extension["statistic-value"];
-            ModalDialog.modalShow("Statistic Value", 
+            ModalDialog.modalShow(Updater.getResource(self, MODAL_STATISTIC_CHANGE) 
                 `<div class="row">
                     <div class="col-6">
-                        <label for="svName" class="col-form-label">Name</label>
+                        <label for="svName" class="col-form-label">${Updater.getResource(self, MODAL_SV_NAME)}</label>
                     </div>
                     <div class="col-6">
                         <input type="text" id="svName" class="form-control form-control-sm" value="${ext["name"]}" ${enable ? '' : 'disabled'}>
@@ -784,7 +953,7 @@ class ModalDialog {
                 </div>
                 <div class="row">
                     <div class="col-6">
-                        <label for="svEom" class="col-form-label">Eom</label>
+                        <label for="svEom" class="col-form-label">${Updater.getResource(self, MODAL_SV_EOM)}</label>
                     </div>
                     <div class="col-6">
                         <input class="form-check-input" type="checkbox" id="svEom" ${ext["eom"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
@@ -792,7 +961,7 @@ class ModalDialog {
                 </div>
                 <div class="row">
                     <div class="col-6">
-                        <label for="svFinal" class="col-form-label">Final</label>
+                        <label for="svFinal" class="col-form-label">${Updater.getResource(self, MODAL_SV_FINAL)}</label>
                     </div>
                     <div class="col-6">
                         <input class="form-check-input" type="checkbox" id="svFinal" ${ext["final"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
@@ -804,10 +973,10 @@ class ModalDialog {
         }
 
         let ext = extension["principal-change"];
-        ModalDialog.modalShow("Principal Change", 
+        ModalDialog.modalShow(Updater.getResource(self, MODAL_PRINCIPAL_CHANGE), 
             `<div class="row">
                 <div class="col-6">
-                    <label for="pcType" class="col-form-label">Type</label>
+                    <label for="pcType" class="col-form-label">${Updater.getResource(self, MODAL_PC_TYPE)}</label>
                 </div>
                 <div class="col-6">
                     <select id="pcType" class="form-select form-select-sm" ${enable ? '' : 'disabled'}>
@@ -820,7 +989,7 @@ class ModalDialog {
             </div>
             <div class="row">
                 <div class="col-6">
-                    <label for="pcEom" class="col-form-label">Eom</label>
+                    <label for="pcEom" class="col-form-label">${Updater.getResource(self, MODAL_PC_EOM)}</label>
                 </div>
                 <div class="col-6">
                     <input class="form-check-input" type="checkbox" id="pcEom" ${ext["eom"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
@@ -828,7 +997,7 @@ class ModalDialog {
             </div>
             <div class="row">
                 <div class="col-6">
-                    <label for="pcPrinFirst" class="col-form-label">Principal first</label>
+                    <label for="pcPrinFirst" class="col-form-label">${Updater.getResource(self, MODAL_PC_PRIN_FIRST)}</label>
                 </div>
                 <div class="col-6">
                     <input class="form-check-input" type="checkbox" id="pcPrinFirst" ${ext["principal-first"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
@@ -836,7 +1005,7 @@ class ModalDialog {
             </div>
             <div class="row">
                 <div class="col-6">
-                    <label for="pcBalStats" class="col-form-label">Balance statistics</label>
+                    <label for="pcBalStats" class="col-form-label">${Updater.getResource(self, MODAL_PC_BAL_STAT)}</label>
                 </div>
                 <div class="col-6">
                     <input class="form-check-input" type="checkbox" id="pcBalStats" ${ext["statistics"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
@@ -844,7 +1013,7 @@ class ModalDialog {
             </div>
             <div class="row">
                 <div class="col-6">
-                    <label for="pcAuxiliary" class="col-form-label">Auxiliary</label>
+                    <label for="pcAuxiliary" class="col-form-label">${Updater.getResource(self, MODAL_PC_AUXILIARY)}</label>
                 </div>
                 <div class="col-6">
                     <input class="form-check-input" type="checkbox" id="pcAuxiliary" ${ext["auxiliary"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
@@ -852,7 +1021,7 @@ class ModalDialog {
             </div>
             <div class="row">
                 <div class="col-6">
-                    <label for="pcAuxPassive" class="col-form-label">Auxiliary passive</label>
+                    <label for="pcAuxPassive" class="col-form-label">${Updater.getResource(self, MODAL_PC_AUX_PASSIVE)}</label>
                 </div>
                 <div class="col-6">
                     <input class="form-check-input" type="checkbox" id="pcAuxPassive" ${ext["passive"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
@@ -947,8 +1116,8 @@ class ModalDialog {
         if (result.length > 0) {
             row.extension = extension;
 
-            let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(tab.lastFocusedRowIndex);
-            gridRow.setDataValue(tab.lastFocusedColDef.col_name, result);
+            let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(tab.lastFocused.rowIndex);
+            gridRow.setDataValue(tab.lastFocused.colDef.col_name, result);
 
             Updater.refreshAmResults(self);
             Updater.updateTabLabel(self, true);
@@ -978,9 +1147,9 @@ class ModalDialog {
             ++index;
         }
 
-        ModalDialog.modalShow("Insert Event", body, {
-            textCancel: "Cancel",
-            textOK: "Submit",
+        ModalDialog.modalShow(Updater.getResource(self, MODAL_INSERT_EVENT), body, {
+            textCancel: Updater.getResource(self, MODAL_CANCEL),
+            textOK: Updater.getResource(self, MODAL_SUBMIT),
             outputFn: (isOK) => {
                 if (!isOK) return {};
 
@@ -995,7 +1164,7 @@ class ModalDialog {
 
                 let valid = event.length > 0;
                 if (!valid) {
-                    Toast.toastError("Please select a template event");
+                    Toast.toastError(Updater.getResource(self, MSG_SELECT_TEMPLATE_EVENT));
                     return null;
                 }
 
@@ -1010,7 +1179,7 @@ class ModalDialog {
             }
         });
     }
-
+    
     /**
      * Show a new cashflow modal dialog.
      * @param {object} self Self object.
@@ -1022,7 +1191,7 @@ class ModalDialog {
         let body = 
             `<div class="row">
                 <div class="col-6">
-                    <label for="cfName" class="col-form-label">Name</label>
+                    <label for="cfName" class="col-form-label">${Updater.getResource(self, MODAL_NC_NAME)}</label>
                 </div>
                 <div class="col-6">
                     <input type="text" id="cfName" class="form-control form-control-sm">
@@ -1030,7 +1199,7 @@ class ModalDialog {
             </div>
             <div class="row">
                 <div class="col-6">
-                    <label for="cfTemplate" class="col-form-label">Template</label>
+                    <label for="cfTemplate" class="col-form-label">${Updater.getResource(self, MODAL_NC_TEMPLATE)}</label>
                 </div>
                 <div class="col-6">
                     <select id="cfTemplate" class="form-select form-select-sm">
@@ -1045,9 +1214,9 @@ class ModalDialog {
                 </div>
             </div>`;
 
-        ModalDialog.modalShow("New Cashflow", body, {
-            textCancel: "Cancel",
-            textOK: "Submit",
+        ModalDialog.modalShow(Updater.getResource(self, MODAL_NEW_CASHFLOW), body, {
+            textCancel: Updater.getResource(self, MODAL_CANCEL),
+            textOK: Updater.getResource(self, MODAL_SUBMIT),
             outputFn: (isOK) => {
                 if (!isOK) return {};
 
@@ -1056,7 +1225,7 @@ class ModalDialog {
                 
                 let valid = cfName.length > 0 && cfTemplate.length > 0;
                 if (!valid) {
-                    Toast.toastError("Please enter a name and select a cashflow template");
+                    Toast.toastError(Updater.getResource(self, MSG_SELECT_CASHFLOW_TEMPLATE));
                     return null;
                 }
 
@@ -1090,13 +1259,13 @@ class ModalDialog {
         let body = "";
             `<div class="row">
                 <div class="col-4">
-                    <strong>Name</strong>
+                    <strong>${Updater.getResource(self, MODAL_PARAM_NAME)}</strong>
                 </div>
                 <div class="col-4">
-                    <strong>Type</strong>
+                    <strong>${Updater.getResource(self, MODAL_PARAM_TYPE)}</strong>
                 </div>
                 <div class="col-4">
-                    <strong>Value</strong>
+                    <strong>${Updater.getResource(self, MODAL_PARAM_VALUE)}</strong>
                 </div>
             </div>`;
 
@@ -1123,9 +1292,9 @@ class ModalDialog {
                 </div>`;       
         }
 
-        ModalDialog.modalShow("Parameter List", body, {
-            textCancel: enable ? "Cancel" : "",
-            textOK: enable ? "Submit" : "OK",
+        ModalDialog.modalShow(Updater.getResource(self, MODAL_PARAMETER_LIST), body, {
+            textCancel: enable ? Updater.getResource(self, MODAL_CANCEL) : "",
+            textOK: enable ? Updater.getResource(self, MODAL_SUBMIT) : Updater.getResource(self, MODAL_OK),
             outputFn: (isOK) => {
                 if (!enable || !isOK) return {};
 
@@ -1205,9 +1374,9 @@ class ModalDialog {
             tableType: tableType
         };
 
-        ModalDialog.modalShow("Skip Periods", body, {
-            textCancel: "Cancel",
-            textOK: "Submit",
+        ModalDialog.modalShow(Updater.getResource(self, MODAL_SKIP_PERIODS), body, {
+            textCancel: Updater.getResource(self, MODAL_CANCEL),
+            textOK: Updater.getResource(self, MODAL_SUBMIT),
             inputFn: (inputData) => {
                 ModalDialog.showSkipPeriodsRangeChange(inputData.self, skipPeriodsChangeInfo, true);
 
@@ -1264,8 +1433,8 @@ class ModalDialog {
                 if (tokens.length === 3) {       
                     let value = tokens[2];
 
-                    let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(tab.lastFocusedRowIndex);
-                    gridRow.setDataValue(tab.lastFocusedColDef.col_name, value);
+                    let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(tab.lastFocused.rowIndex);
+                    gridRow.setDataValue(tab.lastFocused.colDef.col_name, value);
 
                     Updater.refreshAmResults(self);
                     Updater.updateTabLabel(self, true);
@@ -1329,12 +1498,13 @@ class ModalDialog {
 
     /**
      * Show a cashflow summary in a modal dialog.
-     * @param {object} summary The summary list to show.
+     * @param {object} self Self object.
      */    
-     static showSummary(summary) {
+    static showSummary(self) {
+        let tab = self.tabs[self.activeTabIndex];
         let body = "";
 
-        for (let sum of summary) {
+        for (let sum of tab.summary) {
             body +=
                 `<div class="row">
                     <div class="col-6">
@@ -1346,7 +1516,7 @@ class ModalDialog {
                 </div>`        
         }
 
-        ModalDialog.modalShow("Cashflow Summary", body);
+        ModalDialog.modalShow(Updater.getResource(self, MODAL_CASHFLOW_SUMMARY), body);
     }
 }
 

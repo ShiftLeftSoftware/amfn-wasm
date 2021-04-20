@@ -793,7 +793,7 @@ impl Engine {
 
     pub fn calculate_value(
         &self,
-        cf_index: u32,
+        cf_index: i32,
         index: u32,
         target_value: &str,
     ) -> String {
@@ -844,7 +844,7 @@ impl Engine {
 
     pub fn calculate_periods(
         &self,
-        cf_index: u32,
+        cf_index: i32,
         index: u32,
         target_value: &str
     ) -> i32 {
@@ -894,7 +894,7 @@ impl Engine {
         &self,
         group_param: &str,
         event_param: &str,
-        cf_index: u32
+        cf_index: i32
     ) -> String {
 
         match self.engine.create_template_events(
@@ -1154,7 +1154,7 @@ impl Engine {
     ///
     /// * Returns the cashflow status string.
 
-    pub fn get_cashflow_status(&self, cf_index: u32, status: &str) -> String {
+    pub fn get_cashflow_status(&self, cf_index: i32, status: &str) -> String {
         let calc_mgr = self.engine.calc_mgr();
 
         if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
@@ -1194,7 +1194,7 @@ impl Engine {
     ///
     /// * Returns an array of chart definition elements.
 
-    pub fn get_chart_definitions(&self, cf_index: u32) -> Array {
+    pub fn get_chart_definitions(&self, cf_index: i32) -> Array {
         let calc_mgr = self.engine.calc_mgr();
 
         if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
@@ -1259,7 +1259,7 @@ impl Engine {
     ///
     /// * The event index or -1.
 
-    pub fn get_event_by_date(&self, cf_index: u32, date_param: &str, sort_param: u32) -> u32 {
+    pub fn get_event_by_date(&self, cf_index: i32, date_param: &str, sort_param: u32) -> u32 {
         let calc_mgr = self.engine.calc_mgr();
 
         if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
@@ -1275,6 +1275,28 @@ impl Engine {
                 o.index() as u32
             }
         }
+    }
+
+    /// Get a specific resource.
+    ///
+    /// # Arguments
+    ///
+    /// * `cf_index` - The cashflow index.
+    /// * `key` - The resource key.
+    ///
+    /// # Return
+    ///
+    /// * See description.
+
+    pub fn get_resource(&self, cf_index: i32, key: &str) -> String {
+        let calc_mgr = self.engine.calc_mgr();
+
+        if cf_index >= 0 {
+            calc_mgr.list_cashflow().get_element(cf_index as usize);
+        }
+
+        let locale = calc_mgr.list_locale();
+        String::from(locale.get_resource(key))
     }
 
     /// Get the loaded template names.
@@ -1313,13 +1335,14 @@ impl Engine {
     pub fn get_template_event_names(&self, group_param: &str) -> Array {
         let calc_mgr = self.engine.calc_mgr();
         let list_template_group = calc_mgr.list_template_group();
-        let list_template_event = list_template_group.list_template_event();
 
         let mut ary_template_events: Vec<String> = Vec::new();
 
         if !list_template_group.get_element_by_group(group_param, true) {
             return ary_template_events.into_iter().map(JsValue::from).collect();
         }
+        
+        let list_template_event = list_template_group.list_template_event();
 
         let orig_index = list_template_event.index();
         let mut index: usize = 0;
@@ -1343,8 +1366,10 @@ impl Engine {
     ///
     /// * Returns the cashflow's name.
 
-    pub fn init_cashflow(&self, cf_index: u32) -> String {
-        if !self.engine.init_cashflow(cf_index) {
+    pub fn init_cashflow(&self, cf_index: i32) -> String {
+        if cf_index < 0 { return String::from(""); }
+
+        if !self.engine.init_cashflow(cf_index as u32) {
             return String::from("");
         }
 
@@ -1370,9 +1395,10 @@ impl Engine {
     ///
     /// * See description.
 
-    pub fn init_cashflow_status(&self, cf_index: u32) -> String {
-        let calc_mgr = self.engine.calc_mgr();
+    pub fn init_cashflow_status(&self, cf_index: i32) -> String {
+        if cf_index < 0 { return String::from(""); }
 
+        let calc_mgr = self.engine.calc_mgr();
         if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
             return String::from("");
         }
@@ -1416,9 +1442,10 @@ impl Engine {
     ///
     /// * See description.
 
-    pub fn parse_columns(&self, cf_index: u32, table_type_param: u32) -> Array {
-        let calc_mgr = self.engine.calc_mgr();
+    pub fn parse_columns(&self, cf_index: i32, table_type_param: u32) -> Array {
+        if cf_index < 0 { return Array::new(); }
 
+        let calc_mgr = self.engine.calc_mgr();
         if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
             return Array::new();
         }
@@ -1475,9 +1502,10 @@ impl Engine {
     ///
     /// * See description.
 
-    pub fn parse_descriptors(&self, cf_index: u32, index: u32, table_type_param: u32) -> Array {
-        let calc_mgr = self.engine.calc_mgr();
+    pub fn parse_descriptors(&self, cf_index: i32, index: u32, table_type_param: u32) -> Array {
+        if cf_index < 0 { return Array::new(); }
 
+        let calc_mgr = self.engine.calc_mgr();
         if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
             return Array::new();
         }
@@ -1564,9 +1592,10 @@ impl Engine {
     ///
     /// * See description.
 
-    pub fn parse_parameters(&self, cf_index: u32, index: u32, table_type_param: u32) -> Array {
-        let calc_mgr = self.engine.calc_mgr();
+    pub fn parse_parameters(&self, cf_index: i32, index: u32, table_type_param: u32) -> Array {
+        if cf_index < 0 { return Array::new(); }
 
+        let calc_mgr = self.engine.calc_mgr();
         if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
             return Array::new();
         }
@@ -1645,9 +1674,10 @@ impl Engine {
     ///
     /// * See description.
 
-    pub fn parse_summary(&self, cf_index: u32) -> Array {
-        let calc_mgr = self.engine.calc_mgr();
+    pub fn parse_summary(&self, cf_index: i32) -> Array {
+        if cf_index < 0 { return Array::new(); }
 
+        let calc_mgr = self.engine.calc_mgr();
         if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
             return Array::new();
         }
@@ -1685,7 +1715,9 @@ impl Engine {
     ///
     /// * True if successful.
 
-    pub fn remove_cashflow(&self, cf_index: u32) -> bool {
+    pub fn remove_cashflow(&self, cf_index: i32) -> bool {
+        if cf_index < 0 { return false; }
+
         {
             let calc_mgr = self.engine.calc_mgr();
 
@@ -1708,7 +1740,9 @@ impl Engine {
     ///
     /// * True if successful.
 
-    pub fn remove_event(&self, cf_index: u32, index: u32) -> bool {
+    pub fn remove_event(&self, cf_index: i32, index: u32) -> bool {
+        if cf_index < 0 { return false; }
+
         {
             let calc_mgr = self.engine.calc_mgr();
 
@@ -1743,7 +1777,9 @@ impl Engine {
     ///
     /// * Returns serialized cashflow.
 
-    pub fn serialize(&self, cf_index: u32, options: u32) -> String {
+    pub fn serialize(&self, cf_index: i32, options: u32) -> String {
+        if cf_index < 0 { return String::from(""); }
+
         if !self
             .engine
             .calc_mgr()
@@ -1779,10 +1815,12 @@ impl Engine {
         col_name_index_param: u32,
         type_param: &str,
         code_param: &str,
-        cf_index_param: u32,
+        cf_index_param: i32,
         index_param: u32,
         value_param: &str
     ) -> String {
+        if cf_index_param < 0 { return String::from(""); }
+
         {
             let calc_mgr = self.engine.calc_mgr();
 
@@ -1836,10 +1874,12 @@ impl Engine {
 
     pub fn set_extension_values(
         &self, 
-        cf_index_param: u32,
+        cf_index_param: i32,
         index_param: u32,
         ext_param: &str
     ) -> String {        
+        if cf_index_param < 0 { return String::from(""); }
+
         {
             let calc_mgr = self.engine.calc_mgr();
 
@@ -1906,7 +1946,9 @@ impl Engine {
     ///
     /// * True if successful, otherwise false.
 
-    pub fn set_parameter_values(&self, cf_index: u32, index_param: u32, parameters: &str) -> bool {
+    pub fn set_parameter_values(&self, cf_index: i32, index_param: u32, parameters: &str) -> bool {
+        if cf_index < 0 { return false; }
+
         {
             let calc_mgr = self.engine.calc_mgr();
 
@@ -1939,7 +1981,9 @@ impl Engine {
     ///
     /// * Return a string that can be directly loaded into ag-grid.
 
-    pub fn table_values(&self, cf_index: u32, table_type_param: u32) -> String {
+    pub fn table_values(&self, cf_index: i32, table_type_param: u32) -> String {
+        if cf_index < 0 { return String::from(""); }
+
         let calc_mgr = self.engine.calc_mgr();
 
         if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
