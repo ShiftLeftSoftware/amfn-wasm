@@ -9,6 +9,9 @@
     except according to those terms.
 */
 
+// AmFn Wasm - JavaScript
+const { WasmElemPreferences } = wasm_bindgen;
+
 // Table type event.
 const TABLE_EVENT = 0;
 // Table type amortization.
@@ -85,7 +88,6 @@ const FREQ_CONTINUOUS = "Frequency_Continuous";
 // Resource menu constants.
 const MENU_NEW = "Menu_New";
 const MENU_OPEN = "Menu_Open";
-const MENU_EXAMPLES = "Menu_Examples";
 const MENU_BASIC_LOAN = "Menu_Basic_Loan";
 const MENU_BIWEEKLY_LOAN = "Menu_Biweekly_Loan";
 const MENU_STANDARD_ANNUITY = "Menu_Standard_Annuity";
@@ -115,6 +117,8 @@ const MODAL_NEW_CASHFLOW = "Modal_New_Cashflow";
 const MODAL_PARAMETER_LIST = "Modal_Parameter_List";
 const MODAL_SKIP_PERIODS = "Modal_Skip_Periods";
 const MODAL_CASHFLOW_SUMMARY = "Modal_Cashflow_Summary";
+const MODAL_USER_PREFERENCES = "Modal_User_Preferences";
+const MODAL_CASHFLOW_PREFERENCES = "Modal_Cashflow_Preferences";
 
 // Resource modal descriptors.
 const MODAL_DESC_GROUP = "Modal_Desc_Group";
@@ -160,7 +164,17 @@ const MODAL_PARAM_NAME = "Modal_Param_Name";
 const MODAL_PARAM_TYPE = "Modal_Param_Type";
 const MODAL_PARAM_VALUE = "Modal_Param_Value";
 
+// Resource modal preferences
+const MODAL_PREF_LOCALE = "Modal_Pref_Locale";
+const MODAL_PREF_CROSS_RATE = "Modal_Pref_Cross_Rate";
+const MODAL_PREF_ENCODING = "Modal_Pref_Encoding";
+const MODAL_PREF_GROUP = "Modal_Pref_Group";
+const MODAL_PREF_FISCAL_YEAR = "Modal_Pref_Fiscal_Year";
+const MODAL_PREF_DECIMAL_DIGITS = "Modal_Pref_Decimal_Digits";
+const MODAL_PREF_TARGET_VALUE = "Modal_Pref_Target_Value";
+
 // Resource message constants.
+const MSG_INITIALIZED = "Msg_Initialized";
 const MSG_SELECT_FILE = "Msg_Select_File";
 const MSG_SELECT_TEMPLATE_EVENT = "Msg_Select_Template_Event";
 const MSG_SELECT_CASHFLOW_TEMPLATE = "Msg_Select_Cashflow_Template";
@@ -170,6 +184,8 @@ const MSG_ENGINE = "Msg_Engine";
 
 // Resource navigation constants.
 const NAV_FILE = "Nav_File";
+const NAV_EXAMPLES = "Nav_Examples";
+const NAV_VERSION = "Nav_Version";
 
 // Principal type constants
 const PRIN_TYPE_INCREASE = "Principal_Type_Increase";
@@ -431,16 +447,16 @@ class ChartUtility {
         let tokens = events[0].split('~');
         if (tokens.length !== 3) return;
 
-        let event_date = tokens[0];
-        let sort_order = parseInt(tokens[1]);
-        let param_count = parseInt(tokens[2]);
+        let eventDate = tokens[0];
+        let sortOrder = parseInt(tokens[1]);
+        let paramCount = parseInt(tokens[2]);
         tab.lastFocused.colDef = null; // Start at Date column
 
-        let rowIndex = Updater.refreshEvents(self, event_date, sort_order);
+        let rowIndex = Updater.refreshEvents(self, eventDate, sortOrder);
         Updater.refreshAmResults(self);
         Updater.updateTabLabel(self, true);
 
-        if (param_count === 0) return;
+        if (paramCount === 0) return;
 
         setTimeout(function() {
             ModalDialog.showParameters(self, rowIndex, TABLE_EVENT);
@@ -519,7 +535,10 @@ class ChartUtility {
 
         tab.grdEventOptions.api.setRowData(tab.eventValues);  
 
-        let rowIndex = self.engine.get_event_by_date(self.activeTabIndex, eventDate, sortOrder);
+        let rowIndex = tab.lastFocused.rowIndex > 0 ? tab.lastFocused.rowIndex : 0;
+        if (eventDate.length > 0) {
+            rowIndex = self.engine.get_event_by_date(self.activeTabIndex, eventDate, sortOrder);
+        }
 
         let column = null;
         if (tab.lastFocused.colDef) {
@@ -527,9 +546,10 @@ class ChartUtility {
         } else {
             column = tab.grdEventOptions.columnApi.getColumn(FIELD_DATE);
         }
-        if (!column) return rowIndex;        
+        if (!column) return rowIndex;
 
         tab.grdEventOptions.api.setFocusedCell(rowIndex, column);
+        
         return rowIndex;
     }
 
@@ -1256,7 +1276,7 @@ class ModalDialog {
     static showParameters(self, rowIndex, tableType) {
         let enable = tableType === TABLE_EVENT;
 
-        let body = "";
+        let body =
             `<div class="row">
                 <div class="col-4">
                     <strong>${Updater.getResource(self, MODAL_PARAM_NAME)}</strong>
@@ -1321,6 +1341,100 @@ class ModalDialog {
                 }
             }
         });
+    }
+
+    /**
+     * Show a preferences a modal dialog.
+     * @param {object} self Self object.
+     * @param {number} cfIndex Cashflow index or -1 for user preferences.
+     */    
+     static showPreferences(self, cfIndex) {
+
+        let pref = self.engine.get_preferences(cfIndex);
+    
+        ModalDialog.modalShow(Updater.getResource(self, cfIndex < 0 ? MODAL_USER_PREFERENCES : MODAL_CASHFLOW_PREFERENCES), 
+            `<div class="row">
+                <div class="col-6">
+                    <label for="prefLocale" class="col-form-label">${Updater.getResource(self, MODAL_PREF_LOCALE)}</label>
+                </div>
+                <div class="col-6">
+                    <input type="text" id="prefLocale" class="form-control form-control-sm" value="${pref["locale_str"]}" disabled>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label for="prefGroup" class="col-form-label">${Updater.getResource(self, MODAL_PREF_GROUP)}</label>
+                </div>
+                <div class="col-6">
+                    <input type="text" id="prefGroup" class="form-control form-control-sm" value="${pref["group"]}" disabled>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label for="prefCrossRate" class="col-form-label">${Updater.getResource(self, MODAL_PREF_CROSS_RATE)}</label>
+                </div>
+                <div class="col-6">
+                    <input type="text" id="prefCrossRate" class="form-control form-control-sm" value="${pref["cross_rate_code"]}" ${cfIndex >= 0 ? '' : 'disabled'}>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label for="prefEncoding" class="col-form-label">${Updater.getResource(self, MODAL_PREF_ENCODING)}</label>
+                </div>
+                <div class="col-6">
+                    <input type="text" id="prefEncoding" class="form-control form-control-sm" value="${pref["default_encoding"]}" ${cfIndex >= 0 ? '' : 'disabled'}>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label for="prefFiscalYear" class="col-form-label">${Updater.getResource(self, MODAL_PREF_FISCAL_YEAR)}</label>
+                </div>
+                <div class="col-6">
+                    <input type="number" id="prefFiscalYear" class="form-control form-control-sm" value="${pref["fiscal_year_start"]}" ${cfIndex >= 0 ? '' : 'disabled'}>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label for="prefDecimalDigits" class="col-form-label">${Updater.getResource(self, MODAL_PREF_DECIMAL_DIGITS)}</label>
+                </div>
+                <div class="col-6">
+                    <input type="number" id="prefDecimalDigits" class="form-control form-control-sm" value="${pref["decimal_digits"]}" ${cfIndex >= 0 ? '' : 'disabled'}>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label for="prefTargetValue" class="col-form-label">${Updater.getResource(self, MODAL_PREF_TARGET_VALUE)}</label>
+                </div>
+                <div class="col-6">
+                    <input type="text" id="prefTargetValue" class="form-control form-control-sm" value="${pref["target"]}" ${cfIndex >= 0 ? '' : 'disabled'}>
+                </div>
+            </div>`, {
+                textCancel: cfIndex >= 0 ? Updater.getResource(self, MODAL_CANCEL) : "",
+                textOK: cfIndex >= 0 ? Updater.getResource(self, MODAL_SUBMIT) : Updater.getResource(self, MODAL_OK),
+                outputFn: (isOK) => {
+                    if (cfIndex < 0 || !isOK) return {};
+
+                    return new WasmElemPreferences(
+                        "", // Not set
+                        "", // Not set
+                        document.getElementById("prefCrossRate").value,
+                        document.getElementById("prefEncoding").value,
+                        parseInt(document.getElementById("prefFiscalYear").value),
+                        parseInt(document.getElementById("prefDecimalDigits").value),
+                        document.getElementById("prefTargetValue").value
+                    );
+                },
+                finalFn: (isOK, data) => {    
+                    if (cfIndex < 0 || !isOK || !data) return;
+        
+                    if (self.engine.set_preferences(cfIndex, data)) {
+                        Updater.refreshEvents(self, "", 0);
+                        Updater.refreshAmResults(self);
+                        Updater.updateTabLabel(self, true);        
+                    }
+                }
+            }
+        );
     }
     
     /**

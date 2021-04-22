@@ -15,6 +15,9 @@ use amfnengine::core::*;
 use amfnengine::engine::*;
 use amfnengine::*;
 
+/// Version message. 
+pub const APP_VERSION: Option<&'static str> = option_env!("CARGO_PKG_VERSION");
+
 /// Event table.
 pub const TABLE_EVENT: u32 = 0;
 /// Am table.
@@ -578,6 +581,151 @@ impl WasmElemColumn {
     }
 }
 
+/// Wasm preferences.
+#[wasm_bindgen]
+pub struct WasmElemPreferences {
+    /// Locale string.
+    locale_str: String,
+    /// Template group name.
+    group: String,
+    /// Cross rate international currency code (e.g., USD, GBP, JPY, AUD, EUR, other currency code).
+    cross_rate_code: String,
+    /// Default encoding (us-ascii, iso-8859-1, utf-8, utf-16be, utf-16le, utf-16, other encoding).
+    default_encoding: String,
+    /// Start of fiscal year in MMDD format.
+    fiscal_year_start: u32,
+    /// Number of significant decimal digits.
+    decimal_digits: u32,
+    /// Target value.
+    target: String
+}
+
+/// Wasm preferences implementation.
+#[wasm_bindgen]
+impl WasmElemPreferences {
+
+    /// Create and return a preferences element.
+    ///
+    /// # Arguments
+    ///
+    /// * `locale_str_param` - Locale string.
+    /// * `group_param` - Template group name.
+    /// * `cross_rate_code_param` - Cross rate international currency code.
+    /// * `default_encoding_param` - Default encoding.
+    /// * `fiscal_year_start_param` - Start of fiscal year in MMDD format.
+    /// * `decimal_digits_param` - Number of significant decimal digits.
+    /// * `target_param` - Target value.
+    ///
+    /// # Return
+    ///
+    /// * See description.
+
+    #[wasm_bindgen(constructor)]
+    pub fn new(
+        locale_str_param: &str,
+        group_param: &str,
+        cross_rate_code_param: &str,
+        default_encoding_param: &str,
+        fiscal_year_start_param: u32,
+        decimal_digits_param: u32,
+        target_param: &str
+    ) -> WasmElemPreferences {
+        WasmElemPreferences {
+            locale_str: String::from(locale_str_param),
+            group: String::from(group_param),
+            cross_rate_code: String::from(cross_rate_code_param),
+            default_encoding: String::from(default_encoding_param),
+            fiscal_year_start: fiscal_year_start_param,
+            decimal_digits: decimal_digits_param,
+            target: String::from(target_param)
+        }
+    }
+
+    /// Getter for locale_str property
+    #[wasm_bindgen(getter)]
+    pub fn locale_str(&self) -> String {
+        String::from(self.locale_str.as_str())
+    }
+
+    /// Setter for locale_str property
+    #[wasm_bindgen(setter)]
+    pub fn set_locale_str(&mut self, locale_str: String) {
+        self.locale_str = locale_str;
+    }
+
+    /// Getter for group property
+    #[wasm_bindgen(getter)]
+    pub fn group(&self) -> String {
+        String::from(self.group.as_str())
+    }
+
+    /// Setter for group property
+    #[wasm_bindgen(setter)]
+    pub fn set_group(&mut self, group: String) {
+        self.group = group;
+    }
+
+    /// Getter for cross_rate_code property
+    #[wasm_bindgen(getter)]
+    pub fn cross_rate_code(&self) -> String {
+        String::from(self.cross_rate_code.as_str())
+    }
+
+    /// Setter for cross_rate_code property
+    #[wasm_bindgen(setter)]
+    pub fn set_cross_rate_code(&mut self, cross_rate_code: String) {
+        self.cross_rate_code = cross_rate_code;
+    }
+
+    /// Getter for default_encoding property
+    #[wasm_bindgen(getter)]
+    pub fn default_encoding(&self) -> String {
+        String::from(self.default_encoding.as_str())
+    }
+
+    /// Setter for default_encoding property
+    #[wasm_bindgen(setter)]
+    pub fn set_default_encoding(&mut self, default_encoding: String) {
+        self.default_encoding = default_encoding;
+    }
+
+    /// Getter for fiscal_year_start property
+    #[wasm_bindgen(getter)]
+    pub fn fiscal_year_start(&self) -> u32 {
+        self.fiscal_year_start
+    }
+
+    /// Setter for fiscal_year_start property
+    #[wasm_bindgen(setter)]
+    pub fn set_fiscal_year_start(&mut self, fiscal_year_start: u32) {
+        self.fiscal_year_start = fiscal_year_start;
+    }
+
+    /// Getter for decimal_digits property
+    #[wasm_bindgen(getter)]
+    pub fn decimal_digits(&self) -> u32 {
+        self.decimal_digits
+    }
+
+    /// Setter for decimal_digits property
+    #[wasm_bindgen(setter)]
+    pub fn set_decimal_digits(&mut self, decimal_digits: u32) {
+        self.decimal_digits = decimal_digits;
+    }
+
+    /// Getter for target property
+    #[wasm_bindgen(getter)]
+    pub fn target(&self) -> String {
+        String::from(self.target.as_str())
+    }
+
+    /// Setter for target property
+    #[wasm_bindgen(setter)]
+    pub fn set_target(&mut self, target: String) {
+        self.target = target;
+    }
+}
+
 /// Wasm summary element.
 #[wasm_bindgen]
 pub struct WasmElemSummary {
@@ -774,6 +922,32 @@ impl Engine {
         format!("{}|{}|{}", locale_str, encoding, decimal_digits)
     }
 
+    /// Return the AmFn engine version string.
+    ///
+    /// # Return
+    ///
+    /// * See description.
+
+    pub fn get_engine_version(&self) -> String {
+        match amfnengine::APP_VERSION {
+            None => String::from(""),
+            Some(o) => String::from(o)
+        }
+    }
+
+    /// Return the AmFn wasm version string.
+    ///
+    /// # Return
+    ///
+    /// * See description.
+
+    pub fn get_wasm_version(&self) -> String {
+        match APP_VERSION {
+            None => String::from(""),
+            Some(o) => String::from(o)
+        }
+    }
+
     /// Calculates the value for an event.
     /// Calculates either an interest amount or a principal amount
     /// (depending upon the selected event type) that will satisfy
@@ -785,7 +959,6 @@ impl Engine {
     ///
     /// * `cf_index` - The cashflow index.
     /// * `index` - The event index of the cashflow.
-    /// * `target_value` - See description.
     ///
     /// # Return
     ///
@@ -794,8 +967,7 @@ impl Engine {
     pub fn calculate_value(
         &self,
         cf_index: i32,
-        index: u32,
-        target_value: &str,
+        index: u32
     ) -> String {
         {
             let calc_mgr = self.engine.calc_mgr();
@@ -814,13 +986,7 @@ impl Engine {
             }
         }
 
-        let target;
-        match target_value.parse::<Decimal>() {
-            Err(_e) => return String::from(""),
-            Ok(o) => target = o
-        }
-
-        match self.engine.calculate_value(target) {
+        match self.engine.calculate_value() {
             Err(_e) => String::from(""),
             Ok(o) => o.result_decimal().to_string()
         }
@@ -836,7 +1002,6 @@ impl Engine {
     ///
     /// * `cf_index` - The cashflow index.
     /// * `index` - The event index of the cashflow.
-    /// * `target_value` - See description.
     ///
     /// # Return
     ///
@@ -845,8 +1010,7 @@ impl Engine {
     pub fn calculate_periods(
         &self,
         cf_index: i32,
-        index: u32,
-        target_value: &str
+        index: u32
     ) -> i32 {
         {
             let calc_mgr = self.engine.calc_mgr();
@@ -865,13 +1029,7 @@ impl Engine {
             }
         }
 
-        let target;
-        match target_value.parse::<Decimal>() {
-            Err(_e) => return 0,
-            Ok(o) => target = o
-        }
-
-        match self.engine.calculate_periods(target) {
+        match self.engine.calculate_periods() {
             Err(_e) => 0,
             Ok(o) => o.result_integer()
         }
@@ -1277,6 +1435,46 @@ impl Engine {
         }
     }
 
+    /// Get selected user or cashflow preferences.
+    ///
+    /// # Arguments
+    ///
+    /// * `cf_index` - The cashflow index or -1 for user preferences.
+    ///
+    /// # Return
+    ///
+    /// * See description.
+
+    pub fn get_preferences(&self, cf_index: i32) -> WasmElemPreferences {
+        let calc_mgr = self.engine.calc_mgr();
+        let prefs: &ElemPreferences;
+
+        if cf_index >= 0 {
+            calc_mgr.list_cashflow().get_element(cf_index as usize);
+
+            match calc_mgr.list_cashflow().preferences() {
+                None => { 
+                    prefs = calc_mgr.preferences(); 
+                } 
+                Some(o) => {
+                    prefs = o;
+                }
+            }
+        } else {
+            prefs = calc_mgr.preferences();
+        }
+
+        WasmElemPreferences::new(
+            prefs.locale_str(),
+            prefs.group(),
+            prefs.cross_rate_code(),
+            prefs.default_encoding(),
+            prefs.fiscal_year_start() as u32,
+            prefs.decimal_digits() as u32,
+            prefs.target().to_string().as_str()
+        )
+    }
+
     /// Get a specific resource.
     ///
     /// # Arguments
@@ -1375,13 +1573,24 @@ impl Engine {
 
         let calc_mgr = self.engine.calc_mgr();
 
+        let locale_str: &str;
         let group: &str;
         match calc_mgr.list_cashflow().preferences() {
-            None => group = "",
-            Some(o) => group = o.group()
+            None => {
+                locale_str = calc_mgr.preferences().locale_str();
+                group = "";
+            }
+            Some(o) => {
+                if o.locale_str().is_empty() {
+                    locale_str = calc_mgr.preferences().locale_str();                
+                } else {
+                    locale_str = o.locale_str();
+                }
+                group = o.group();
+            }
         }
 
-        format!("{}|{}", calc_mgr.list_cashflow().name(), group)
+        format!("{}|{}|{}", calc_mgr.list_cashflow().name(), locale_str, group)
     }
 
     /// Initialize and return the selected cashflow's
@@ -1966,6 +2175,47 @@ impl Engine {
             self.engine.calc_manager(), index_param as usize, values) { 
             return false; 
         }
+
+        true
+    }
+
+    /// Set selected user or cashflow preferences.
+    ///
+    /// # Arguments
+    ///
+    /// * `cf_index` - The cashflow index or -1 for user preferences.
+    ///
+    /// # Return
+    ///
+    /// * See description.
+
+    pub fn set_preferences(&self, cf_index: i32, prefs: &WasmElemPreferences) -> bool {
+        if cf_index >= 0 {
+            let calc_mgr = self.engine.calc_mgr();
+            calc_mgr.list_cashflow().get_element(cf_index as usize);
+        }
+
+        let mut calc_mgr = self.engine.calc_mgr_mut();
+        let elem_prefs: &mut ElemPreferences;
+
+        if cf_index >= 0 {
+            match calc_mgr.list_cashflow_mut().preferences_mut() {
+                None => { 
+                    elem_prefs = calc_mgr.preferences_mut(); 
+                } 
+                Some(o) => {
+                    elem_prefs = o;
+                }
+            }
+        } else {
+            elem_prefs = calc_mgr.preferences_mut();
+        }
+
+        elem_prefs.set_cross_rate_code(prefs.cross_rate_code().as_str());
+        elem_prefs.set_default_encoding(prefs.default_encoding().as_str());
+        elem_prefs.set_fiscal_year_start(prefs.fiscal_year_start() as usize);
+        elem_prefs.set_decimal_digits(prefs.decimal_digits() as usize);
+        elem_prefs.set_target(CoreUtility::parse_decimal(prefs.target().as_str()));
 
         true
     }

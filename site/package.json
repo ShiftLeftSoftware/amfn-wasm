@@ -1,6 +1,6 @@
 {
   "name": "amfnwasm",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "MIT OR Apache-2.0",
   "private": false,
   "scripts": {
@@ -8,7 +8,7 @@
     "serve": "webpack-dev-server"
   },
   "dependencies": {
-    "amfnwasm": "~0.2",
+    "amfnwasm": "~0.3",
     "ag-grid-community": "^25.1.0",
     "bootstrap": "^5.0.0-beta3",
     "bootstrap-icons": "^1.4.0",

@@ -14,17 +14,23 @@ const { Engine } = wasm_bindgen;
 // AmFn Wasm - Rust
 const amfnWasmRust = "./node_modules/amfnwasm/amfnwasm_bg.wasm";
 
-// Initialization urls (can be customized)
-const initUrls = "./default/en-us/preferences.json ./default/en-us/locales.json ./default/en-us/templates.json";
+// Default locale if we cannot find an appropriate locale from navigator.languages
+const defaultLocaleStr = "en-US";
+
+/// Default locale files
+const defaultFolder = "./default/";
+const defaultPreferences = "/preferences.json";
+const defaultLocales = "/locales.json";
+const defaultTemplates = "/templates.json";
 
 // Example cashflow URLs.
-const defaultBasicLoanUrl = "./default/basic_loan.json";
-const defaultBiWeeklyLoanUrl = "./default/bi_weekly_loan.json";
-const defaultStandardAnnuityUrl = "./default/standard_annuity.json";
-const defaultStandardBondUrl = "./default/standard_bond.json";
-const defaultStandardCashflowUrl = "./default/standard_cashflow.json";
-const defaultStandardInvestmentUrl = "./default/standard_investment.json";
-const defaultStandardLoanUrl = "./default/standard_loan.json";
+const defaultBasicLoanUrl = defaultFolder + "basic_loan.json";
+const defaultBiWeeklyLoanUrl = defaultFolder + "bi_weekly_loan.json";
+const defaultStandardAnnuityUrl = defaultFolder + "standard_annuity.json";
+const defaultStandardBondUrl = defaultFolder + "standard_bond.json";
+const defaultStandardCashflowUrl = defaultFolder + "standard_cashflow.json";
+const defaultStandardInvestmentUrl = defaultFolder + "standard_investment.json";
+const defaultStandardLoanUrl = defaultFolder + "standard_loan.json";
 
 // Serialize user preferences.
 const JSON_SERIALIZE_PREFERENCES = 1;
@@ -67,56 +73,80 @@ class CashflowManager {
             decimalDigits: 2
         };
     
-        this.initEnvironment(initUrls);
-    }
+        this.initLocaleStrAry = navigator.languages.slice();
+        this.initLocaleStrAry.push(defaultLocaleStr);
+
+        this.initLocale();
+    }    
 
     /**
-     * Initialize the user preferences, locales, templates, etc.
-     * @param {string} urlString The urls delimiter by a space character.
+     * Fetch and deserialize the next locale in the list (if present).
      */    
-    initEnvironment(urlString) {
+     initLocale() {
 
-        let urls = urlString.replace(/  +/g, ' ').split(' ');
+        let localeStr = this.initLocaleStrAry.shift();
+        if (!localeStr) return;
 
-        this.initUrl(urls);
-    }
+        let url = defaultFolder + localeStr + defaultPreferences;        
+        fetch(url).then(response => {
+            if (!response.ok) {
+                this.initLocale();
+                return;
+            }
 
-    /**
-     * Fetch and deserialize the url.
-     * @param {array} urls The array of urls to deserialize.
-     */    
-    initUrl(urls) {
+            response.text().then(text => {
+                let result = this.engine.deserialize(text);
+                if (result.length > 0) {
+                    Toast.toastError(result);
+                    return;
+                }  
 
-        let url = urls.shift();
-        if (url) {
-
-            fetch(url).then(response => {
-                response.text().then(text => {
-                    let result = this.engine.deserialize(text);
-                    if (result.length > 0) {
-                        Toast.toastError(result);
+                let url = defaultFolder + localeStr + defaultLocales;        
+                fetch(url).then(response => {
+                    if (!response.ok) {
+                        Toast.toastError("Cannot fetch locales");
                         return;
-                    }  
-                    
-                    this.initUrl(urls);
+                    }
+
+                    response.text().then(text => {
+                        let result = this.engine.deserialize(text);
+                        if (result.length > 0) {
+                            Toast.toastError(result);
+                            return;
+                        }  
+
+                        let url = defaultFolder + localeStr + defaultTemplates;        
+                        fetch(url).then(response => {
+                            if (!response.ok) {
+                                Toast.toastError("Cannot fetch templates");
+                                return;
+                            }
+        
+                            response.text().then(text => {
+                                let result = this.engine.deserialize(text);
+                                if (result.length > 0) {
+                                    Toast.toastError(result);
+                                    return;
+                                }  
+        
+                                let initInfo =  this.engine.init("").split('|');
+                                if (initInfo.length === 3) {    
+                                    this.config.localeStr = initInfo[0];                
+                                    this.config.encoding = initInfo[1];                
+                                    this.config.decimalDigits = parseInt(initInfo[2]);
+                                                                
+                                    this.loadMainResources();
+                                    
+                                    Toast.toastInfo(Updater.getResource(this, MSG_INITIALIZED) + this.config.localeStr);
+                                    this.initialized = true;
+                                }
+                            });
+                        });
+                    });
                 });
             });
-                    
-            return;
-        }
-
-        let initInfo =  this.engine.init("").split('|');
-        if (initInfo.length === 3) {    
-            this.config.localeStr = initInfo[0];                
-            this.config.encoding = initInfo[1];                
-            this.config.decimalDigits = parseInt(initInfo[2]);
-            
-        this.loadMainResources();
-
-        Toast.toastInfo(this.config.localeStr);
-            this.initialized = true;
-        }
-}
+        });
+    }
     
     /**
      * Descriptor callback.
@@ -523,8 +553,9 @@ class CashflowManager {
         let index = this.tabs.length;
 
         let labels = this.engine.init_cashflow(index).split('|'); 
-        let group = labels.length > 1 ? labels[1] : "";
-        let label = labels[0] + "[" + group + "]";
+        let group = labels.length > 2 ? labels[2] : "";
+        
+        let label = labels[0] + " [" + labels[1] + "]";
 
         let status = this.engine.init_cashflow_status(index);
     
@@ -543,6 +574,10 @@ class CashflowManager {
         spanLabel.innerHTML = label + " ";
         spanLabel.setAttribute("class", "tabLabel");
         divTab.appendChild(spanLabel);
+        let iPrefs = document.createElement("i");
+        iPrefs.style.cursor = "pointer";
+        iPrefs.setAttribute("class", "bi-gear");
+        divTab.appendChild(iPrefs);
         let iClose = document.createElement("i");
         iClose.style.cursor = "pointer";
         iClose.setAttribute("class", "bi-x");
@@ -576,6 +611,7 @@ class CashflowManager {
         this.enableCashflowMenu(true);
     
         divTab.addEventListener("click", e => this.activateTabEvent(e));
+        iPrefs.addEventListener("click", e => this.prefsTabEvent(e));
         iClose.addEventListener("click", e => this.closeTabEvent(e));
 
         grdEvent.addEventListener("keyup", e => EventHelper.eventKeyUp(e));
@@ -587,6 +623,13 @@ class CashflowManager {
      * Load main resources.
      */
      loadMainResources() {
+
+        let versionWasm = this.engine.get_wasm_version();
+        let versionEngine = this.engine.get_engine_version();
+
+        let spnVersion = document.getElementById("spnVersion");
+        spnVersion.innerHTML = Updater.getResource(this, NAV_VERSION) + 
+            versionWasm + "/" + versionEngine;
 
         let btn = document.getElementById("btnInsert");
         btn.innerHTML += " " + Updater.getResource(this, BUTTON_INSERT);
@@ -614,7 +657,6 @@ class CashflowManager {
 
         document.getElementById("menuNew").innerHTML += " " + Updater.getResource(this, MENU_NEW);
         document.getElementById("menuOpen").innerHTML += " " + Updater.getResource(this, MENU_OPEN);
-        document.getElementById("menuExamples").innerHTML += " " + Updater.getResource(this, MENU_EXAMPLES);
         document.getElementById("menuBasicLoan").innerHTML += " " + Updater.getResource(this, MENU_BASIC_LOAN);
         document.getElementById("menuBiWeeklyLoan").innerHTML += " " + Updater.getResource(this, MENU_BIWEEKLY_LOAN);
         document.getElementById("menuStandardAnnuity").innerHTML += " " + Updater.getResource(this, MENU_STANDARD_ANNUITY);
@@ -626,7 +668,28 @@ class CashflowManager {
         document.getElementById("menuSave").innerHTML += " " + Updater.getResource(this, MENU_SAVE);
         document.getElementById("modalOK").innerHTML = Updater.getResource(this, MODAL_CANCEL);
         document.getElementById("modalCancel").innerHTML = Updater.getResource(this, MODAL_OK);
-        document.getElementById("navbarDropdown").innerHTML += " " + Updater.getResource(this, NAV_FILE);
+        document.getElementById("navFile").innerHTML += " " + Updater.getResource(this, NAV_FILE);
+        document.getElementById("navExamples").innerHTML += " " + Updater.getResource(this, NAV_EXAMPLES);
+    }
+
+    /**
+     * Show the preferences for the tab that was clicked.
+     * @param {object} e The click event.
+     */    
+     prefsTabEvent(e) {    
+        e.stopPropagation();
+    
+        let target = e.target.parentElement.parentElement;
+    
+        let children = target.parentElement.children;
+        let index = 0;
+        for (; index < children.length; index++) {                
+            if (children[index] === target) {
+                break;
+            }
+        }
+    
+        ModalDialog.showPreferences(this, index);
     }
 
     /**
@@ -666,11 +729,13 @@ class CashflowManager {
     
         if (expand) {
             grdAmOptions.api.setRowData(this.tabs[this.activeTabIndex].amValues.expanded);
+            grdAmOptions.columnApi.setColumnVisible("Periods", false);
             btnExpand.innerHTML = `<i class="bi-arrows-collapse"></i> ` + Updater.getResource(this, BUTTON_COMPRESS);
             btnExpand.title = Updater.getResource(this, BUTTON_COMPRESS2);
             this.tabs[this.activeTabIndex].expanded = true;
         } else {
             grdAmOptions.api.setRowData(this.tabs[this.activeTabIndex].amValues.compressed);
+            grdAmOptions.columnApi.setColumnVisible("Periods", true);
             btnExpand.innerHTML = `<i class="bi-arrows-expand"></i> ` + Updater.getResource(this, BUTTON_EXPAND);
             btnExpand.title = Updater.getResource(this, BUTTON_EXPAND2);
             this.tabs[this.activeTabIndex].expanded = false;
@@ -727,9 +792,13 @@ class EventHelper {
 
         self.tabs[index].grdEvent.remove();
         self.tabs[index].grdAm.remove();
+
+        let iPrefs = self.tabs[index].divTab.querySelector(".bi-gear")
+        iPrefs.removeEventListener("click", e => this.prefsTabEvent(e));
     
         let iClose = self.tabs[index].divTab.querySelector(".bi-x")
         iClose.removeEventListener("click", e => self.closeTabEvent(e));
+
         self.tabs[index].divTab.removeEventListener("click", e => self.activateTabEvent(e));
     
         let ulTabs = document.getElementById("ulTabs"); 
@@ -884,6 +953,15 @@ class EventHelper {
     }
 
     /**
+     * Respond to the menu user preferences event.
+     */    
+     static menuUserPreferences() {
+        if (!cashflowManager.engineInitialized()) return;
+    
+        ModalDialog.showPreferences(cashflowManager, -1);
+    }
+
+    /**
      * Respond to the menu close cashflow event.
      */    
      static menuCloseCashflow() {
@@ -999,7 +1077,7 @@ class EventHelper {
         switch (tab.lastFocused.colDef.col_name) {
             case FIELD_VALUE:
                 result = cashflowManager.engine.calculate_value(
-                    cashflowManager.activeTabIndex, tab.lastFocused.rowIndex, "0.0"); // ##### Split button
+                    cashflowManager.activeTabIndex, tab.lastFocused.rowIndex);
                 if ("interest-change" in tab.eventValues[tab.lastFocused.rowIndex].extension) {
                     result = cashflowManager.engine.format_decimal_out(result);
                 } else {
@@ -1008,7 +1086,7 @@ class EventHelper {
                 break;
             case FIELD_PERIODS:
                 result = cashflowManager.engine.calculate_periods(
-                    cashflowManager.activeTabIndex, tab.lastFocused.rowIndex, "0.0"); // ##### Split button
+                    cashflowManager.activeTabIndex, tab.lastFocused.rowIndex);
                 result = cashflowManager.engine.format_integer_out(result);
                 break;
         }
@@ -1109,6 +1187,8 @@ class EventHelper {
 
     document.getElementById("btnExpand").addEventListener("click", () => EventHelper.menuExpand());
     document.getElementById("btnSummary").addEventListener("click", () => EventHelper.menuSummary());
+
+    document.getElementById("menuUserPreferences").addEventListener("click", () => EventHelper.menuUserPreferences());    
 
     ModalDialog.modalInit();
     

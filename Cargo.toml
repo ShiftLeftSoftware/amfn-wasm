@@ -1,6 +1,6 @@
 [package]
 name = "amfnwasm"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["ShiftLeft Software"]
 description = "Amortization Functions (AmFn) Web Assembly"
 homepage = "https://shiftleftsoftware.com"
@@ -20,7 +20,7 @@ crate-type = ["cdylib"]
 rust_decimal = "~1.10"
 wasm-bindgen = "~0.2"
 js-sys = "~0.3"
-amfnengine = { path  = "../amfn-engine", version = "~0.2" }
+amfnengine = { path  = "../amfn-engine", version = "~0.3" }
 
 [dependencies.chrono]
 version = "~0.4"

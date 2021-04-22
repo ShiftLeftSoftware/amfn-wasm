@@ -19,9 +19,6 @@
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <div class="mt-1">
-                    Loading AmFn Engine...
-                </div>                
             </div>            
         </div>
 
@@ -42,36 +39,37 @@
         
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
-                <button class="navbar-toggler" type="button" tabindex="-1" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" tabindex="-1" data-bs-toggle="collapse" 
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
+                        aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" id="navFile" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi-file-earmark"></i>
                             </a>
-                            <ul class="dropdown-menu multi-level" aria-labelledby="navbarDropdown">
+                            <ul class="dropdown-menu" aria-labelledby="navFile">
                                 <li><a id="menuNew" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
                                 <li><a id="menuOpen" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li class="nav-item dropdown-submenu">
-                                    <a id="menuExamples" class="dropdown-item" href="#">
-                                        <i class="bi-file-earmark"></i>
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li><a id="menuBasicLoan" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
-                                        <li><a id="menuBiWeeklyLoan" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
-                                        <li><a id="menuStandardAnnuity" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
-                                        <li><a id="menuStandardBond" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
-                                        <li><a id="menuStandardCashflow" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
-                                        <li><a id="menuStandardInvestment" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
-                                        <li><a id="menuStandardLoan" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
-                                    </ul>
-                                </li>                                  
-                                <li><hr class="dropdown-divider"></li>
                                 <li><a id="menuClose" class="dropdown-item disabled" href="#"><i class="bi-x"></i></a></li>
                                 <li><a id="menuSave" class="dropdown-item disabled" href="#"><i class="bi-file-earmark-arrow-down"></i></a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navExamples" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi-file-earmark"></i>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navExamples">
+                                <li><a id="menuBasicLoan" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
+                                <li><a id="menuBiWeeklyLoan" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
+                                <li><a id="menuStandardAnnuity" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
+                                <li><a id="menuStandardBond" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
+                                <li><a id="menuStandardCashflow" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
+                                <li><a id="menuStandardInvestment" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
+                                <li><a id="menuStandardLoan" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
                             </ul>
                         </li>
                     </ul>
@@ -97,20 +95,22 @@
             </div>
         </nav>
 
-        <ul id="ulTabs" class="nav nav-tabs" role="tablist">
-        </ul>
+        <ul id="ulTabs" class="nav nav-tabs" role="tablist"></ul>
 
         <content class="flex-grow-1 max-height">
             <section class="container-fluid d-flex flex-column max-height">
-                <div id="divEvents" class="vertical-resize">
-                </div>
-                <div id="divAms" class="flex-grow-1">
-                </div>
+                <div id="divEvents" class="vertical-resize"></div>
+                <div id="divAms" class="flex-grow-1"></div>
             </section>
         </content>
 
         <footer class="mt-auto">
-            <div id="divStatus">                
+            <div class="d-flex justify-content-between">
+                <div id="divStatus" class="ms-2"></div>
+                <div class="me-2">
+                    <span id="spnVersion" class="text-muted"></span>
+                    <a id="menuUserPreferences" href="#"><i class="bi-gear"></i></a>
+                </div>
             </div>
         </footer>
 
