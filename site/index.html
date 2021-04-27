@@ -5,7 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-        <link href="node_modules/toastify-js/src/toastify.css" rel="stylesheet">
         <link href="index.css" rel="stylesheet">
         <title>AmFn Wasm</title>
     </head>
@@ -26,6 +25,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 id="modalTitle" class="modal-title"></h5>
+                    <a id="modalHelp" class="btn" role="button" tabindex="-1" data-bs-toggle="popover" data-help="general"><i class="bi-question-circle" ></i></a>
                     <button id="modalClose" type="button" class="btn-close" tabindex="-1"></button>
                 </div>
                 <div id="modalBody" class="modal-body">
@@ -60,16 +60,16 @@
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navExamples" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi-file-earmark"></i>
+                                <i class="bi-file-earmark-ruled"></i>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navExamples">
-                                <li><a id="menuBasicLoan" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
-                                <li><a id="menuBiWeeklyLoan" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
-                                <li><a id="menuStandardAnnuity" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
-                                <li><a id="menuStandardBond" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
-                                <li><a id="menuStandardCashflow" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
-                                <li><a id="menuStandardInvestment" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
-                                <li><a id="menuStandardLoan" class="dropdown-item" href="#"><i class="bi-file-earmark-arrow-up"></i></a></li>
+                                <li><a id="menuBasicLoan" class="dropdown-item" href="#"><i class="bi-file-earmark-ruled"></i></a></li>
+                                <li><a id="menuBiWeeklyLoan" class="dropdown-item" href="#"><i class="bi-file-earmark-ruled"></i></a></li>
+                                <li><a id="menuStandardAnnuity" class="dropdown-item" href="#"><i class="bi-file-earmark-ruled"></i></a></li>
+                                <li><a id="menuStandardBond" class="dropdown-item" href="#"><i class="bi-file-earmark-ruled"></i></a></li>
+                                <li><a id="menuStandardCashflow" class="dropdown-item" href="#"><i class="bi-file-earmark-ruled"></i></a></li>
+                                <li><a id="menuStandardInvestment" class="dropdown-item" href="#"><i class="bi-file-earmark-ruled"></i></a></li>
+                                <li><a id="menuStandardLoan" class="dropdown-item" href="#"><i class="bi-file-earmark-ruled"></i></a></li>
                             </ul>
                         </li>
                     </ul>
@@ -88,6 +88,17 @@
                                 <i class="bi-graph-up"></i>
                             </button>
                             <ul id="chartDefsBtn" class="dropdown-menu dropdown-menu-end" aria-labelledby="btnCharts">
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="btn-toolbar" role="toolbar">
+                        <div class="btn-group me-2" role="group">
+                            <button class="btn btn-outline-primary dropdown-toggle" id="btnHelp" tabindex="-1" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi-question-circle"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="btnHelp">
+                                <li><a id="helpConcepts" class="dropdown-item" href="#" target="_blank"><i class="bi-question-circle"></i></a></li>
+                                <li><a id="helpCashflow" class="dropdown-item" href="#" target="_blank"><i class="bi-question-circle"></i></a></li>
                             </ul>
                         </div>
                     </div>
@@ -116,10 +127,11 @@
 
         <input type="file" class="display-none" id="fileInput" accept=".json"/>
 
+        <div id="toast-container" class="toast-container position-absolute bottom-0 end-0 p-3"></div>
+
         <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
         <script src="node_modules/ag-grid-community/dist/ag-grid-community.min.js"></script>
         <script src="node_modules/chart.js/dist/Chart.bundle.min.js"></script>
-        <script src="node_modules/toastify-js/src/toastify.js"></script>
         <script src="node_modules/amfnwasm/amfnwasm.js"></script>
         <script src="./utility.js"></script>
         <script src="./index.js"></script>

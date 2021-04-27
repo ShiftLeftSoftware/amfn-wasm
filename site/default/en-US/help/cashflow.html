@@ -1,0 +1,190 @@
+<!doctype html>
+<html class="max-height">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="../../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../../node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+        <title>AmFn Wasm Cashflow Help</title>
+    </head>
+    <body class="d-flex flex-column max-height">
+
+        <div class="m-3">
+
+            <h3>Cashflow tabs.</h3>
+
+            <p>A tab represents an open cashflow. Clicking on a tab activates that particular
+            cashflow and deactivates any previously active cashflow. Activating a tab shows that
+            cashflow's event grid, amortization grid, summary, and status line.</p>
+            
+            <p>Each tab displays the cashflow name, a button that displays the cashflow preferences,
+            and another button ("X") that closes the cashflow. When a cashflow has been updated, an asterisk
+            ("*") displays next to the cashflow name in the tab.</p>
+        
+            <h3>Creating a new cashflow.</h3>
+
+            <p>When a new cashflow is created, a dialog is shown that asks for a name (for the cashflow)
+            and the template group the cashflow will be based upon. The cashflow name and template group name
+            are required fields. Template groups designate an initial template event that will be automatically 
+            copied into the cashflow.</p>
+                    
+            <h3>Opening an existing cashflow.</h3>
+
+            <p>An open dialog appears asking for a AmFn JSON file name. Usually, the
+            JSON file represents a single cashflow. The AmFn Wasm JSON file may also contain any
+            number of user preferences, templates, exchange rates, etc.</p>
+                    
+            <h3>Closing an existing cashflow.</h3>
+
+            <p>Close an opened cashflow. If the cashflow has been updated, an asterisk ("*") appears
+            next to the caption of the cashflow tab and a close will be confirmed.</p>
+
+            <h3>Saving an opened cashflow.</h3>
+
+            <p>The currently selected cashflow is saved in the AmFn compliant
+            JSON file format. The saved cashflow may be retrieved at a later date
+            by the Open action.</p>
+
+            <p>Note: If an asterisk ("*") appears next to the caption of the cash
+            flow tab, the cashflow has changes that are unsaved, otherwise the
+            cashflow has no outstanding changes.</p>
+
+            <h3>Inserting a new event.</h3>
+
+            <p>A new event can be inserted into the currently selected cashflow by using the 
+            Cashflow Insert button. When cashflows are created, they specify a particular
+            template group. The template group contains template events for all the types
+            of events that can be created from that group.</p>
+            
+            <p>The list of template events for that template group is shown to the user. A specific 
+            template event can be selected from the list. The template event is then copied into the
+            cashflow's event list based upon the date of the currently selected event (or today's 
+            date if no event is selected). To reorder the event, simply change the date to the 
+            desired new date. After date, the minor sort key is the sort order (usually not shown
+            in the grids) that has been preset by the template events.</p>
+
+            <p>After creating the template event into the cashflow, if any events have one or more
+            parameters, the parameters dialog is shown to the user asking for initial inputs. This
+            signifies a more complex type of event such as a graduated payment. These type of
+            events have one or more expressions in applicable fields that calculate their values
+            based upon the parameter values entered.</p>
+
+            <h3>Deleting the currently selected event.</h3>
+
+            <p>An event can be deleted from the currently active cashflow by selecting a cell in the
+            applicable grid row and using the Delete Event button.</p>
+
+            <h3>Calculating the value of the selected event cell.</h3>
+
+            <p>The selected event cell of the active cashflow can be calculated by
+            using the Cashflow Calculate button. When a particular column of the cashflow can be 
+            calculated, the Calculate Cashflow button will become enabled.
+
+            <h3>Expand/Compress amortization.</h3>
+
+            <p>The user can switch between the compressed cashflow view and the expanded
+            amortization view by toggling the "Expand/Compress" button.</p>
+
+            <h3>Cashflow events.</h3>
+
+            <p>The event grid is the top-most grid within the cashflow. All editing of 
+            cashflow events is accomplished via this grid.</p>
+
+            <p>Each row of the event grid represents a separate event, while each
+            column of an event grid represents a different field of an event. The
+            columns that are shown for a particular cashflow and the ordering of
+            those columns can vary substantially between cashflows of different types
+            (i.e., loans versus investments, etc.).</p>
+
+            <p>A number of columns contain a selection button in the right side of the cell. By pressing
+            this button, a dialog or selection list is shown that assists in viewing or editing the
+            content of the cell.</p>
+
+            <p>The columns and rows of the event grid are navigated in a left-to-right and
+            top-to-bottom manner. While the mouse may be used to position between cells of
+            individual events, keystrokes will be used in a large number of cases (if not
+            exclusively by some users).</p>
+                
+            <h3>Expanded amortization.</h3>
+
+            <p>The expanded amortization grid is the "primary" bottom-most
+            grid within the cashflow. All editing of cashflow events is accomplished
+            with the event grid shown above this grid (i.e., the expanded amortization grid and
+            it's respective dialogs are read-only).</p>
+
+            <p>Each row of the expanded amortization grid represents a separate expanded event, while
+            each column represents a different field of an expanded event. The columns that are shown
+            for a particular cashflow and the ordering of those columns can vary substantially between
+            Cashflows of different types (i.e., loans versus investments, etc.).</p>
+
+            <p>A number of columns contain a selection button in the right side of the cell. By pressing
+            this button, a dialog or selection list is shown that assists in viewing the content
+            of the cell.</p>
+
+            <p>The columns and rows of the expanded amortization grid are navigated in a left-to-right,
+            top-to-bottom manner. While the mouse may be used to position between cells of individual
+            expanded events, keystrokes will be used in a large number of cases (if not exclusively by
+            some users).</p>
+
+            <h3>Compressed amortization.</h3>
+
+            <p>The compressed cashflow grid is the "secondary" bottom-most
+            grid within the cashflow. All editing of cashflow events is accomplished
+            with the event grid shown above this grid (i.e., the compressed cashflow grid and
+            it's respective dialogs are read-only).</p>
+
+            <p>Each row of the compressed cashflow grid represents a separate compressed event, while
+            each column represents a different field of a compressed event. The columns that are shown
+            for a particular cashflow and the ordering of those columns can vary substantially between
+            Cashflows of different types (i.e., loans versus investments, etc.).</p>
+
+            <p>A number of columns contain a selection button in the right side of the cell. By pressing
+            this button, a dialog or selection list is shown that assists in viewing the content
+            of the cell.</p>
+
+            <p>The columns and rows of the compressed cashflow grid are navigated in a left-to-right,
+            top-to-bottom manner. While the mouse may be used to position between cells of individual
+            compressed events, keystrokes will be used in a large number of cases (if not exclusively by
+            some users).</p>
+
+            <h3>Cashflow summary.</h3>
+
+            <p>The summary of the currently selected cashflow can be shown by using the Summary
+            button. The summary shows two columns and a variable number of
+            rows. The number of rows that are shown depends upon the number of summary
+            item descriptors that were defined for the cashflow (normally created via a template
+            group).</p>
+
+            <p>The first column displays the resolved label expression that was declared
+            with each summary item. The second column displays the resolved result
+            expression that was also declared with each summary item.</p>
+
+            <h3>Cashflow charts.</h3>
+
+            <p>The chart definitions for the currently selected cashflow can be shown by
+            using the Cashflow Charts dropdown button. A number of chart definitions appear under the 
+            charts dropdown.</p>
+
+            <p>Charts definitions operate either on a single cashflow (i.e., the
+            active cashflow) or all open cashflows. The icon displayed next to the chart name
+            designates the type of chart (single or multiple).</p>
+
+            <h3>Cashflow status line.</h3>
+
+            <p>The status line view appears at bottom of each cashflow. It represents various
+            statistics of the cashflow. The status line is automatically updated whenever the
+            event grid is changed.</p>
+
+            <p>The information that is shown in the status line can vary substantially between
+            cashflows of different types (i.e., loans versus investments, etc.). The degree that
+            the content of the status line varies between Cashflows is dependent upon the template
+            that was chosen at the time that the cashflow was created.</p>
+
+            <p>To the right of the status line is the AmFn Wasm version followed by the AmFn Engine
+            version. To the right of the version, a button shows the user preferences dialog.</p>
+        
+        </div>
+
+        <script src="../../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

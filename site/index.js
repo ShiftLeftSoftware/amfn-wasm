@@ -17,21 +17,6 @@ const amfnWasmRust = "./node_modules/amfnwasm/amfnwasm_bg.wasm";
 // Default locale if we cannot find an appropriate locale from navigator.languages
 const defaultLocaleStr = "en-US";
 
-/// Default locale files
-const defaultFolder = "./default/";
-const defaultPreferences = "/preferences.json";
-const defaultLocales = "/locales.json";
-const defaultTemplates = "/templates.json";
-
-// Example cashflow URLs.
-const defaultBasicLoanUrl = defaultFolder + "basic_loan.json";
-const defaultBiWeeklyLoanUrl = defaultFolder + "bi_weekly_loan.json";
-const defaultStandardAnnuityUrl = defaultFolder + "standard_annuity.json";
-const defaultStandardBondUrl = defaultFolder + "standard_bond.json";
-const defaultStandardCashflowUrl = defaultFolder + "standard_cashflow.json";
-const defaultStandardInvestmentUrl = defaultFolder + "standard_investment.json";
-const defaultStandardLoanUrl = defaultFolder + "standard_loan.json";
-
 // Serialize user preferences.
 const JSON_SERIALIZE_PREFERENCES = 1;
 /// Serialize templates.
@@ -66,12 +51,6 @@ class CashflowManager {
 
         this.tabs = [];
         this.activeTabIndex = -1;
-
-        this.config = {
-            localeStr: "",
-            encoding: "utf-8",
-            decimalDigits: 2
-        };
     
         this.initLocaleStrAry = navigator.languages.slice();
         this.initLocaleStrAry.push(defaultLocaleStr);
@@ -90,7 +69,7 @@ class CashflowManager {
         let url = defaultFolder + localeStr + defaultPreferences;        
         fetch(url).then(response => {
             if (!response.ok) {
-                this.initLocale();
+                Toast.toastError(result);
                 return;
             }
 
@@ -128,24 +107,53 @@ class CashflowManager {
                                     Toast.toastError(result);
                                     return;
                                 }  
-        
-                                let initInfo =  this.engine.init("").split('|');
-                                if (initInfo.length === 3) {    
-                                    this.config.localeStr = initInfo[0];                
-                                    this.config.encoding = initInfo[1];                
-                                    this.config.decimalDigits = parseInt(initInfo[2]);
-                                                                
-                                    this.loadMainResources();
-                                    
-                                    Toast.toastInfo(Updater.getResource(this, MSG_INITIALIZED) + this.config.localeStr);
-                                    this.initialized = true;
-                                }
+
+                                let url = defaultFolder + localeStr + defaultHelpContext;
+                                fetch(url).then(response => {
+                                    if (!response.ok) {
+                                        Toast.toastError("Cannot fetch help context");
+                                        return;
+                                    }
+                        
+                                    response.text().then(text => this.initEngine(localeStr, text));
+                                });
                             });
                         });
                     });
                 });
             });
         });
+    }
+
+    /**
+     * Initialize the AmFn engine.
+     * @param {string} localeStr Locale string.
+     * @param {string} text Text from help context fetch.
+     */    
+    initEngine(localeStr, text) {
+        let initInfo =  this.engine.init().split('|');
+        if (initInfo.length === 3) {    
+            config.localeStr = initInfo[0];                
+            config.encoding = initInfo[1];                
+            config.decimalDigits = parseInt(initInfo[2]);
+
+            config.helpForms = JSON.parse(text);
+            config.helpTitleInfo = Updater.getResource(this, HELP_TITLE_INFO);
+            config.helpTitleError = Updater.getResource(this, HELP_TITLE_ERROR);
+
+            let helpConcepts = document.getElementById("helpConcepts");
+            helpConcepts.innerHTML += " " + Updater.getResource(this, HELP_CONCEPTS);
+            helpConcepts.setAttribute("href", defaultFolder + localeStr + defaultHelpConcepts);
+        
+            let helpCashflow = document.getElementById("helpCashflow");
+            helpCashflow.innerHTML += " " + Updater.getResource(this, HELP_CASHFLOW);
+            helpCashflow.setAttribute("href", defaultFolder + localeStr + defaultHelpCashflow);
+                                                                                
+            this.loadMainResources();
+            
+            Toast.toastInfo(Updater.getResource(this, MSG_INITIALIZED) + config.localeStr);
+            this.initialized = true;
+        }
     }
     
     /**
@@ -176,8 +184,13 @@ class CashflowManager {
                 {
                     textCancel: Updater.getResource(self, MODAL_CANCEL),
                     textOK: Updater.getResource(self, MODAL_SUBMIT),
-                    finalFn: (isOK) => {
-                        if (isOK) ModalDialog.showExtensionOutput(self, rowIndex);
+                    outputFn: (isOK) => {
+                        if (!isOK) return {};        
+                        return ModalDialog.extensionOutput(self, rowIndex);
+                    },        
+                    finalFn: (isOK, data) => {
+                        if (!isOK) return;
+                        ModalDialog.extensionFinal(self, rowIndex, data);
                         Updater.focusEventGrid(tab);                        
                     }
                 }
@@ -186,6 +199,44 @@ class CashflowManager {
         }
 
         ModalDialog.showExtension(self, rowIndex, TABLE_AM);
+    }
+
+    /**
+     * Get the tab index.
+     * @param {object} e Event object.
+     * @return {number} The tab index.
+     */    
+     getTabIndex(e) {
+        let target = e.target;
+        let ulTabs = target;
+
+        do {
+            ulTabs = ulTabs.parentElement;            
+        } while (ulTabs.parentElement && ulTabs.id != "ulTabs");
+
+        let index = 0;
+        for (let elem of ulTabs.children) {
+            if (this.isTabChild(elem, target)) return index;
+            ++index;
+        }
+
+        return -1;
+    }
+
+    /**
+     * Determine if the target element is in the current element's hierarchy.
+     * @param {object} elem Current element.
+     * @param {number} target Target element.
+     * @return {bool} True if found.
+     */    
+     isTabChild(elem, target) {
+        if (elem === target) return true;
+
+        for (let child of elem.children) {
+            if (this.isTabChild(child, target)) return true;
+        }
+
+        return false;
     }
     
     /**
@@ -230,17 +281,8 @@ class CashflowManager {
             }
         }
     
-        let target = e.target.parentElement;
-    
-        let children = target.parentElement.children;
-        let index = 0;
-        for (; index < children.length; index++) {
-            if (children[index] === target) {
-                break;
-            }
-        }
-    
-        if (index >= this.tabs.length) {
+        let index = this.getTabIndex(e);    
+        if (index < 0) {
             Toast.toastError(Updater.getResource(this, MSG_TAB_INDEX) + index);
             return;
         }
@@ -361,15 +403,11 @@ class CashflowManager {
      */    
     closeTabEvent(e) {    
         e.stopPropagation();
-    
-        let target = e.target.parentElement.parentElement;
-    
-        let children = target.parentElement.children;
-        let index = 0;
-        for (; index < children.length; index++) {                
-            if (children[index] === target) {
-                break;
-            }
+
+        let index = this.getTabIndex(e);
+        if (index < 0) {
+            Toast.toastError(Updater.getResource(this, MSG_TAB_INDEX) + index);
+            return;
         }
     
         this.closeTab(index);
@@ -614,7 +652,7 @@ class CashflowManager {
         iPrefs.addEventListener("click", e => this.prefsTabEvent(e));
         iClose.addEventListener("click", e => this.closeTabEvent(e));
 
-        grdEvent.addEventListener("keyup", e => EventHelper.eventKeyUp(e));
+        grdEvent.addEventListener("keydown", e => EventHelper.eventKeyDown(e));
     
         divTab.click();
     }
@@ -666,8 +704,8 @@ class CashflowManager {
         document.getElementById("menuStandardLoan").innerHTML += " " + Updater.getResource(this, MENU_STANDARD_LOAN);
         document.getElementById("menuClose").innerHTML += " " + Updater.getResource(this, MENU_CLOSE);
         document.getElementById("menuSave").innerHTML += " " + Updater.getResource(this, MENU_SAVE);
-        document.getElementById("modalOK").innerHTML = Updater.getResource(this, MODAL_CANCEL);
-        document.getElementById("modalCancel").innerHTML = Updater.getResource(this, MODAL_OK);
+        document.getElementById("modalCancel").innerHTML = Updater.getResource(this, MODAL_CANCEL);
+        document.getElementById("modalOK").innerHTML = Updater.getResource(this, MODAL_OK);
         document.getElementById("navFile").innerHTML += " " + Updater.getResource(this, NAV_FILE);
         document.getElementById("navExamples").innerHTML += " " + Updater.getResource(this, NAV_EXAMPLES);
     }
@@ -679,14 +717,10 @@ class CashflowManager {
      prefsTabEvent(e) {    
         e.stopPropagation();
     
-        let target = e.target.parentElement.parentElement;
-    
-        let children = target.parentElement.children;
-        let index = 0;
-        for (; index < children.length; index++) {                
-            if (children[index] === target) {
-                break;
-            }
+        let index = this.getTabIndex(e);
+        if (index < 0) {
+            Toast.toastError(Updater.getResource(this, MSG_TAB_INDEX) + index);
+            return;
         }
     
         ModalDialog.showPreferences(this, index);
@@ -758,7 +792,7 @@ class CashflowManager {
         }
     
         if (!chartDef) {
-            Toast.toastError(this.engine.get_chart_definitions(MSG_CHART_DEF) + name);
+            Toast.toastError(Updater.getResource(this, MSG_CHART_DEF) + name);
             return;
         }
     
@@ -788,7 +822,7 @@ class EventHelper {
             self.setExpand(false);
         }
     
-        self.tabs[index].grdEvent.removeEventListener("keyup", e => EventHelper.eventKeyUp(e));
+        self.tabs[index].grdEvent.removeEventListener("keydown", e => EventHelper.eventKeyDown(e));
 
         self.tabs[index].grdEvent.remove();
         self.tabs[index].grdAm.remove();
@@ -860,16 +894,17 @@ class EventHelper {
     }
     
     /**
-     * Respond to the grid event key up.
-     * @param {object} e Keyup event.
+     * Respond to the grid event key down.
+     * @param {object} e Keydown event.
      */    
-    static eventKeyUp(e) {
+    static eventKeyDown(e) {
         if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;    
 
         let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
         if (e.keyCode !== 13 || e.shiftKey || e.ctrlKey || e.altKey || !tab.lastFocused.colDef) return;
 
-        if (tab.lastFocused.value !== tab.eventValues[tab.lastFocused.rowIndex][tab.lastFocused.colDef.col_name]) return;
+        if (tab.lastFocused.value !== // Change event will fire next
+            tab.eventValues[tab.lastFocused.rowIndex][tab.lastFocused.colDef.col_name]) return;
 
         Updater.focusEventGrid(tab);
         if (!tab.grdEventOptions.api.tabToNextCell()) {
@@ -916,9 +951,11 @@ class EventHelper {
             gridRow.setDataValue(colDef.col_name, value);
         }
 
-        Updater.focusEventGrid(tab);
-        if (!tab.grdEventOptions.api.tabToNextCell()) {
-            EventHelper.nextInsert();
+        Updater.focusEventGrid(tab); // Insure it's the same cell   
+        if (e.rowIndex === tab.lastFocused.rowIndex && e.column === tab.lastFocused.column) { 
+            if (!tab.grdEventOptions.api.tabToNextCell()) {
+                EventHelper.nextInsert();
+            }
         }
 
         Updater.refreshAmResults(cashflowManager);
@@ -949,7 +986,7 @@ class EventHelper {
             cashflowManager.loadCashflow(fileName);
         };
     
-        reader.readAsText(fileName, cashflowManager.config.encoding);
+        reader.readAsText(fileName, config.encoding);
     }
 
     /**
@@ -1148,7 +1185,7 @@ class EventHelper {
      * Show/hide the spinner.
      * @param {bool} isShow Show the spinner.
      */    
-     static showSpinner(isShow) {
+    static showSpinner(isShow) {
 
         let divBackground = document.getElementById("divBackground");
         let divSpinner = document.getElementById("divSpinner");
@@ -1160,6 +1197,36 @@ class EventHelper {
             divBackground.style.display = "none";
             divSpinner.style.display = "none";
         }
+    }
+
+    /**
+     * Respond to the skip periods input value changing.
+     * @param {object} e Input event.
+     * @param {object} self Self event.
+     * @param {object} skipPeriodsChangeInfo Skip periods change info.
+     */  
+    static skipPeriodsInput(e, self, skipPeriodsChangeInfo) {  
+        skipPeriodsChangeInfo.newValue = e.target.value;
+        
+        let rangeValue = document.getElementById("skipPeriodsRangeValue");
+        rangeValue.value = skipPeriodsChangeInfo.newValue;
+
+        ModalDialog.showSkipPeriodsRangeChange(self, skipPeriodsChangeInfo);
+    }    
+
+    /**
+     * Respond to the skip periods slider value changing.
+     * @param {object} e Change event.
+     * @param {object} self Self event.
+     * @param {object} skipPeriodsChangeInfo Skip periods change info.
+     */    
+     static skipPeriodsChange(e, self, skipPeriodsChangeInfo) {
+        skipPeriodsChangeInfo.newValue = e.target.value;
+        
+        let range = document.getElementById("skipPeriodsRange");
+        range.value = skipPeriodsChangeInfo.newValue;
+
+        ModalDialog.showSkipPeriodsRangeChange(self, skipPeriodsChangeInfo);
     }
 }
 
@@ -1188,7 +1255,7 @@ class EventHelper {
     document.getElementById("btnExpand").addEventListener("click", () => EventHelper.menuExpand());
     document.getElementById("btnSummary").addEventListener("click", () => EventHelper.menuSummary());
 
-    document.getElementById("menuUserPreferences").addEventListener("click", () => EventHelper.menuUserPreferences());    
+    document.getElementById("menuUserPreferences").addEventListener("click", () => EventHelper.menuUserPreferences()); 
 
     ModalDialog.modalInit();
     

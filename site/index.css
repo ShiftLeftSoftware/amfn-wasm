@@ -42,9 +42,19 @@ footer {
     z-index: 1100;
 }
 
+.div-popover {
+    z-index: 1150;
+    max-width: 40%;
+}
+
 .div-spinner {
     display:none; 
     z-index: 1200;
+}
+
+.popover-body {
+    height: 80vh;
+    overflow-y: auto;
 }
 
 .dropdown-submenu {
@@ -106,6 +116,11 @@ footer {
 
 .max-width {
     width: 100%;
+}
+
+.toast-color-box {
+    height:20px;
+    width:20px;    
 }
 
 .value-cell {

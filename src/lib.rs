@@ -880,26 +880,19 @@ impl Engine {
 
     /// Initialize the engine with the user locale.
     ///
-    /// # Arguments
-    ///
-    /// * `locale_str_param` - The optional locale string.
-    ///
     /// # Return
     ///
     /// * Return the locale string, encoding, and default decimal digits.
 
-    pub fn init(&mut self, locale_str_param: &str) -> String {
-        let mut locale_str = String::from(locale_str_param);
+    pub fn init(&mut self) -> String {
         let mut encoding = String::from(amfnengine::DEFAULT_ENCODING);
         let mut decimal_digits = amfnengine::DEFAULT_DECIMAL_DIGITS;
 
         if self.initialized {
-            return locale_str;
+            return String::from("");
         }
 
-        if locale_str.is_empty() {
-            locale_str = String::from(self.engine.calc_mgr().preferences().locale_str());
-        }
+        let locale_str = String::from(self.engine.calc_mgr().preferences().locale_str());
 
         if !self
             .engine

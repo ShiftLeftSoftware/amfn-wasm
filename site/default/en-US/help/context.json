@@ -1,0 +1,765 @@
+[
+	{
+		"group": "CurrentValue",
+		"name": "general",
+		"value": [
+			"The current value editor allows current value event options to be updated and viewed",
+			"(while within the event or template event list tables) or viewed only (while within the expanded",
+			"amortization or compressed cashflow tables). The current value editor is shown by pressing",
+			"the button on the right side of the \"Type\" column."
+		]
+	},
+	{
+		"group": "CurrentValue",
+		"name": "eom",
+		"value": [
+			"Check this option to require that all expanded and compressed events of a base event",
+			"are adjusted to the end of the month (i.e., last day of the month) if applicable."
+		]
+	},
+	{
+		"group": "CurrentValue",
+		"name": "passive",
+		"value": [
+			"Check this option to specify a passive current value event. A passive current value",
+			"event does not affect the balance of the cashflow. In contrast, an active current",
+			"value event does affect the balance of the cashflow."
+		]
+	},
+	{
+		"group": "CurrentValue",
+		"name": "present",
+		"value": [
+			"Check this option to specify a Present Value (PV) current value event. A Present",
+			"Value (PV) current balance event separates the \"past\" from the \"future\" as of",
+			"a certain date."
+		]
+	},
+	{
+		"group": "InterestChange",
+		"name": "general",
+		"value": [
+			"The interest change editor allows interest change event options to be updated and viewed",
+			"(while within the event or template event list tables) or viewed only (while within the expanded",
+			"amortization or compressed cashflow tables). The interest change editor is shown by pressing",
+			"the button on the right side of the \"Type\" column."
+		]
+	},
+	{
+		"group": "InterestChange",
+		"name": "interest-method",
+		"value": [
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "Actuarial",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "This method is used for all positive Cashflows. For negative Cashflows,",
+                    "any interest that is not satisfied for a principal change event is compounded back",
+                    "into the principal balance.",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "Simple interest",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "For negative Cashflows, any interest that is not satisfied for a",
+                    "principal change event is placed into a separate accrued interest balance and is usually",
+                    "satisfied first with the next principal change event (unless the \"principal first\" option",
+                    "is used). For positive Cashflows, any interest is placed into a separate accrued interest",
+                    "balance and is not compounded back into the principal. If the interest method is changed",
+                    "from simple interest to actuarial, any accrued interest balance is added into the principal",
+                    "at that point in time for both positive and negative Cashflows.",
+                "</div>",
+            "</div>"
+		]
+	},
+	{
+		"group": "InterestChange",
+		"name": "day-count-basis",
+		"value": [
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "Periodic",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "The periodic interest rate is most often used to calculate interest with",
+                    "negative Cashflows (i.e., loans, etc.) and some investments.",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "Rule-Of-78",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "Sometimes used by financial institutions when negative Cashflows (i.e.,",
+                    "loans, etc.) are to be paid off early. The theory is that more interest is paid at the",
+                    "beginning of the cashflow to recoup profit or up-front costs lost by the financial",
+                    "institution.",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "Actual/Days-In-Year",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "The actual number of days divided by the number of days in the",
+                    "year as defined by the \"Days in year\" field (e.g., money markets and mutual funds).",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "Actual/Actual (ISMA)",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "The ISMA method of calculating an actual day count (e.g., U.S.",
+                    "Treasury bonds and notes).",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "Actual/Actual (AFB)",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "The AFB method of calculating an actual day count (e.g., U.S.",
+                    "Treasury bonds and notes).",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "Actual/365L (ISDA)",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "The ISDA method of calculating an actual day count (e.g., bonds",
+                    "that take leap years into account).",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "30/Days-In-Year",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "A 30-day based calculation divided by the number of days in",
+                    "the year as defined by the \"Days in year\" field (e.g., U.S. agency bonds, municipal",
+                    "bonds, corporate bonds, mortgage backed securities, etc.).",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "30E/Days-In-Year",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "A 30-day based calculation divided by the number of days in",
+                    "the year as defined by the \"Days in year\" field (e.g., Euro bonds).",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "30E+/Days-In-Year",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "A 30-day based calculation divided by the number of days in",
+                    "the year as defined by the \"Days in year\" field (e.g., Swiss bonds).",
+                "</div>",
+            "</div>"
+		]
+	},
+	{
+		"group": "InterestChange",
+		"name": "days-in-year",
+		"value": [
+			"The declared number of days in the year that is used for particular day counts."
+		]
+	},
+	{
+		"group": "InterestChange",
+		"name": "effective-frequency",
+		"value": [
+			"Adjusts the compounding period as set by the Frequency",
+			"column of the interest change event, thus changing the effective annual rate. For example,",
+			"Canadian loans often mandate a 6-month effective frequency while maintaining monthly",
+			"payments. This would usually result in 5 payments with no interest and 1 payment with",
+			"an interest amount that is too large to be covered by the 6th payment (thus compounding",
+			"the unpaid interest back into the principal balance). By specifying 6-month in this",
+			"field, the large interest amount normally accrued on the 6th payment is prorated",
+			"over all 6 payments while maintaining the required effective annual rate."
+		]
+	},
+	{
+		"group": "InterestChange",
+		"name": "interest-frequency",
+		"value": [
+			"Since the Frequency column of interest change events",
+			"are used to specify the compounding period, this field can be optionally used with",
+			"the Periods and Intervals columns to allow interest change events to be repeated",
+			"on a periodic basis (or a non-periodic basis with active skip periods), thus allowing",
+			"\"stepped\" interest events, etc."
+		]
+	},
+	{
+		"group": "InterestChange",
+		"name": "round-balance",
+		"value": [
+			"<div>Each interest amount is rounded according to all values of round decimal digits. This",
+			"option is usually set to None for the actuarial method and is sometimes set to bankers",
+			"for the actuarial and simple interest methods.</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "none",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "Do not round interest amounts.",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "bankers",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "Exact rounding using banker's method (at .5 round to even number).",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "bias-up",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "Exact rounding with bias up (at .5 round up).",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "bias-down",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "Exact rounding with bias down (at .5 round down).",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "up",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "Any decimal digits round up.",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "truncate",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "Truncate decimal digits.",
+                "</div>",
+            "</div>"
+		]
+	},
+	{
+		"group": "InterestChange",
+		"name": "round-decimal-digits",
+		"value": [
+			"A value less than zero (< 0) indicates that the decimal digits",
+			"specified in the user preferences should be used. A value greater than zero and less than",
+			"one (0 < x < 1) indicates that rounding is performed according to the fraction x. A value",
+			"equal to zero or greater than or equal to one (0 or >= 1) indicates an explicit integer number",
+			"of decimal digits to perform rounding."
+		]
+	},
+	{
+		"group": "InterestChange",
+		"name": "nominal-annual-rate",
+		"value": [
+			"The nominal annual rate as defined by the Value column",
+			"of this interest change event. If this value is updated, the Value column will also",
+			"be changed. Any changes to this field will be reflected in all rate fields of this",
+			"dialog."
+		]
+	},
+	{
+		"group": "InterestChange",
+		"name": "effective-annual-rate",
+		"value": [
+			"The effective annual rate will be the same as the",
+			"nominal annual rate when the compounding period is 1-year. However, when the",
+			"compounding period is less than 1-year (e.g., 1-month, etc.), the effective",
+			"annual rate will be slightly greater than the nominal annual rate due to compounding",
+			"occuring more frequently. Any changes to this field will be reflected in all",
+			"rate fields of this dialog."
+		]
+	},
+	{
+		"group": "InterestChange",
+		"name": "periodic-rate",
+		"value": [
+			"The periodic rate is the interest rate that will",
+			"be used for each compounding period when the day count basis is set to Periodic",
+			"(except when a \"stub\" or odd days period is seen, in which case the daily rate",
+			"is used). Any changes to this field will be reflected in all rate fields of this dialog."
+		]
+	},
+	{
+		"group": "InterestChange",
+		"name": "daily-rate",
+		"value": [
+			"The daily rate is the interest rate that will",
+			"be used when the day count basis is set to Actual/Days-In-Year (all other day",
+			"count basis options use industry standard formulas) or when the Periodic day count",
+			"basis is used and a \"stub\" or odd days period is seen. Any changes to this field",
+			"will be reflected in all rate fields of this dialog."
+		]
+	},
+	{
+		"group": "PrincipalChange",
+		"name": "general",
+		"value": [
+			"The principal change editor allows principal change event options to be updated and viewed",
+			"(while within the event or template event list tables) or viewed only (while within the expanded",
+			"amortization or compressed cashflow tables). The principal change editor is shown by pressing",
+			"the button on the right side of the \"Type\" column."
+		]
+	},
+	{
+		"group": "PrincipalChange",
+		"name": "principal-type",
+		"value": [
+			"<div>The type of principal change event.</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "decrease",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "Decrease the principal balance.",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "increase",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "Increase the principal balance.",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "negative",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "Set the principal balance to a negative value.",
+                "</div>",
+            "</div>",
+            "<div class=\"row mt-2\">",
+                "<div class=\"col-3\">",
+                    "positive",
+                "</div>",
+                "<div class=\"col-9\">",
+                    "Set the principal balance to a positive value.",
+                "</div>",
+            "</div>"
+		]
+	},
+	{
+		"group": "PrincipalChange",
+		"name": "eom",
+		"value": [
+			"Check this option to require that all expanded and compressed",
+			"events of a base event are adjusted to the end of the month (i.e., last day of the month) if",
+			"applicable. For example, some contracts explicitly state that principal change events (such",
+			"as payments for loans) must come on the 30th of the month unless the number of days in the",
+			"month is less, while other contracts explicitly state that principal change events must come",
+			"on the last day of the month."
+		]
+	},
+	{
+		"group": "PrincipalChange",
+		"name": "principal-first",
+		"value": [
+			"For negative Cashflows (i.e., loans, etc.) operating under",
+			"the \"Simple interest\" method, check this option to force the entire amount of the principal",
+			"change value to be applied to the principal balance first (thus allowing interest to be",
+			"accrued in the meantime). This will change the balance of the cashflow since any interest",
+			"accrued is only satisfied after the entire principal balance is satisfied."
+		]
+	},
+	{
+		"group": "PrincipalChange",
+		"name": "statictics",
+		"value": [
+			"Check this option for any principal change event that",
+			"should be assigned a \"Sequence\" column incrementing value and also be counted in the",
+			"principal change balance statistics (usually shown within the status line)."
+		]
+	},
+	{
+		"group": "PrincipalChange",
+		"name": "auxiliary",
+		"value": [
+			"Check this option if the principal change event is",
+			"an active auxiliary event and does affect the balance of the cashflow. An example",
+			"would be prepaid interest paid on a loan."
+		]
+	},
+	{
+		"group": "PrincipalChange",
+		"name": "passive",
+		"value": [
+			"This option can only be checked if the \"Auxiliary event\"",
+			"option above is first checked. Check this option if the principal change event is",
+			"a passive auxiliary event and does not affect the balance of the cashflow, even",
+			"though it is displayed within the cashflow. Examples would be \"Points\" paid on a",
+			"loan or any type of fee incurred while originating or servicing the cashflow. Note:",
+			"The overall yield (i.e., APR) calculation will factor in passive auxiliary principal",
+			"change events, so that an overall interest rate can be correctly reported."
+		]
+	},
+	{
+		"group": "StatisticValue",
+		"name": "general",
+		"value": [
+			"The statistic value editor allows statistic value event options to be updated and viewed",
+			"(while within the event or template event list tables) or viewed only (while within the expanded",
+			"amortization or compressed cashflow tables). The statistic value editor is shown by pressing",
+			"the button on the right side of the \"Type\" column."
+		]
+	},
+	{
+		"group": "StatisticValue",
+		"name": "name",
+		"value": [
+			"A short unique name that normally appears in the \"Type\" column",
+			"for the event. If a uniquely identifying name is not assigned to the statistic event, a name is",
+			"automatically assigned when the statistic event is created. When a name is used that is already",
+			"active, the current statistic value event is discontinued and the new statistic value event is",
+			"started (unless the \"Final statistic\" option is checked)."
+		]
+	},
+	{
+		"group": "StatisticValue",
+		"name": "eom",
+		"value": [
+			"Check this option to require that all expanded and compressed",
+			"events of a base event are adjusted to the end of the month (i.e., last day of the month)",
+			"if applicable."
+		]
+	},
+	{
+		"group": "StatisticValue",
+		"name": "final",
+		"value": [
+			"When checked, prematurely discontinues the statistic event",
+			"with the corresponding name shown in the Name field. (Note: Statistic value events normally",
+			"run in perpetuity until the end of the cashflow.)"
+		]
+	},
+	{
+		"group": "SkipPeriods",
+		"name": "general",
+		"value": [
+			"<div>The skip periods editor has a slider bar and a table, which shows the skip periods",
+			"entries selected with the slider bar.</div>",
+			"<div>The slider bar specifies the number of skip period entries that will be displayed",
+			"in the table up to and including the number of periods specified in the Periods column",
+			"of this event.</div>",
+			"<div>The skip period entries indicate which periods to allow and which periods to skip for",
+			"the event. If the number of skip period entries is less than the number of periods, the",
+			"entries are simply repeated until the number of periods is satisfied for this event. Skip",
+			"periods can also be used with interest change events to handle non-periodic interest rate",
+			"adjustments, all from a single event.</div>",
+			"<div>For example, with a loan for a seasonal business, we could easy create 3 principal",
+			"change events, each having a periods value of 120 months (i.e., 10 years) and 12 skip",
+			"period entries (i.e., 1 year), in order to adjust for 3 different payment amounts during",
+			"specific months of each year for the life of the loan.</div>",
+			"<div>Within the table are shown the skip periods entries. Each skip periods entry can be",
+			"either True, indicating that the period is to be skipped, or False, indicating that the",
+			"period is not to be skipped. By clicking the checkbox for the skip period entries,",
+			"each skip period is either skipped (True) or not skipped (False).</div>"
+		]
+	},
+	{
+		"group": "SkipPeriods",
+		"name": "date",
+		"value": [
+			"The date of the skip period as determined by",
+			"the start date, intervals and frequency of the event. Since skip period",
+			"entries are repeated until the number of periods in the event are satisfied,",
+			"this date represents only the first date that a skip period entry is used."
+		]
+	},
+	{
+		"group": "SkipPeriods",
+		"name": "skip-period",
+		"value": [
+			"A checkbox indicating if the period is to be skipped",
+			"(i.e., checked or True) or not skipped (i.e., unchecked or False)"
+		]
+	},
+	{
+		"group": "Descriptor",
+		"name": "general",
+		"value": [
+			"The descriptor editor has a table, which shows one or more descriptors",
+		    "that comprise the descriptor list, and a New and Delete button. The New button",
+		    "creates a new descriptor into the descriptor list while the Delete button deletes",
+		    "the selected descriptor from the descriptor list."
+		]
+	},
+	{
+		"group": "Descriptor",
+		"name": "group",
+		"value": [
+			"The group identifier of the descriptor. A number",
+			"of descriptors that are used with customization have pre-defined group identifiers. All",
+			"other types of descriptors may use any group identifier except those that are",
+			"pre-defined. The associated button with this column displays the pre-defined identifiers",
+			"for the user, template, and cashflow descriptor lists."
+		]
+	},
+	{
+		"group": "Descriptor",
+		"name": "name",
+		"value": [
+			"The name identifier of the descriptor within the selected",
+			"group. A number of descriptors that are used with customization have pre-defined name",
+			"identifiers within the selected group. All other types of descriptors may use any name",
+			"identifier except those that are pre-defined within the selected group. The associated",
+			"button with this column displays the pre-defined identifiers within the selected group for",
+			"the user, template, and cashflow descriptor lists."
+		]
+	},
+	{
+		"group": "Descriptor",
+		"name": "type",
+		"value": [
+			"The type of the descriptor, which may be the pre-defined",
+			"identifier \"locale\", for a locale sensitive descriptor, or anything else that has",
+			"meaning to the user or installation (e.g., \"GLCode\", \"TaxCode\", etc.)."
+		]
+	},
+	{
+		"group": "Descriptor",
+		"name": "code",
+		"value": [
+			"The code of the descriptor, which must be a valid locale",
+			"(if the type has been set to \"locale\") or anything else that has meaning to the user",
+			"or installation (e.g., a general ledger code, tax code, etc.)."
+		]
+	},
+	{
+		"group": "Descriptor",
+		"name": "value",
+		"value": [
+			"The actual value of the descriptor. When employing one",
+			"of the pre-defined customization descriptors at the user, template or cashflow levels,",
+			"the associated button will invoke one of the customization editors to assist in defining",
+			"the descriptor's value. This column is read-only for pre-defined customization descriptors",
+			"(i.e., the customization editor must be used to change the value) and read-write for all",
+			"other types of descriptors."
+		]
+	},
+	{
+		"group": "Descriptor",
+		"name": "value-expr",
+		"value": [
+			"When this column is not blank for a particular descriptor,",
+			"the expression is evaluated (at the appropriate point in time) and the result is set into",
+			"the Value column field. The associated button invokes the expression editor to assist in",
+			"creating the expression."
+		]
+	},
+	{
+		"group": "Descriptor",
+		"name": "propagate",
+		"value": [
+			"Copy this descriptor to the next level down if applicable.",
+			"This option is primarily used with a user level descriptor list to allow individual",
+			"descriptors to be copied either to a newly created template or a cashflow that is not",
+			"based upon a template. All template descriptors (both preference descriptors and event",
+			"descriptors) are always copied to a newly created cashflow regardless of the setting",
+			"of this field (otherwise they would have no useful purpose)."
+		]
+	},
+	{
+		"group": "Parameter",
+		"name": "general",
+		"value": [
+			"The parameters editor shows a table, which contains one or more parameters",
+			"that comprise the parameter list, and New and Delete buttons. The New button",
+			"creates a new parameter into the parameter list while the Delete button deletes",
+			"the selected parameter from the parameter list."
+		]
+	},
+	{
+		"group": "Parameter",
+		"name": "name",
+		"value": [
+			"The name of the parameter, which may be",
+			"subsequently used within expressions at the current level of evaluation (i.e.,",
+			"user, cashflow or event list). The name of the parameter must not include",
+			"space characters."
+		]
+	},
+	{
+		"group": "Parameter",
+		"name": "type",
+		"value": [
+			"The type of the parameter, which must be either an",
+			"integer (for dates or whole numbers), decimal (for floating point values) or",
+			"string (for textual information)."
+		]
+	},
+	{
+		"group": "Parameter",
+		"name": "value",
+		"value": [
+			"The value of the parameter which must be of the",
+			"resulting type set by the column \"Type\". This is the only column that is normally",
+			"filled in by the end-user (i.e., all other columns are usually determined by",
+			"the template author)."
+		]
+	},
+	{
+		"group": "Preferences",
+		"name": "general",
+		"value": [
+			"The preferences editor allows the user preferences to be shown and the cashflow preferences",
+			"to be shown and selectively edited."
+		]
+	},
+	{
+		"group": "Preferences",
+		"name": "locale-str",
+		"value": [
+			"A locale designates the language, country",
+			"and an optional variant (such as \"EURO\") separated by underscore",
+			"characters (\"_\"). This value is selected from the accompanying",
+			"combo box list. In addition to a spoken language, a locale helps determine",
+			"the proper date, currency and number formats for formatting purposes."
+		]
+	},
+	{
+		"group": "Preferences",
+		"name": "group",
+		"value": [
+			"This preference sets the template",
+			"group that is assigned to a cashflow. The template group is eventually",
+			"propagated to an individual cashflow from either the user or template",
+			"preferences."
+		]
+	},
+	{
+		"group": "Preferences",
+		"name": "cross-rate-code",
+		"value": [
+			"When this value is set to an international",
+			"currency code, a cross rate exchange rate can be utilized if a direct",
+			"exchange rate is not available. The use of a cross rate code may result",
+			"in a slightly greater margin of error than a direct exchange rate. If this",
+			"value is not set, only a direct exchange rate will be performed."
+		]
+	},
+	{
+		"group": "Preferences",
+		"name": "encoding",
+		"value": [
+			"The encoding type that is used to create",
+			"JSON files. A value of \"utf-8\" is the default and is usually sufficient",
+			"for most JSON files."
+		]
+	},
+	{
+		"group": "Preferences",
+		"name": "fiscal-year-start",
+		"value": [
+			"A date which determines the start of",
+			"the fiscal year. This is primarily applicable to statistic events.",
+			"Only the month and day portions of the date are used (i.e., the year",
+			"portion of the date is ignored). The default value is January 1."
+		]
+	},
+	{
+		"group": "Preferences",
+		"name": "decimal-digits",
+		"value": [
+			"This preference determines the number",
+			"of decimal digits (i.e., digits to the right of the decimal point) that",
+			"are shown for currency values. The default value for decimal digits is 2.",
+			"This value does not affect calculations unless explicit rounding of",
+			"intermediate interest values are requested."
+		]
+	},
+	{
+		"group": "Preferences",
+		"name": "target-value",
+		"value": [
+			"The target value used for investment calculations. For loans, this value is",
+            "normally zero (default)."
+		]
+	},
+	{
+		"group": "Preferences",
+		"name": "combine-principal",
+		"value": [
+			"When set, this preference will combine",
+			"principal value fields during normalization of expanded events (i.e.,",
+			"prior to balancing). Principal value fields will only be combined if the",
+			"principal change events have the same date and other applicable values.",
+			"Parameter and descriptor lists are merged if they are different and this",
+			"preference is set. The default value (if not set) is Set."
+		]
+	},
+	{
+		"group": "Preferences",
+		"name": "compress-descriptor",
+		"value": [
+			"When set, this preference will merge",
+			"descriptor lists into a single descriptor list during compression of",
+			"expanded events (i.e., after balancing). Contiguous events will only be",
+			"compressed into a single event if their values are equal except the date,",
+			"which must be exactly 1 period length greater than the previous event.",
+			"Events are still compressed if their descriptor lists are different and",
+			"this preference is set. The default value (if not set) is Reset."
+		]
+	},
+	{
+		"group": "Preferences",
+		"name": "statistic-events",
+		"value": [
+			"When set, any statistic events seen are omitted",
+			"from the compressed cashflow. The default value (if not set) is Set."
+		]
+	},
+	{
+		"group": "Chart",
+		"name": "general",
+		"value": [
+			"General help."
+		]
+	},
+	{
+		"group": "Confirm",
+		"name": "general",
+		"value": [
+			"General help."
+		]
+	},
+	{
+		"group": "InsertEvent",
+		"name": "general",
+		"value": [
+			"General help."
+		]
+	},
+	{
+		"group": "NewCashflow",
+		"name": "general",
+		"value": [
+			"General help."
+		]
+	},
+	{
+		"group": "Summary",
+		"name": "general",
+		"value": [
+			"General help."
+		]
+	}
+]

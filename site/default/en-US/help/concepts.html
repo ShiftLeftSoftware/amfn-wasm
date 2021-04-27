@@ -1,0 +1,284 @@
+<!doctype html>
+<html class="max-height">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="../../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../../node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+        <title>AmFn Wasm Concepts Help</title>
+    </head>
+    <body class="d-flex flex-column max-height">
+        
+        <div class="m-3">
+
+            <h3>Overview of the AmFn Wasm.</h3>
+
+            <p>The AmFn Wasm is an amortization cashflow calculator that utilizes the AmFn engine written
+            in Rust. While in general, a cashflow represents a movement of money, an amortization cashflow 
+            usually involves interest changes. An amortization cashflow can be negative, such
+            as car loans, mortgages, etc., or positive, such as annuities, bonds, investments, etc.</p>
+            
+            <h4>Event-driven</h4>
+
+            <p>The AmFn Wasm can simultaneously handle multiple open cashflows. Each cashflow is represented
+            by a tab. Clicking on a tab shows the coresponding cashflow. Each cashflow has an event grid at 
+            the top, an amortization grid under the event grid, a status line under the amortization grid,
+            and summary information that can be shown when needed.</p>
+            
+            The AmFn Wasm is an "event-driven" amortization cashflow calculator. The top event grid for a
+            cashflow is editable. In contrast, the amortization grid, status line, and summary
+            information are all products of processing the events in the event grid.</p>
+
+            <p>Cashflow events are always preserved and not merged or lost. One of the
+            benefits of event-driven is that repeatedly asking involved "what if?" questions
+            is a quick and easy task. Another benefit is that events also decrease the amount of user
+            input required to create and actively maintain a cashflow.</p>
+            
+            <h4>Continuous cashflow</h4>
+
+            <p>The continuity of the cashflow is maintained even through certain types of events, such
+            as interest rate changes. This preserves any unresolved accrued interest from previous interest 
+            rate periods.</p>
+            
+            <h4>Amortization schedule</h4>
+            
+            <p>All events are based upon real dates and can occur on "any" date within the cashflow, which
+            can also result in stub periods and odd days interest. This allows for powerful "whatever
+            scenarios" within cashflows that can easily service increasingly competitive, consumer
+            oriented markets and financial products.</p>
+
+            <p>Anytime event fields are updated by the user, the amortization grid, status line, and summary
+            information are all automatically recalculated.</p>
+            
+            <h4>Locales</h4>
+
+            <p>Multiple locale information is consistently used throughout AmFn Wasm, along with applicable
+            ISO (International Standards Organization) standards, to allow for the simultaneous calculation
+            and display of different currencies, date formats, number formats, and spoken languages. The 
+            AmFn Wasm is internationalized and globalized, thus allowing it to be
+            adapted to another spoken language, all from external locale definitions.</p>
+            
+            <h4>Templates</h4>
+
+            <p>AmFn Wasm can be functionally customized to a high degree by it's built-in
+            template facility in order to create different functional processes for each type of 
+            cashflow such as mortgage loans, consumer loans, bonds, annuities, investments, etc.</p>
+
+            <h3>Event grid keyboard conventions.</h3>
+
+            <p>When two or more simultaneous keystrokes are involved, each keystroke is visually
+            separated by a plus sign ("+"). For example, "Shift+Enter" means to press the "Shift" 
+            and the "Enter" keys simultaneously.</p>
+
+            <div class="row">
+                <div class="col-3">
+                    Keystrokes
+                </div>
+                <div class="col-9">
+                    Description
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    Enter
+                </div>
+                <div class="col-9">
+                    Behaves like a Tab except when positioned in the last column 
+                    of the last row. In that case, a new event is automatically placed into the cashflow if the 
+                    current event specifies a "next event" name. If the current event does not specify a next event 
+                    name, the new event dialog is shown to the user allowing the next event to be explicitly selected.
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    Tab
+                </div>
+                <div class="col-9">
+                    Selects the next cell in the current row unless the last cell of the current row is reached, in 
+                    which case the first cell of the next row is selected. If the last cell of the last row is reached, 
+                    the first cell of the first row is then selected.
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    Shift+Tab
+                </div>
+                <div class="col-9">
+                    Selects the previous cell in the current row unless the first cell of the current row is reached, 
+                    in which case the last cell of the previous row is selected. If the first cell of the first row is 
+                    reached, the last cell of the last row is then selected.
+                </div>
+            </div>
+            <br/>
+
+            <h3>Basic event types.</h3>
+
+            <p>There are four basic event types in AmFn from which all events are derived. When used
+            with the templates and expressions, the four basic event types provide the necessary basis
+            to create an unlimited number of different kinds of events. The four basic event types are
+            as follows:</p>
+
+            <h3>Interest change.</h3>
+
+            <p>Interest change events are used to cause changes in the currently active interest rate
+            event (i.e., method, day-count, nominal annual rate, compounding frequency, effective
+            frequency, etc.). Interest change events run in perpetuity until the end of the cashflow
+            or until explicitly changed.</p>
+
+            <h3>Principal change.</h3>
+
+            <p>Principal change events account for any change in the principal balance of a cashflow.
+            The 4 sub-types of principal change events are as follows:</p>
+
+            <div class="row">
+                <div class="col-3">
+                    Label
+                </div>
+                <div class="col-9">
+                    Description
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    Increase
+                </div>
+                <div class="col-9">
+                    Increase the principal balance of the cashflow by a certain amount (normally used).
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    Decrease
+                </div>
+                <div class="col-9">
+                    Decrease the principal balance of the cashflow by a certain amount (normally used).
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    Positive
+                </div>
+                <div class="col-9">
+                    Assign or overwrite the principal balance of the cashflow by a positive amount (rarely used).
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    Negative
+                </div>
+                <div class="col-9">
+                    Assign or overwrite the principal balance of the cashflow by a negative amount (rarely used).
+                </div>
+            </div>
+            <br/>
+
+            <h3>Current value.</h3>
+
+            <p>Current value events indicate the current value of the cashflow at any point in time.
+            The 3 kinds of current value events are as follows:</p>
+
+            <div class="row">
+                <div class="col-3">
+                    Label
+                </div>
+                <div class="col-9">
+                    Description
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    Passive
+                </div>
+                <div class="col-9">
+                    A passive current value does not affect the balance of the cashflow. An 
+                    example would be reporting the balance of a loan as of a specific date 
+                    without causing a normal period to be actively split.
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    Active
+                </div>
+                <div class="col-9">
+                    An active current value event affects the balance of the cashflow. An 
+                    example would be an initial investment that reports the balance on an 
+                    annual basis, with no periodic re-investments.
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    Present Value (PV)
+                </div>
+                <div class="col-9">
+                    The Present Value (PV) current value event is a
+                    special form of an active current balance event. This event is normally used to
+                    separate the "past" from the "future" as of a certain date.
+                </div>
+            </div>
+            <br/>
+
+            <h3>Statistic value.</h3>
+
+            <p>Statistic value events are used to collect and report on totals within the cashflow such
+            as annual, quarterly, trimester, 4-week, 2-year, or any length of period desired by the
+            user. Any number and combination of statistic value events may be used with other statistic events
+            as desired. Statistic value events automatically run in perpetuity until the end of the cashflow
+            or until explicitly discontinued by the user.</p>
+
+            <h3>User, template and cashflow preferences.</h3>
+
+            <p>Preference elements exist at the user (top-tier), template (middle-tier)
+            and cashflow (bottom-tier) levels. When new templates or Cashflows are created,
+            preference elements are propagated from the user level to the template level and
+            from the template level to the cashflow level, when the user has explicitly specified
+            that this action is to occur.</p>
+            
+            <p>All preference elements contain various of fields of information, a descriptor list,
+            and a parameter list that can be used in a number of ways depending upon the level of the
+            preference element.</p>
+
+            <h3>Locale sensitive information descriptors.</h3>
+
+            <p>Descriptors (i.e., lists of descriptor elements) exist within user, template
+            and cashflow preferences as well as within each event of a cashflow. When indicated
+            by the user, descriptors are propagated from the user preferences into the template
+            preferences and from the template preferences into the cashflow preferences.</p>
+
+            <p>Descriptors are also propagated from the event lists of a particular template name
+            element into the event list of a cashflow when new events are created. However,
+            descriptors are never propagated from the various preferences into the event list
+            of a cashflow.</p>
+
+            <p>All descriptors within a descriptor list can be "locale sensitive". That is, each descriptor
+            can define a specific locale where the descriptor will be used. When searching for a descriptor
+            within a descriptor list, AmFn Wasm will always consider the locale first on all applicable levels
+            and then subsequently search for a generic descriptor (i.e., a descriptor with no locale set) only
+            if a descriptor cannot be found for a given locale within all applicable levels.</p>
+
+            <p>Descriptors can also define specific codes of information other than locales. These codes
+            are customizable by the user and may include General Ledger codes, Tax codes, or literally
+            any other type of code that make sense to the user.</p>
+
+            <p>This is especially useful with event descriptor lists, where certain events may need to be
+            marked for further interpretation on a report or for additional processing by another system.</p>
+
+            <h3>Interface parameters and expressions.</h3>
+
+            <p>Interface parameters exist within user, template and cashflow preferences as
+            well as within each event of a cashflow. Parameters are used to supply information to
+            various expressions. The declarations of parameters are normally defined within a template,
+            while the values to the previously defined parameters are usually entered by the user.</p>
+
+            <p>AmFn defines a robust expression facility that comes complete with common functions
+            for cashflow oriented tasks, and can even store intermediate results of expressions as
+            variables. More than one expression can be specified within a compound expression.</p>
+
+            <p>Expressions can be used within any descriptor element at any level. However, expressions
+            used within certain locations, such as descriptors involved with customization, normally make
+            use of variables that are predefined by AmFn.</p>
+
+        </div>
+
+        <script src="../../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
