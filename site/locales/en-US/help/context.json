@@ -723,43 +723,43 @@
 		"group": "Preferences",
 		"name": "statistic-events",
 		"value": [
-			"When set, any statistic events seen are omitted",
-			"from the compressed cashflow. The default value (if not set) is Set."
+			"When set, any statistic events seen are omitted from the",
+			"compressed cashflow. The default value (if not set) is Set."
 		]
 	},
 	{
 		"group": "Chart",
 		"name": "general",
 		"value": [
-			"General help."
+			"General help #####."
 		]
 	},
 	{
 		"group": "Confirm",
 		"name": "general",
 		"value": [
-			"General help."
+			"General help #####."
 		]
 	},
 	{
 		"group": "InsertEvent",
 		"name": "general",
 		"value": [
-			"General help."
+			"General help #####."
 		]
 	},
 	{
 		"group": "NewCashflow",
 		"name": "general",
 		"value": [
-			"General help."
+			"General help #####."
 		]
 	},
 	{
 		"group": "Summary",
 		"name": "general",
 		"value": [
-			"General help."
+			"General help #####."
 		]
 	}
 ]

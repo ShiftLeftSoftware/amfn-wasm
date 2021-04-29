@@ -1,0 +1,111 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title>ShiftLeft Software AmFn Web Assembly Loan Tutorial</title>
+  <meta name="description" content="ShiftLeft Software AmFn Web Assembly Loan Tutorial">
+  <meta name="author" content="ShiftLeft Software">
+
+  <link rel="stylesheet" href="../style.css">
+
+</head>
+
+<body>
+
+	<main>			
+        <nav class="section-nav">
+            <div class="section-nav-splash">
+                <a href="./loan.html"><img src="../logo-dark.png" alt="ShiftLeft Software Logo"></a>
+                AmFn&trade; Web Assembly Loan Tutorial
+            </div>
+            <div class="section-inner-nav">			
+                <ul>
+                    <li><a href="#overview">Loan tutorial overview.</a></li>
+                    <li><a href="#createloan">Create loan cashflow.</a></li>
+                    <li><a href="#interestchange">Create interest change.</a></li>
+                    <li><a href="#regularpayment">Create regular payment.</a></li>
+                    <li><a href="#finalpayment">Create final payment.</a></li>
+                    <li><a href="#annualbump">Create annual bump payments.</a></li>
+                    <li><a href="#newterm">Recalculate the new term.</a></li>        
+                </ul>
+            </div>
+        </nav>
+        <div id="main-content" class="main-content">
+
+            <div class="inner-content">
+
+            <h3 id="overview">Loan tutorial overview.</h3>
+
+            <p>This tutorial creates a loan with an odd-days period (i.e., a stub period). The tutorial then
+            applies an annual bump payment for 10 years, which could represent an annual bonus. Finally,
+            the periods of the regular payment event is calculated to reduce the term of the loan. The overall Annual
+            Percentage Rate (APR) and associated Reg-Z information are also calculated and shown in the summary.</p>
+
+            <p><em>Note: This tutorial meant is for the default en-US locale. If another locale is chosen, the AmFn Wasm
+            will handle the date format, decimal format, currency format, and spoken language resources for that
+            locale.</em></p>
+
+            <h3 id="createloan">Create loan cashflow.</h3>
+
+            <p>Let's begin by selecting the File -> New menu item. A dialog is displayed asking you to enter
+            a cashflow name and select a template for this cash flow. Please enter the name of your cashflow,
+            select "Standard loan", and press the Submit button.</p>
+            
+            <p>A new cash flow is created with a "Loan" event preselected for you. Press the Enter key 
+            until you are positioned in the "Value" column and enter 200000 (i.e., two hundred thousand).</p>
+
+            <p><img src="images/loan1.png"></p>
+
+            <h3 id="interestchange">Create interest change.</h3>
+
+            <p>Press the Enter key until a new interest change event is created. Press the Enter key 
+            until you are positioned in the "Value" column and enter 6.5 (i.e., 6.5 percent).</p>
+
+            <p><img src="images/loan2.png"></p>
+
+            <h3 id="regularpayment">Create regular payment.</h3>
+
+            <p>Press the Enter key until a payment event is created. Press the Enter key 
+            until you are positioned in the "Periods" column and enter 240 (i.e., 20 years).</p>
+    
+            <p>Click back in the "Value" column and press the Calculate button.</p>
+
+            <p><img src="images/loan3.png"></p>
+
+            <h3 id="finalpayment">Create final payment.</h3>
+
+            <p>Press the Enter key until a final payment event is created. Press the Enter key 
+            until you are positioned in the "Value" column and press the Calculate button. Our
+            balance shows 0 on the status line, which indicates the loan is satisfied.</p>
+
+            <p><img src="images/loan4.png"></p>
+
+            <h3 id="annualbump">Create annual bump payments.</h3>
+
+            <p>Position on any cell in the final payment event and press the "Delete" button.</p>
+    
+            <p>Press the Insert button, which will show the event that can be created into the cashflow
+            from the loan template. Select the "Normal payment" event and press the Submit button.</p>
+
+            <p>Press the Enter key until you are positioned in the "Value" column and enter 5000 (i.e., 
+            Five thousand). Press the Enter key once and enter 10 periods. Finally, press the Enter
+            key once and select a "1-year" frequency (i.e., annual bump payments).</p>
+
+            <p><img src="images/loan5.png"></p>
+
+            <h3 id="newterm">Recalculate the new term.</h3>
+
+            <p>Click on the "Periods" of the regular payment that currently shows 240 payments and press the
+            Calculate button to calculate a new loan term. You can optionally re-create the final payment
+            by following the "Create final payment" step above.</p>
+
+            <p><img src="images/loan6.png"></p>
+          
+            </div>
+            
+	    </div>
+	</main>	
+</body>
+</html>

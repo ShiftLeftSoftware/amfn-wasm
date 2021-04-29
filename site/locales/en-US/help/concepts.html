@@ -1,24 +1,52 @@
 <!doctype html>
-<html class="max-height">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="../../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link href="../../../node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-        <title>AmFn Wasm Concepts Help</title>
-    </head>
-    <body class="d-flex flex-column max-height">
-        
-        <div class="m-3">
 
-            <h3>Overview of the AmFn Wasm.</h3>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title>ShiftLeft Software AmFn Web Assembly Concepts</title>
+  <meta name="description" content="ShiftLeft Software AmFn Web Assembly Concepts">
+  <meta name="author" content="ShiftLeft Software">
+
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+
+<body>
+
+	<main>			
+        <nav class="section-nav">
+            <div class="section-nav-splash">
+                <a href="./concepts.html"><img src="./logo-dark.png" alt="ShiftLeft Software Logo"></a>
+                AmFn&trade; Web Assembly
+            </div>
+            <div class="section-inner-nav">			
+                <ul>                
+                    <li><a href="#overview">Overview of the AmFn Wasm.</a></li>
+                    <li><a href="#eventkeys">Event grid keyboard conventions.</a></li>
+                    <li><a href="#eventtypes">Basic event types.</a></li>
+                    <li><a href="#intchange">Interest change.</a></li>
+                    <li><a href="#princhange">Principal change.</a></li>
+                    <li><a href="#curvalue">Current value.</a></li>
+                    <li><a href="#statvalue">Statistic value.</a></li>
+                    <li><a href="#preferences">User, template and cashflow preferences.</a></li>
+                    <li><a href="#descriptors">Locale sensitive information descriptors.</a></li>
+                    <li><a href="#parameters">Interface parameters and expressions.</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div id="main-content" class="main-content">
+
+            <div class="inner-content">
+
+            <h3 id="overview">Overview of the AmFn Wasm.</h3>
 
             <p>The AmFn Wasm is an amortization cashflow calculator that utilizes the AmFn engine written
             in Rust. While in general, a cashflow represents a movement of money, an amortization cashflow 
             usually involves interest changes. An amortization cashflow can be negative, such
             as car loans, mortgages, etc., or positive, such as annuities, bonds, investments, etc.</p>
             
-            <h4>Event-driven</h4>
+            <h4 id="eventdriven">Event-driven</h4>
 
             <p>The AmFn Wasm can simultaneously handle multiple open cashflows. Each cashflow is represented
             by a tab. Clicking on a tab shows the coresponding cashflow. Each cashflow has an event grid at 
@@ -34,13 +62,13 @@
             is a quick and easy task. Another benefit is that events also decrease the amount of user
             input required to create and actively maintain a cashflow.</p>
             
-            <h4>Continuous cashflow</h4>
+            <h4 id="continuous">Continuous cashflow</h4>
 
             <p>The continuity of the cashflow is maintained even through certain types of events, such
             as interest rate changes. This preserves any unresolved accrued interest from previous interest 
             rate periods.</p>
             
-            <h4>Amortization schedule</h4>
+            <h4 id="amortization">Amortization schedule</h4>
             
             <p>All events are based upon real dates and can occur on "any" date within the cashflow, which
             can also result in stub periods and odd days interest. This allows for powerful "whatever
@@ -50,7 +78,7 @@
             <p>Anytime event fields are updated by the user, the amortization grid, status line, and summary
             information are all automatically recalculated.</p>
             
-            <h4>Locales</h4>
+            <h4 id="locales">Locales</h4>
 
             <p>Multiple locale information is consistently used throughout AmFn Wasm, along with applicable
             ISO (International Standards Organization) standards, to allow for the simultaneous calculation
@@ -58,13 +86,13 @@
             AmFn Wasm is internationalized and globalized, thus allowing it to be
             adapted to another spoken language, all from external locale definitions.</p>
             
-            <h4>Templates</h4>
+            <h4 id="templates">Templates</h4>
 
             <p>AmFn Wasm can be functionally customized to a high degree by it's built-in
             template facility in order to create different functional processes for each type of 
             cashflow such as mortgage loans, consumer loans, bonds, annuities, investments, etc.</p>
 
-            <h3>Event grid keyboard conventions.</h3>
+            <h3 id="eventkeys">Event grid keyboard conventions.</h3>
 
             <p>When two or more simultaneous keystrokes are involved, each keystroke is visually
             separated by a plus sign ("+"). For example, "Shift+Enter" means to press the "Shift" 
@@ -111,21 +139,21 @@
             </div>
             <br/>
 
-            <h3>Basic event types.</h3>
+            <h3 id="eventtypes">Basic event types.</h3>
 
             <p>There are four basic event types in AmFn from which all events are derived. When used
             with the templates and expressions, the four basic event types provide the necessary basis
             to create an unlimited number of different kinds of events. The four basic event types are
             as follows:</p>
 
-            <h3>Interest change.</h3>
+            <h3 id="intchange">Interest change.</h3>
 
             <p>Interest change events are used to cause changes in the currently active interest rate
             event (i.e., method, day-count, nominal annual rate, compounding frequency, effective
             frequency, etc.). Interest change events run in perpetuity until the end of the cashflow
             or until explicitly changed.</p>
 
-            <h3>Principal change.</h3>
+            <h3 id="princhange">Principal change.</h3>
 
             <p>Principal change events account for any change in the principal balance of a cashflow.
             The 4 sub-types of principal change events are as follows:</p>
@@ -172,7 +200,7 @@
             </div>
             <br/>
 
-            <h3>Current value.</h3>
+            <h3 id="curvalue">Current value.</h3>
 
             <p>Current value events indicate the current value of the cashflow at any point in time.
             The 3 kinds of current value events are as follows:</p>
@@ -217,7 +245,7 @@
             </div>
             <br/>
 
-            <h3>Statistic value.</h3>
+            <h3 id="statvalue">Statistic value.</h3>
 
             <p>Statistic value events are used to collect and report on totals within the cashflow such
             as annual, quarterly, trimester, 4-week, 2-year, or any length of period desired by the
@@ -225,7 +253,7 @@
             as desired. Statistic value events automatically run in perpetuity until the end of the cashflow
             or until explicitly discontinued by the user.</p>
 
-            <h3>User, template and cashflow preferences.</h3>
+            <h3 id="preferences">User, template and cashflow preferences.</h3>
 
             <p>Preference elements exist at the user (top-tier), template (middle-tier)
             and cashflow (bottom-tier) levels. When new templates or Cashflows are created,
@@ -237,7 +265,7 @@
             and a parameter list that can be used in a number of ways depending upon the level of the
             preference element.</p>
 
-            <h3>Locale sensitive information descriptors.</h3>
+            <h3 id="descriptors">Locale sensitive information descriptors.</h3>
 
             <p>Descriptors (i.e., lists of descriptor elements) exist within user, template
             and cashflow preferences as well as within each event of a cashflow. When indicated
@@ -262,7 +290,7 @@
             <p>This is especially useful with event descriptor lists, where certain events may need to be
             marked for further interpretation on a report or for additional processing by another system.</p>
 
-            <h3>Interface parameters and expressions.</h3>
+            <h3 id="parameters">Interface parameters and expressions.</h3>
 
             <p>Interface parameters exist within user, template and cashflow preferences as
             well as within each event of a cashflow. Parameters are used to supply information to
@@ -277,8 +305,9 @@
             used within certain locations, such as descriptors involved with customization, normally make
             use of variables that are predefined by AmFn.</p>
 
-        </div>
-
-        <script src="../../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    </body>
+            </div>
+            
+	    </div>
+	</main>	
+</body>
 </html>

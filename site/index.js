@@ -66,7 +66,7 @@ class CashflowManager {
         let localeStr = this.initLocaleStrAry.shift();
         if (!localeStr) return;
 
-        let url = defaultFolder + localeStr + defaultPreferences;        
+        let url = localeFolder + localeStr + localePreferences;        
         fetch(url).then(response => {
             if (!response.ok) {
                 Toast.toastError(result);
@@ -80,7 +80,7 @@ class CashflowManager {
                     return;
                 }  
 
-                let url = defaultFolder + localeStr + defaultLocales;        
+                let url = localeFolder + localeStr + localeLocales;        
                 fetch(url).then(response => {
                     if (!response.ok) {
                         Toast.toastError("Cannot fetch locales");
@@ -94,7 +94,7 @@ class CashflowManager {
                             return;
                         }  
 
-                        let url = defaultFolder + localeStr + defaultTemplates;        
+                        let url = localeFolder + localeStr + localeTemplates;        
                         fetch(url).then(response => {
                             if (!response.ok) {
                                 Toast.toastError("Cannot fetch templates");
@@ -108,7 +108,7 @@ class CashflowManager {
                                     return;
                                 }  
 
-                                let url = defaultFolder + localeStr + defaultHelpContext;
+                                let url = localeFolder + localeStr + localeHelpContext;
                                 fetch(url).then(response => {
                                     if (!response.ok) {
                                         Toast.toastError("Cannot fetch help context");
@@ -141,13 +141,29 @@ class CashflowManager {
             config.helpTitleInfo = Updater.getResource(this, HELP_TITLE_INFO);
             config.helpTitleError = Updater.getResource(this, HELP_TITLE_ERROR);
 
+            let tutorialLoan = document.getElementById("tutorialLoan");
+            tutorialLoan.innerHTML += " " + Updater.getResource(this, TUTORIAL_LOAN);
+            tutorialLoan.setAttribute("href", localeFolder + localeStr + localeTutorialLoan);
+
+            let tutorialAnnuity = document.getElementById("tutorialAnnuity");
+            tutorialAnnuity.innerHTML += " " + Updater.getResource(this, TUTORIAL_ANNUITY);
+            tutorialAnnuity.setAttribute("href", localeFolder + localeStr + localeTutorialAnnuity);
+
+            let tutorialBond = document.getElementById("tutorialBond");
+            tutorialBond.innerHTML += " " + Updater.getResource(this, TUTORIAL_BOND);
+            tutorialBond.setAttribute("href", localeFolder + localeStr + localeTutorialBond);
+
+            let tutorialInvestment = document.getElementById("tutorialInvestment");
+            tutorialInvestment.innerHTML += " " + Updater.getResource(this, TUTORIAL_INVESTMENT);
+            tutorialInvestment.setAttribute("href", localeFolder + localeStr + localeTutorialInvestment);
+
             let helpConcepts = document.getElementById("helpConcepts");
             helpConcepts.innerHTML += " " + Updater.getResource(this, HELP_CONCEPTS);
-            helpConcepts.setAttribute("href", defaultFolder + localeStr + defaultHelpConcepts);
+            helpConcepts.setAttribute("href", localeFolder + localeStr + localeHelpConcepts);
         
             let helpCashflow = document.getElementById("helpCashflow");
             helpCashflow.innerHTML += " " + Updater.getResource(this, HELP_CASHFLOW);
-            helpCashflow.setAttribute("href", defaultFolder + localeStr + defaultHelpCashflow);
+            helpCashflow.setAttribute("href", localeFolder + localeStr + localeHelpCashflow);
                                                                                 
             this.loadMainResources();
             
@@ -695,19 +711,11 @@ class CashflowManager {
 
         document.getElementById("menuNew").innerHTML += " " + Updater.getResource(this, MENU_NEW);
         document.getElementById("menuOpen").innerHTML += " " + Updater.getResource(this, MENU_OPEN);
-        document.getElementById("menuBasicLoan").innerHTML += " " + Updater.getResource(this, MENU_BASIC_LOAN);
-        document.getElementById("menuBiWeeklyLoan").innerHTML += " " + Updater.getResource(this, MENU_BIWEEKLY_LOAN);
-        document.getElementById("menuStandardAnnuity").innerHTML += " " + Updater.getResource(this, MENU_STANDARD_ANNUITY);
-        document.getElementById("menuStandardBond").innerHTML += " " + Updater.getResource(this, MENU_STANDARD_BOND);
-        document.getElementById("menuStandardCashflow").innerHTML += " " + Updater.getResource(this, MENU_STANDARD_CASHFLOW);
-        document.getElementById("menuStandardInvestment").innerHTML += " " + Updater.getResource(this, MENU_STANDARD_INVESTMENT);
-        document.getElementById("menuStandardLoan").innerHTML += " " + Updater.getResource(this, MENU_STANDARD_LOAN);
         document.getElementById("menuClose").innerHTML += " " + Updater.getResource(this, MENU_CLOSE);
         document.getElementById("menuSave").innerHTML += " " + Updater.getResource(this, MENU_SAVE);
         document.getElementById("modalCancel").innerHTML = Updater.getResource(this, MODAL_CANCEL);
         document.getElementById("modalOK").innerHTML = Updater.getResource(this, MODAL_OK);
         document.getElementById("navFile").innerHTML += " " + Updater.getResource(this, NAV_FILE);
-        document.getElementById("navExamples").innerHTML += " " + Updater.getResource(this, NAV_EXAMPLES);
     }
 
     /**
@@ -1084,10 +1092,14 @@ class EventHelper {
         if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;
 
         let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
+        if (tab.lastFocused.rowIndex < 0) return;
 
         if (cashflowManager.engine.remove_event(cashflowManager.activeTabIndex, tab.lastFocused.rowIndex)) {
-            tab.grdEventOptions.rowData.splice(tab.lastFocused.rowIndex, 1);
-            tab.grdEventOptions.api.setRowData(tab.grdEventOptions.rowData);
+            tab.eventValues.splice(tab.lastFocused.rowIndex, 1);
+            tab.grdEventOptions.api.setRowData(tab.eventValues);
+
+            Updater.refreshAmResults(cashflowManager);
+            Updater.updateTabLabel(cashflowManager, true);
 
             tab.lastFocused.colDef = null;
             tab.lastFocused.column = null;
@@ -1234,15 +1246,7 @@ class EventHelper {
  * Wait for the DOM content to be loaded and initialize the app.
  */    
  document.addEventListener("DOMContentLoaded", () => {
-
-    document.getElementById("menuBasicLoan").addEventListener("click", () => EventHelper.menuOpenExample(defaultBasicLoanUrl));    
-    document.getElementById("menuBiWeeklyLoan").addEventListener("click", () => EventHelper.menuOpenExample(defaultBiWeeklyLoanUrl));    
-    document.getElementById("menuStandardAnnuity").addEventListener("click", () => EventHelper.menuOpenExample(defaultStandardAnnuityUrl));    
-    document.getElementById("menuStandardBond").addEventListener("click", () => EventHelper.menuOpenExample(defaultStandardBondUrl));    
-    document.getElementById("menuStandardCashflow").addEventListener("click", () => EventHelper.menuOpenExample(defaultStandardCashflowUrl));    
-    document.getElementById("menuStandardInvestment").addEventListener("click", () => EventHelper.menuOpenExample(defaultStandardInvestmentUrl));    
-    document.getElementById("menuStandardLoan").addEventListener("click", () => EventHelper.menuOpenExample(defaultStandardLoanUrl));    
-    
+   
     document.getElementById("menuNew").addEventListener("click", () => EventHelper.menuNewCashflow());    
     document.getElementById("menuOpen").addEventListener("click", () => EventHelper.menuOpenCashflow());    
     document.getElementById("menuClose").addEventListener("click", () => EventHelper.menuCloseCashflow());    

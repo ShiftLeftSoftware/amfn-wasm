@@ -12,23 +12,18 @@
 // AmFn Wasm - JavaScript
 const { WasmElemPreferences } = wasm_bindgen;
 
-/// Default locale files
-const defaultFolder = "./default/";
-const defaultHelpContext = "/help/context.json";
-const defaultHelpConcepts = "/help/concepts.html";
-const defaultHelpCashflow = "/help/cashflow.html";
-const defaultPreferences = "/preferences.json";
-const defaultLocales = "/locales.json";
-const defaultTemplates = "/templates.json";
-
-// Example cashflow URLs.
-const defaultBasicLoanUrl = defaultFolder + "basic_loan.json";
-const defaultBiWeeklyLoanUrl = defaultFolder + "bi_weekly_loan.json";
-const defaultStandardAnnuityUrl = defaultFolder + "standard_annuity.json";
-const defaultStandardBondUrl = defaultFolder + "standard_bond.json";
-const defaultStandardCashflowUrl = defaultFolder + "standard_cashflow.json";
-const defaultStandardInvestmentUrl = defaultFolder + "standard_investment.json";
-const defaultStandardLoanUrl = defaultFolder + "standard_loan.json";
+/// Locale file definitions
+const localeFolder = "./locales/";
+const localePreferences = "/preferences.json";
+const localeLocales = "/locales.json";
+const localeTemplates = "/templates.json";
+const localeHelpContext = "/help/context.json";
+const localeHelpConcepts = "/help/concepts.html";
+const localeHelpCashflow = "/help/cashflow.html";
+const localeTutorialLoan = "/tutorials/loan/loan.html";
+const localeTutorialAnnuity = "/tutorials/annuity/annuity.html";
+const localeTutorialBond = "/tutorials/bond/bond.html";
+const localeTutorialInvestment = "/tutorials/investment/investment.html";
 
 // Table type event.
 const TABLE_EVENT = 0;
@@ -106,13 +101,6 @@ const FREQ_CONTINUOUS = "Frequency_Continuous";
 // Resource menu constants.
 const MENU_NEW = "Menu_New";
 const MENU_OPEN = "Menu_Open";
-const MENU_BASIC_LOAN = "Menu_Basic_Loan";
-const MENU_BIWEEKLY_LOAN = "Menu_Biweekly_Loan";
-const MENU_STANDARD_ANNUITY = "Menu_Standard_Annuity";
-const MENU_STANDARD_BOND = "Menu_Standard_Bond";
-const MENU_STANDARD_CASHFLOW = "Menu_Standard_Cashflow";
-const MENU_STANDARD_INVESTMENT = "Menu_Standard_Investment";
-const MENU_STANDARD_LOAN = "Menu_Standard_Loan";
 const MENU_CLOSE = "Menu_Close";
 const MENU_SAVE = "Menu_Save";
 
@@ -202,7 +190,6 @@ const MSG_ENGINE = "Msg_Engine";
 
 // Resource navigation constants.
 const NAV_FILE = "Nav_File";
-const NAV_EXAMPLES = "Nav_Examples";
 const NAV_VERSION = "Nav_Version";
 
 // Principal type constants
@@ -239,6 +226,12 @@ const HELP_CONCEPTS = "Help_Concepts";
 const HELP_CASHFLOW = "Help_Cashflow";
 const HELP_TITLE_INFO = "Help_Title_Info";
 const HELP_TITLE_ERROR = "Help_Title_Error";
+
+// Tutorial constants
+const TUTORIAL_LOAN = "Tutorial_Loan";
+const TUTORIAL_ANNUITY = "Tutorial_Annuity";
+const TUTORIAL_BOND = "Tutorial_Bond";
+const TUTORIAL_INVESTMENT = "Tutorial_Investment";
 
 // From the book "Show Me the Numbers: Designing Tables and Graphs to Enlighten" 
 const chartColors = [

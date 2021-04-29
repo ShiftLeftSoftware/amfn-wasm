@@ -1943,29 +1943,39 @@ impl Engine {
     /// * True if successful.
 
     pub fn remove_event(&self, cf_index: i32, index: u32) -> bool {
-        if cf_index < 0 { return false; }
+        let mut result: bool = false;
+        if cf_index < 0 { return result; }
 
         {
             let calc_mgr = self.engine.calc_mgr();
 
             if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
-                return false;
+                return result;
             }
 
             match calc_mgr.list_cashflow().list_event() {
-                None => { return false; }
+                None => { return result; }
                 Some(o) => { 
                     if !o.get_element(index as usize) {
-                        return false;
+                        return result;
                     }
                 }
             }
         }
 
         match self.engine.calc_mgr_mut().list_cashflow_mut().list_event_mut() {
-            None => false,
-            Some(o) => o.remove()
+            None => { return result }
+            Some(o) => {
+                result = o.remove();
+            }
         }
+
+        match self.engine.balance_cashflow() {
+            Err(_e) => { }
+            Ok(_o) => { }
+        }
+
+        result
     }
 
     /// Serialize and return the selected cashflow.

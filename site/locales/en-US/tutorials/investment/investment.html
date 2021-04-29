@@ -1,0 +1,104 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title>ShiftLeft Software AmFn Web Assembly Investment Tutorial</title>
+  <meta name="description" content="ShiftLeft Software AmFn Web Assembly Investment Tutorial">
+  <meta name="author" content="ShiftLeft Software">
+
+  <link rel="stylesheet" href="../style.css">
+
+</head>
+
+<body>
+
+	<main>			
+        <nav class="section-nav">
+            <div class="section-nav-splash">
+                <a href="./loan.html"><img src="../logo-dark.png" alt="ShiftLeft Software Logo"></a>
+                AmFn&trade; Web Assembly Investment Tutorial
+            </div>
+            <div class="section-inner-nav">			
+                <ul>
+                    <li><a href="#overview">Investment tutorial overview.</a></li>
+                    <li><a href="#createinvestment">Create investment cashflow.</a></li>
+                    <li><a href="#interestchange">Create interest change.</a></li>
+                    <li><a href="#normalinvest">Create normal invest.</a></li>
+                    <li><a href="#normalreturn">Create normal return.</a></li>
+                    <li><a href="#annualstatistic">Create annual statistic.</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div id="main-content" class="main-content">
+
+            <div class="inner-content">
+
+            <h3 id="overview">Investment tutorial overview.</h3>
+
+            <p>This tutorial presents a typical investment intended for an individual's retirement that
+            starts with an initial investment amount and a small monthly periodic investment (i.e.,
+            contribution). In addition, an annual statistic event is created to accumulate annual totals
+            for the investment.</p>
+
+            <p><em>Note: This tutorial meant is for the default en-US locale. If another locale is chosen, the AmFn Wasm
+            will handle the date format, decimal format, currency format, and spoken language resources for that
+            locale.</em></p>
+    
+            <h3 id="createinvestment">Create investment cashflow.</h3>
+
+            <p>Let's begin by selecting the File -> New menu item. A dialog is displayed asking you to enter
+            a cashflow name and select a template for this cash flow. Please enter the name of your cashflow,
+            select "Standard investment", and press the Submit button.</p>
+    
+            <p>A new cash flow window is created with an "Init Inv" (i.e., initial investment) event preselected
+            for you. Press the Enter key until you are positioned in the "Value" column and enter 10000 (i.e.,
+            our initial investment is ten thousand)</p>
+
+            <p><img src="images/investment1.png"></p>
+
+            <h3 id="interestchange">Create interest change.</h3>
+
+            <p>Press the Enter key until a new interest change event is created. Press the Enter key until 
+            you are positioned in the "Value" column and enter 5 (i.e., a 5 percent interest rate).</p>
+
+            <p><img src="images/investment2.png"></p>
+
+            <h3 id="normalinvest">Create normal invest.</h3>
+
+            <p>Press the Enter key until a new normal invest event is created. Press the Enter key until you
+            are positioned in the "Value" column and enter 100 (i.e., one hundred). Press the Enter key until 
+            you are positioned in the "Periods" column and enter 240 (i.e., 240 monthly events = 20 years).</p>
+
+            <p><em>Note: The balance on the status line now reflects the amount that will be available
+            after 20 years, given the current interest rate. You can simply change the initial investment,
+            interest rate, periodic investment amount or periods to immediately see how the investment is
+            affected on the status line balance.</em></p>
+    
+            <p><img src="images/investment3.png"></p>
+
+            <h3 id="normalreturn">Create normal return.</h3>
+
+            <p>Press the Enter key until a new normal return event is created. Press the Enter key until you
+            are positioned in the "Value" column. Press the Calculate button to apply the remaining balance to
+            the return event</p>
+
+            <p><img src="images/investment4.png"></p>
+
+            <h3 id="annualstatistic">Create annual statistic.</h3>
+
+            <p>Finally, press the Insert button and select annual statistic and press the Submit button to
+            create an annual statistic event. Press the Enter key until you are positioned in the "Date"
+            column, enter the same date as the initial investment, and press the Enter key.</p>
+
+            <p><img src="images/investment5.png"></p>
+
+            <p><em>The annual statistic event is aligned for you to the user defined start of the fiscal
+            year and is automatically repeated until the end of the cash flow.</em></p>
+
+        </div>
+    </main>
+
+</body>
+</html>

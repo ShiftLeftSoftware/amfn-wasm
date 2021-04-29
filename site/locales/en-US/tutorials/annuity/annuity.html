@@ -1,0 +1,108 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title>ShiftLeft Software AmFn Web Assembly Annuity Tutorial</title>
+  <meta name="description" content="ShiftLeft Software AmFn Web Assembly Annuity Tutorial">
+  <meta name="author" content="ShiftLeft Software">
+
+  <link rel="stylesheet" href="../style.css">
+
+</head>
+
+<body>
+
+	<main>			
+        <nav class="section-nav">
+            <div class="section-nav-splash">
+                <a href="./loan.html"><img src="../logo-dark.png" alt="ShiftLeft Software Logo"></a>
+                AmFn&trade; Web Assembly Annuity Tutorial
+            </div>
+            <div class="section-inner-nav">			
+                <ul>
+                    <li><a href="#overview">Annuity tutorial overview.</a></li>
+                    <li><a href="#createannuity">Create annuity cashflow.</a></li>
+                    <li><a href="#interestchange">Create interest change.</a></li>
+                    <li><a href="#periodicpremium">Create periodic premium.</a></li>
+                    <li><a href="#intestchange2">Additional interest change.</a></li>
+                    <li><a href="#periodicwithdrawal">Create periodic withdrawal.</a></li>        
+                </ul>
+            </div>
+        </nav>
+        <div id="main-content" class="main-content">
+
+            <div class="inner-content">
+
+            <h3 id="overview">Annuity tutorial overview.</h3>
+
+            <p>This tutorial presents an annuity with an initial premium, a semi-annual compounding and a
+            guaranteed interest period of 10 years at 6% under the simple interest method (i.e., interest
+            is not compounded back into the principal). Thereafter the renewal interest rate is set at 3.5%
+            under the actuarial method (i.e., interest is compounded back into the principal). In addition,
+            a periodic semi-annual premium of 600.00 is made for the first 10 years. Following that, a
+            semi-annual withdrawal of 1200.00 is paid for the next 10 years with a remaining balance thereafter.</p>
+
+            <p><em>Note: This tutorial meant is for the default en-US locale. If another locale is chosen, the AmFn Wasm
+            will handle the date format, decimal format, currency format, and spoken language resources for that
+            locale.</em></p>
+    
+            <h3 id="createannuity">Create annuity cashflow.</h3>
+
+            <p>Let's begin by selecting the File -> New menu item. A dialog is displayed asking you to enter
+            a cashflow name and select a template for this cash flow. Please enter the name of your cashflow,
+            select "Standard annuity", and press the Submit button.</p>
+            
+            <p>A new cash flow is created with a "Initial premium" event preselected for you. Press the Enter key 
+            until you are positioned in the "Value" column and enter 10000 (i.e., ten thousand). Finally,
+            Press the Enter key until you are positioned in the "Frequency" column and select a "6-month"
+            (semi-annual) frequency.</p>
+        
+            <p><img src="images/annuity1.png"></p>
+
+            <h3 id="interestchange">Create interest change.</h3>
+
+            <p>Press the Enter key until a new interest change event is created. Click the small button in the
+            right side of the "Type" column. Change the interest method from "Actuarial" to "Simple interest" 
+            and press the Submit button.</p>
+
+            <p>Press the Enter key until you are positioned in the "Value" column and enter 6 (i.e., a
+            6 percent interest rate).</p>
+
+            <p><img src="images/annuity2.png"></p>
+
+            <h3 id="periodicpremium">Create periodic premium.</h3>
+
+            <p>Press the Enter key until a new semi-annual periodic premium event is created.
+            Press the Enter key until you are positioned in the "Value" column and enter 100 (i.e.,
+            one hundred). Press the Enter key until you are positioned in the "Periods" column and enter
+            20 (i.e., 20 semi-annual events = 10 years).</p>
+    
+            <p><img src="images/annuity3.png"></p>
+
+            <h3 id="intestchange2">Additional interest change.</h3>
+
+            <p>Press the "Insert" button and subsequently select "Interest rate" and press the Submit 
+            button to create another "Interest" event, except under the default actuarial method. Press 
+            the Enter key until you are positioned in the "Value" column and enter 3.5 (i.e., a 3.5 percent 
+            interest rate).</p>
+
+            <p><img src="images/annuity4.png"></p>
+
+            <h3 id="periodicwithdrawal">Create periodic withdrawal.</h3>
+
+            <p>Press the "Insert" button and subsequently select "Periodic withdrawal" and press the 
+            Submit button to create a semi-annual "Withdrawal" event. Press the Enter key until you are
+            positioned in the "Value" column and enter 200 (i.e., two hundred). Press the Enter key until 
+            you are positioned in the "Periods" column and enter 20 (i.e., 20 semi-annual events = 10 years).</p>
+
+            <p><img src="images/annuity5.png"></p>
+
+            <p>On the status line we can see that 21352.11 remains in the annuity.</p>
+
+        </div>
+    </main>
+
+</body>
+</html>
