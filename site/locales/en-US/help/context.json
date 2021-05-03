@@ -382,7 +382,7 @@
 	},
 	{
 		"group": "PrincipalChange",
-		"name": "statictics",
+		"name": "statistics",
 		"value": [
 			"Check this option for any principal change event that",
 			"should be assigned a \"Sequence\" column incrementing value and also be counted in the",
@@ -731,35 +731,54 @@
 		"group": "Chart",
 		"name": "general",
 		"value": [
-			"General help #####."
+			"This dialog shows the chart rendered from the selected chart definition."
 		]
 	},
 	{
 		"group": "Confirm",
 		"name": "general",
 		"value": [
-			"General help #####."
+			"This dialog allows a confirmation choice to be made."
 		]
 	},
 	{
 		"group": "InsertEvent",
 		"name": "general",
 		"value": [
-			"General help #####."
+			"Depending upon the cashflow template group, this dialog shows the",
+            "list of available template events and allows one to be selected.",
+            "When the Submit button is pressed, a new event is created."
 		]
 	},
 	{
 		"group": "NewCashflow",
 		"name": "general",
 		"value": [
-			"General help #####."
+			"This dialog allows a cashflow name to be entered and a template group",
+            "to be selected. When the Submit button is pressed, a new cashflow is",
+            "created."
+		]
+	},
+	{
+		"group": "NewCashflow",
+		"name": "name",
+		"value": [
+			"The name of the new cashflow to create."
+		]
+	},
+	{
+		"group": "NewCashflow",
+		"name": "template",
+		"value": [
+			"The template group that is attached to the newly created cashflow."
 		]
 	},
 	{
 		"group": "Summary",
 		"name": "general",
 		"value": [
-			"General help #####."
+			"This dialog shows the evaluated results of the summary descriptors for",
+            "the cashflow."
 		]
 	}
 ]

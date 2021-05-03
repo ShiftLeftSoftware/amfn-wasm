@@ -69,49 +69,49 @@ class CashflowManager {
         let url = localeFolder + localeStr + localePreferences;        
         fetch(url).then(response => {
             if (!response.ok) {
-                Toast.toastError(result);
+                Toaster.toastError(result);
                 return;
             }
 
             response.text().then(text => {
                 let result = this.engine.deserialize(text);
                 if (result.length > 0) {
-                    Toast.toastError(result);
+                    Toaster.toastError(result);
                     return;
                 }  
 
                 let url = localeFolder + localeStr + localeLocales;        
                 fetch(url).then(response => {
                     if (!response.ok) {
-                        Toast.toastError("Cannot fetch locales");
+                        Toaster.toastError(Updater.getResource(this, MSG_LOCALES_LOAD));
                         return;
                     }
-
+            
                     response.text().then(text => {
                         let result = this.engine.deserialize(text);
                         if (result.length > 0) {
-                            Toast.toastError(result);
+                            Toaster.toastError(result);
                             return;
                         }  
 
                         let url = localeFolder + localeStr + localeTemplates;        
                         fetch(url).then(response => {
                             if (!response.ok) {
-                                Toast.toastError("Cannot fetch templates");
+                                Toaster.toastError(Updater.getResource(this, MSG_TEMPLATES_LOAD));
                                 return;
                             }
         
                             response.text().then(text => {
                                 let result = this.engine.deserialize(text);
                                 if (result.length > 0) {
-                                    Toast.toastError(result);
+                                    Toaster.toastError(result);
                                     return;
                                 }  
 
                                 let url = localeFolder + localeStr + localeHelpContext;
                                 fetch(url).then(response => {
                                     if (!response.ok) {
-                                        Toast.toastError("Cannot fetch help context");
+                                        Toaster.toastError(Updater.getResource(this, MSG_HELP_LOAD));
                                         return;
                                     }
                         
@@ -145,29 +145,69 @@ class CashflowManager {
             tutorialLoan.innerHTML += " " + Updater.getResource(this, TUTORIAL_LOAN);
             tutorialLoan.setAttribute("href", localeFolder + localeStr + localeTutorialLoan);
 
+            let tutorialLoan2 = document.getElementById("tutorialLoan2");
+            tutorialLoan2.innerHTML += " " + Updater.getResource(this, TUTORIAL_LOAN);
+            tutorialLoan2.setAttribute("href", localeFolder + localeStr + localeTutorialLoan);
+
             let tutorialAnnuity = document.getElementById("tutorialAnnuity");
             tutorialAnnuity.innerHTML += " " + Updater.getResource(this, TUTORIAL_ANNUITY);
             tutorialAnnuity.setAttribute("href", localeFolder + localeStr + localeTutorialAnnuity);
+
+            let tutorialAnnuity2 = document.getElementById("tutorialAnnuity2");
+            tutorialAnnuity2.innerHTML += " " + Updater.getResource(this, TUTORIAL_ANNUITY);
+            tutorialAnnuity2.setAttribute("href", localeFolder + localeStr + localeTutorialAnnuity);
 
             let tutorialBond = document.getElementById("tutorialBond");
             tutorialBond.innerHTML += " " + Updater.getResource(this, TUTORIAL_BOND);
             tutorialBond.setAttribute("href", localeFolder + localeStr + localeTutorialBond);
 
+            let tutorialBond2 = document.getElementById("tutorialBond2");
+            tutorialBond2.innerHTML += " " + Updater.getResource(this, TUTORIAL_BOND);
+            tutorialBond2.setAttribute("href", localeFolder + localeStr + localeTutorialBond);
+
             let tutorialInvestment = document.getElementById("tutorialInvestment");
             tutorialInvestment.innerHTML += " " + Updater.getResource(this, TUTORIAL_INVESTMENT);
             tutorialInvestment.setAttribute("href", localeFolder + localeStr + localeTutorialInvestment);
 
+            let tutorialInvestment2 = document.getElementById("tutorialInvestment2");
+            tutorialInvestment2.innerHTML += " " + Updater.getResource(this, TUTORIAL_INVESTMENT);
+            tutorialInvestment2.setAttribute("href", localeFolder + localeStr + localeTutorialInvestment);
+
             let helpConcepts = document.getElementById("helpConcepts");
             helpConcepts.innerHTML += " " + Updater.getResource(this, HELP_CONCEPTS);
             helpConcepts.setAttribute("href", localeFolder + localeStr + localeHelpConcepts);
+
+            let helpConcepts2 = document.getElementById("helpConcepts2");
+            helpConcepts2.innerHTML += " " + Updater.getResource(this, HELP_CONCEPTS);
+            helpConcepts2.setAttribute("href", localeFolder + localeStr + localeHelpConcepts);
         
             let helpCashflow = document.getElementById("helpCashflow");
             helpCashflow.innerHTML += " " + Updater.getResource(this, HELP_CASHFLOW);
             helpCashflow.setAttribute("href", localeFolder + localeStr + localeHelpCashflow);
+
+            let helpCashflow2 = document.getElementById("helpCashflow2");
+            helpCashflow2.innerHTML += " " + Updater.getResource(this, HELP_CASHFLOW);
+            helpCashflow2.setAttribute("href", localeFolder + localeStr + localeHelpCashflow);
                                                                                 
             this.loadMainResources();
-            
-            Toast.toastInfo(Updater.getResource(this, MSG_INITIALIZED) + config.localeStr);
+
+            window.addEventListener("beforeunload", function (e) {
+                let savePending = false;
+                for (let tab of cashflowManager.tabs) {
+                    if (tab.savePending) {
+                        savePending = true;
+                        break;
+                    }
+                }
+
+                if (savePending) {
+                    e.preventDefault();
+                }
+
+                e.returnValue = "";
+            });
+                    
+            Toaster.toastInfo(Updater.getResource(this, MSG_INITIALIZED) + config.localeStr);
             this.initialized = true;
         }
     }
@@ -299,7 +339,7 @@ class CashflowManager {
     
         let index = this.getTabIndex(e);    
         if (index < 0) {
-            Toast.toastError(Updater.getResource(this, MSG_TAB_INDEX) + index);
+            Toaster.toastError(Updater.getResource(this, MSG_TAB_INDEX) + index);
             return;
         }
     
@@ -422,7 +462,7 @@ class CashflowManager {
 
         let index = this.getTabIndex(e);
         if (index < 0) {
-            Toast.toastError(Updater.getResource(this, MSG_TAB_INDEX) + index);
+            Toaster.toastError(Updater.getResource(this, MSG_TAB_INDEX) + index);
             return;
         }
     
@@ -436,18 +476,17 @@ class CashflowManager {
      closeTab(index) {
 
         if (index < 0 || index >= this.tabs.length) {
-            Toast.toastError(Updater.getResource(this, MSG_TAB_INDEX) + index);
+            Toaster.toastError(Updater.getResource(this, MSG_TAB_INDEX) + index);
             return;
         }
 
         if (this.tabs[index].savePending) {
             ModalDialog.showConfirm(this,
-                "Changes are pending; do you wish to discard the changes and close this cashflow anyway?", 
-                EventHelper.closeTabFn, index);
-            return;
+                Updater.getResource(this, MSG_CASHFLOW_SAVE),
+                EventHelper.saveCashflow, EventHelper.closeTabFn, index);
+        } else {
+            EventHelper.closeTabFn(this, index);
         }
-
-        EventHelper.closeTabFn(this, index);
     }
 
     /**
@@ -593,7 +632,7 @@ class CashflowManager {
      */    
     engineInitialized() {
         if (!this.initialized) {
-            Toast.toastError(Updater.getResource(this, MSG_ENGINE));
+            Toaster.toastError(Updater.getResource(this, MSG_ENGINE));
         }
     
         return this.initialized;
@@ -606,7 +645,13 @@ class CashflowManager {
     loadCashflow(name) {
         let index = this.tabs.length;
 
-        let labels = this.engine.init_cashflow(index).split('|'); 
+        let result = this.engine.init_cashflow(index);
+        if (result.length === 0) {
+            Toaster.toastError(Updater.getResource(this, MSG_CASHFLOW_LOAD));
+            return;
+        }
+        
+        let labels = result.split('|'); 
         let group = labels.length > 2 ? labels[2] : "";
         
         let label = labels[0] + " [" + labels[1] + "]";
@@ -637,6 +682,16 @@ class CashflowManager {
         iClose.setAttribute("class", "bi-x");
         divTab.appendChild(iClose);
         li.appendChild(divTab);
+
+        let secHelp = document.getElementById("secHelp");
+        if (!secHelp.classList.contains("display-none")) {
+            secHelp.classList.add("display-none");
+        }
+    
+        let secMain = document.getElementById("secMain"); 
+        if (secMain.classList.contains("display-none")) {
+            secMain.classList.remove("display-none");
+        }
     
         let divEvents = document.getElementById("divEvents"); 
         let grdEvent = document.createElement("div");
@@ -727,37 +782,12 @@ class CashflowManager {
     
         let index = this.getTabIndex(e);
         if (index < 0) {
-            Toast.toastError(Updater.getResource(this, MSG_TAB_INDEX) + index);
+            Toaster.toastError(Updater.getResource(this, MSG_TAB_INDEX) + index);
             return;
         }
     
         ModalDialog.showPreferences(this, index);
     }
-
-    /**
-     * Save the given cashflow.
-     * @param {string} fileName The file name of the cashflow to save.
-     * @param {string} text The serialized cashflow.
-     */    
-    saveCashflow(fileName, text) {
-        let blob = new Blob([text], { type: "application/json" });
-    
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-            window.navigator.msSaveOrOpenBlob(blob, fileName);
-            return;
-        }
-    
-        let a = document.createElement("a");
-        document.body.appendChild(a);
-        a.style.display = "none";
-        a.href = URL.createObjectURL(blob);
-        a.download = fileName;
-    
-        a.click();
-        a.remove();
-
-        Updater.updateTabLabel(this, false);
-    }    
         
     /**
      * Set the expand/compress state of the active cashflow.
@@ -800,7 +830,7 @@ class CashflowManager {
         }
     
         if (!chartDef) {
-            Toast.toastError(Updater.getResource(this, MSG_CHART_DEF) + name);
+            Toaster.toastError(Updater.getResource(this, MSG_CHART_DEF) + name);
             return;
         }
     
@@ -821,7 +851,7 @@ class EventHelper {
      static closeTabFn(self, index) {
     
         if (!self.engine.remove_cashflow(index)) {
-            Toast.toastError(Updater.getResource(self, MSG_TAB_INDEX) + index);
+            Toaster.toastError(Updater.getResource(self, MSG_TAB_INDEX) + index);
             return;
         }
     
@@ -848,10 +878,21 @@ class EventHelper {
     
         self.tabs.splice(index, 1);
     
-        if (lastTab) {        
-            self.enableCashflowMenu(false);
-        } else {
+        if (!lastTab) {        
             self.tabs[0].divTab.click();        
+            return;
+        }
+
+        self.enableCashflowMenu(false);
+
+        let secMain = document.getElementById("secMain"); 
+        if (!secMain.classList.contains("display-none")) {
+            secMain.classList.add("display-none");
+        }
+
+        let secHelp = document.getElementById("secHelp");
+        if (secHelp.classList.contains("display-none")) {
+            secHelp.classList.remove("display-none");
         }
     }
     
@@ -864,6 +905,7 @@ class EventHelper {
         if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;
 
         let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
+        
         if (tab.lastFocused.colDef && 
             tab.lastFocused.column === e.column && 
             tab.lastFocused.rowIndex === e.rowIndex &&
@@ -915,9 +957,12 @@ class EventHelper {
             tab.eventValues[tab.lastFocused.rowIndex][tab.lastFocused.colDef.col_name]) return;
 
         Updater.focusEventGrid(tab);
-        if (!tab.grdEventOptions.api.tabToNextCell()) {
-            EventHelper.nextInsert();
-        }
+        
+        setTimeout(function() {
+            if (!tab.grdEventOptions.api.tabToNextCell()) {
+                EventHelper.nextInsert();
+            }
+        }, 100);
     }
 
     /**
@@ -960,14 +1005,17 @@ class EventHelper {
         }
 
         Updater.focusEventGrid(tab); // Insure it's the same cell   
-        if (e.rowIndex === tab.lastFocused.rowIndex && e.column === tab.lastFocused.column) { 
-            if (!tab.grdEventOptions.api.tabToNextCell()) {
-                EventHelper.nextInsert();
+                
+        setTimeout(function() {        
+            if (e.rowIndex === tab.lastFocused.rowIndex && e.column === tab.lastFocused.column) { 
+                if (!tab.grdEventOptions.api.tabToNextCell()) {
+                    EventHelper.nextInsert();
+                }
             }
-        }
 
-        Updater.refreshAmResults(cashflowManager);
-        Updater.updateTabLabel(cashflowManager, true);
+            Updater.refreshAmResults(cashflowManager);
+            Updater.updateTabLabel(cashflowManager, cashflowManager.activeTabIndex, true);
+            }, 100);
     }
 
     /**
@@ -977,7 +1025,7 @@ class EventHelper {
     static fileInput(files) {
 
         if (files.length < 1) {
-            Toast.toastError(Updater.getResource(cashflowManager, MSG_SELECT_FILE));
+            Toaster.toastError(Updater.getResource(cashflowManager, MSG_SELECT_FILE));
             return;
         }
     
@@ -987,7 +1035,7 @@ class EventHelper {
         reader.onload = (e) => {   
             let result = cashflowManager.engine.deserialize(reader.result);
             if (result.length > 0) {
-                Toast.toastError(result);
+                Toaster.toastError(result);
                 return;
             }  
 
@@ -1036,41 +1084,12 @@ class EventHelper {
     }
     
     /**
-     * Respond to the menu examples event.
-     * @param {string} url The url of the example cashflow to open.
-     */    
-     static menuOpenExample(url) {
-        
-        if (!cashflowManager.engineInitialized()) return;
-    
-        let parts = url.split('/');
-        let name = parts[parts.length - 1];
-    
-        fetch(url).then(response => {
-            response.text().then(text => {
-                let result = cashflowManager.engine.deserialize(text);
-                if (result.length > 0) {
-                    Toast.toastError(result);
-                    return;
-                }  
-
-                cashflowManager.loadCashflow(name);
-            });
-        });
-    }
-    
-    /**
      * Respond to the menu save cashflow event.
      */    
      static menuSaveCashflow() {
         if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;
     
-        let text = cashflowManager.engine.serialize(cashflowManager.activeTabIndex,
-            JSON_SERIALIZE_CASHFLOW_PREFERENCES + 
-            JSON_SERIALIZE_CASHFLOW_SELECTED + 
-            JSON_SERIALIZE_EVENT_LIST);
-    
-        cashflowManager.saveCashflow(cashflowManager.tabs[cashflowManager.activeTabIndex].name, text);
+        EventHelper.saveCashflow(cashflowManager, cashflowManager.activeTabIndex);
     }
     
     /**
@@ -1099,7 +1118,7 @@ class EventHelper {
             tab.grdEventOptions.api.setRowData(tab.eventValues);
 
             Updater.refreshAmResults(cashflowManager);
-            Updater.updateTabLabel(cashflowManager, true);
+            Updater.updateTabLabel(cashflowManager, cashflowManager.activeTabIndex, true);
 
             tab.lastFocused.colDef = null;
             tab.lastFocused.column = null;
@@ -1127,7 +1146,13 @@ class EventHelper {
             case FIELD_VALUE:
                 result = cashflowManager.engine.calculate_value(
                     cashflowManager.activeTabIndex, tab.lastFocused.rowIndex);
-                if ("interest-change" in tab.eventValues[tab.lastFocused.rowIndex].extension) {
+                let isInterest = "interest-change" in tab.eventValues[tab.lastFocused.rowIndex].extension;
+                if (!result) {
+                    Toaster.toastError(Updater.getResource(cashflowManager, 
+                        isInterest ? ERROR_CALCULATE_INTEREST : ERROR_CALCULATE_PRINCIPAL));
+                    break;
+                }
+                if (isInterest) {
                     result = cashflowManager.engine.format_decimal_out(result);
                 } else {
                     result = cashflowManager.engine.format_currency_out(result);
@@ -1136,6 +1161,10 @@ class EventHelper {
             case FIELD_PERIODS:
                 result = cashflowManager.engine.calculate_periods(
                     cashflowManager.activeTabIndex, tab.lastFocused.rowIndex);
+                    if (!result) {
+                        Toaster.toastError(Updater.getResource(cashflowManager, ERROR_CALCULATE_PERIODS));
+                        break;
+                    }
                 result = cashflowManager.engine.format_integer_out(result);
                 break;
         }
@@ -1147,7 +1176,7 @@ class EventHelper {
         gridRow.setDataValue(tab.lastFocused.colDef.col_name, result);
 
         Updater.refreshAmResults(cashflowManager);
-        Updater.updateTabLabel(cashflowManager, true);
+        Updater.updateTabLabel(cashflowManager, cashflowManager.activeTabIndex, true);
         Updater.focusEventGrid(tab);
     }
     
@@ -1192,6 +1221,42 @@ class EventHelper {
         
         Updater.createTemplateEvents(cashflowManager, nextName);
     }
+
+    /**
+     * Save the given cashflow.
+     * @param {object} self The self object.
+     * @param {number} cfIndex The cashflow index.
+     */    
+     static saveCashflow(self, cfIndex) {
+        if (cfIndex < 0) return;
+
+        let fileName = self.tabs[cfIndex].name;
+    
+        let text = self.engine.serialize(cfIndex,
+            JSON_SERIALIZE_CASHFLOW_PREFERENCES + 
+            JSON_SERIALIZE_CASHFLOW_SELECTED + 
+            JSON_SERIALIZE_EVENT_LIST);
+
+        let blob = new Blob([text], { type: "application/json" });
+    
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(blob, fileName);
+
+            Updater.updateTabLabel(self, cfIndex, false);
+            return;
+        }
+    
+        let a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style.display = "none";
+        a.href = URL.createObjectURL(blob);
+        a.download = fileName;
+    
+        a.click();
+        a.remove();
+
+        Updater.updateTabLabel(self, cfIndex, false);
+    }    
 
     /**
      * Show/hide the spinner.

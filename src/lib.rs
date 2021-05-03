@@ -15,7 +15,7 @@ use amfnengine::core::*;
 use amfnengine::engine::*;
 use amfnengine::*;
 
-/// Version message. 
+/// Version message.
 pub const APP_VERSION: Option<&'static str> = option_env!("CARGO_PKG_VERSION");
 
 /// Event table.
@@ -28,6 +28,10 @@ pub const TABLE_AM: u32 = 1;
 pub struct WasmParameter {
     /// Parameter name.
     name: String,
+    /// Parameter label.
+    label: String,
+    /// Parameter description.
+    description: String,
     /// Type of symbol.
     sym_type: String,
     /// Integer value.
@@ -46,6 +50,8 @@ impl WasmParameter {
     /// # Arguments
     ///
     /// * `name_param` - The parameter name.
+    /// * `label_param` - The parameter label.
+    /// * `desc_param` - The parameter description.
     /// * `sym_type_param` - The symbol type.
     /// * `int_value_param` - The integer value.
     /// * `dec_value_param` - The decimal value.
@@ -58,6 +64,8 @@ impl WasmParameter {
     #[wasm_bindgen(skip)]
     pub fn new(
         name_param: &str,
+        label_param: &str,
+        desc_param: &str,
         sym_type_param: &str,
         int_value_param: i32,
         dec_value_param: &str,
@@ -65,6 +73,8 @@ impl WasmParameter {
     ) -> WasmParameter {
         WasmParameter {
             name: String::from(name_param),
+            label: String::from(label_param),
+            description: String::from(desc_param),
             sym_type: String::from(sym_type_param),
             int_value: int_value_param,
             dec_value: String::from(dec_value_param),
@@ -82,6 +92,30 @@ impl WasmParameter {
     #[wasm_bindgen(setter)]
     pub fn set_name(&mut self, name: String) {
         self.name = name;
+    }
+
+    /// Getter for label property
+    #[wasm_bindgen(getter)]
+    pub fn label(&self) -> String {
+        String::from(self.label.as_str())
+    }
+
+    /// Setter for label property
+    #[wasm_bindgen(setter)]
+    pub fn set_label(&mut self, label: String) {
+        self.label = label;
+    }
+
+    /// Getter for description property
+    #[wasm_bindgen(getter)]
+    pub fn description(&self) -> String {
+        String::from(self.description.as_str())
+    }
+
+    /// Setter for description property
+    #[wasm_bindgen(setter)]
+    pub fn set_description(&mut self, description: String) {
+        self.description = description;
     }
 
     /// Getter for sym_type property
@@ -377,7 +411,7 @@ pub struct WasmElemColumn {
     /// Width of column.
     col_width: u32,
     /// Column editable.
-    col_editable: bool
+    col_editable: bool,
 }
 
 /// Wasm column element implementation.
@@ -418,7 +452,7 @@ impl WasmElemColumn {
         format_param: u32,
         decimal_digits_param: u32,
         col_width_param: u32,
-        col_editable_param: bool
+        col_editable_param: bool,
     ) -> WasmElemColumn {
         WasmElemColumn {
             col_name: String::from(col_name_param),
@@ -432,7 +466,7 @@ impl WasmElemColumn {
             format: format_param,
             decimal_digits: decimal_digits_param,
             col_width: col_width_param,
-            col_editable: col_editable_param
+            col_editable: col_editable_param,
         }
     }
 
@@ -597,13 +631,12 @@ pub struct WasmElemPreferences {
     /// Number of significant decimal digits.
     decimal_digits: u32,
     /// Target value.
-    target: String
+    target: String,
 }
 
 /// Wasm preferences implementation.
 #[wasm_bindgen]
 impl WasmElemPreferences {
-
     /// Create and return a preferences element.
     ///
     /// # Arguments
@@ -628,7 +661,7 @@ impl WasmElemPreferences {
         default_encoding_param: &str,
         fiscal_year_start_param: u32,
         decimal_digits_param: u32,
-        target_param: &str
+        target_param: &str,
     ) -> WasmElemPreferences {
         WasmElemPreferences {
             locale_str: String::from(locale_str_param),
@@ -637,7 +670,7 @@ impl WasmElemPreferences {
             default_encoding: String::from(default_encoding_param),
             fiscal_year_start: fiscal_year_start_param,
             decimal_digits: decimal_digits_param,
-            target: String::from(target_param)
+            target: String::from(target_param),
         }
     }
 
@@ -924,7 +957,7 @@ impl Engine {
     pub fn get_engine_version(&self) -> String {
         match amfnengine::APP_VERSION {
             None => String::from(""),
-            Some(o) => String::from(o)
+            Some(o) => String::from(o),
         }
     }
 
@@ -937,7 +970,7 @@ impl Engine {
     pub fn get_wasm_version(&self) -> String {
         match APP_VERSION {
             None => String::from(""),
-            Some(o) => String::from(o)
+            Some(o) => String::from(o),
         }
     }
 
@@ -957,11 +990,7 @@ impl Engine {
     ///
     /// * The results from this method or an error code.
 
-    pub fn calculate_value(
-        &self,
-        cf_index: i32,
-        index: u32
-    ) -> String {
+    pub fn calculate_value(&self, cf_index: i32, index: u32) -> String {
         {
             let calc_mgr = self.engine.calc_mgr();
 
@@ -970,7 +999,9 @@ impl Engine {
             }
 
             match calc_mgr.list_cashflow().list_event() {
-                None => { return String::from(""); }
+                None => {
+                    return String::from("");
+                }
                 Some(o) => {
                     if !o.get_element(index as usize) {
                         return String::from("");
@@ -981,7 +1012,7 @@ impl Engine {
 
         match self.engine.calculate_value() {
             Err(_e) => String::from(""),
-            Ok(o) => o.result_decimal().to_string()
+            Ok(o) => o.result_decimal().to_string(),
         }
     }
 
@@ -1000,11 +1031,7 @@ impl Engine {
     ///
     /// * The results from this method or an error code.
 
-    pub fn calculate_periods(
-        &self,
-        cf_index: i32,
-        index: u32
-    ) -> i32 {
+    pub fn calculate_periods(&self, cf_index: i32, index: u32) -> i32 {
         {
             let calc_mgr = self.engine.calc_mgr();
 
@@ -1013,7 +1040,9 @@ impl Engine {
             }
 
             match calc_mgr.list_cashflow().list_event() {
-                None => { return 0; }
+                None => {
+                    return 0;
+                }
                 Some(o) => {
                     if !o.get_element(index as usize) {
                         return 0;
@@ -1024,7 +1053,7 @@ impl Engine {
 
         match self.engine.calculate_periods() {
             Err(_e) => 0,
-            Ok(o) => o.result_integer()
+            Ok(o) => o.result_integer(),
         }
     }
 
@@ -1045,28 +1074,45 @@ impl Engine {
         &self,
         group_param: &str,
         event_param: &str,
-        cf_index: i32
+        cf_index: i32,
     ) -> String {
-
-        match self.engine.create_template_events(
-            group_param, event_param, cf_index as usize) {
+        match self
+            .engine
+            .create_template_events(group_param, event_param, cf_index as usize)
+        {
             Err(_e) => String::from(""),
             Ok(o) => {
                 let mut events = String::from("");
                 let orig_index = o.index();
                 let mut index: usize = 0;
                 loop {
-                    if !o.get_element(index) { break; }
-                    if !events.is_empty() { events.push('|'); }
+                    if !o.get_element(index) {
+                        break;
+                    }
+                    if !events.is_empty() {
+                        events.push('|');
+                    }
                     let new_date = o.event_date();
-                    events.push_str(format!("{:04}-{:02}-{:02}", new_date / 10000, new_date / 100 % 100, new_date % 100).as_str());
+                    events.push_str(
+                        format!(
+                            "{:04}-{:02}-{:02}",
+                            new_date / 10000,
+                            new_date / 100 % 100,
+                            new_date % 100
+                        )
+                        .as_str(),
+                    );
                     events.push('~');
                     events.push_str(o.sort_order().to_string().as_str());
                     events.push('~');
                     let param_count: usize;
                     match o.list_parameter() {
-                        None => { param_count = 0; }
-                        Some(o) => { param_count = o.count(); }
+                        None => {
+                            param_count = 0;
+                        }
+                        Some(o) => {
+                            param_count = o.count();
+                        }
                     }
                     events.push_str(param_count.to_string().as_str());
                     index += 1;
@@ -1093,9 +1139,11 @@ impl Engine {
         group_param: &str,
         new_name_param: &str,
     ) -> String {
-
         match self.engine.create_cashflow_from_template_group(
-            group_param, new_name_param, group_param) {
+            group_param,
+            new_name_param,
+            group_param,
+        ) {
             Err(_e) => String::from(""),
             Ok(_o) => {
                 let mut initial_name = String::from("*");
@@ -1104,7 +1152,9 @@ impl Engine {
                 let orig_index = list_template_event.index();
                 let mut index: usize = 0;
                 loop {
-                    if !list_template_event.get_element(index) { break; }
+                    if !list_template_event.get_element(index) {
+                        break;
+                    }
                     if list_template_event.initial_event() {
                         initial_name = String::from(list_template_event.name());
                         break;
@@ -1112,10 +1162,10 @@ impl Engine {
                     index += 1;
                 }
                 list_template_event.get_element(orig_index);
-                initial_name                        
+                initial_name
             }
         }
-    }    
+    }
 
     /// Calculates number of intervals between two dates.
     /// If intDate2 is greater than or equal to intDate1,
@@ -1141,17 +1191,17 @@ impl Engine {
         intervals: u32,
         eom_param: bool,
     ) -> i32 {
-
         let freq = CoreUtility::get_frequency(frequency);
 
         CoreUtility::date_diff(
-            CoreUtility::parse_date(date1), 
-            CoreUtility::parse_date(date2), 
-            freq, 
-            intervals as usize, 
-            eom_param) as i32
+            CoreUtility::parse_date(date1),
+            CoreUtility::parse_date(date2),
+            freq,
+            intervals as usize,
+            eom_param,
+        ) as i32
     }
-    
+
     /// Format a date and return the internal format.
     ///
     /// # Arguments
@@ -1249,7 +1299,7 @@ impl Engine {
     pub fn format_decimal_out(&self, val: &str) -> String {
         match val.parse::<Decimal>() {
             Err(_e) => String::from("0.0"),
-            Ok(o) => self.engine.format_decimal_out(o)
+            Ok(o) => self.engine.format_decimal_out(o),
         }
     }
 
@@ -1266,7 +1316,7 @@ impl Engine {
     pub fn format_currency_out(&self, val: &str) -> String {
         match val.parse::<Decimal>() {
             Err(_e) => String::from("0.0"),
-            Ok(o) => self.engine.format_currency_out(o)
+            Ok(o) => self.engine.format_currency_out(o),
         }
     }
 
@@ -1421,8 +1471,10 @@ impl Engine {
 
         match calc_mgr.list_cashflow().list_event() {
             None => 0,
-            Some(o) => { 
-                if !o.get_element_by_date(date_in, sort_param as usize) { return 0; }
+            Some(o) => {
+                if !o.get_element_by_date(date_in, sort_param as usize) {
+                    return 0;
+                }
                 o.index() as u32
             }
         }
@@ -1446,9 +1498,9 @@ impl Engine {
             calc_mgr.list_cashflow().get_element(cf_index as usize);
 
             match calc_mgr.list_cashflow().preferences() {
-                None => { 
-                    prefs = calc_mgr.preferences(); 
-                } 
+                None => {
+                    prefs = calc_mgr.preferences();
+                }
                 Some(o) => {
                     prefs = o;
                 }
@@ -1464,7 +1516,7 @@ impl Engine {
             prefs.default_encoding(),
             prefs.fiscal_year_start() as u32,
             prefs.decimal_digits() as u32,
-            prefs.target().to_string().as_str()
+            prefs.target().to_string().as_str(),
         )
     }
 
@@ -1504,7 +1556,9 @@ impl Engine {
         let orig_index = list_template_group.index();
         let mut index: usize = 0;
         loop {
-            if !list_template_group.get_element(index) { break; }
+            if !list_template_group.get_element(index) {
+                break;
+            }
             ary_template_groups.push(String::from(list_template_group.group()));
             index += 1;
         }
@@ -1532,13 +1586,15 @@ impl Engine {
         if !list_template_group.get_element_by_group(group_param, true) {
             return ary_template_events.into_iter().map(JsValue::from).collect();
         }
-        
+
         let list_template_event = list_template_group.list_template_event();
 
         let orig_index = list_template_event.index();
         let mut index: usize = 0;
         loop {
-            if !list_template_event.get_element(index) { break; }
+            if !list_template_event.get_element(index) {
+                break;
+            }
             ary_template_events.push(String::from(list_template_event.name()));
             index += 1;
         }
@@ -1558,7 +1614,9 @@ impl Engine {
     /// * Returns the cashflow's name.
 
     pub fn init_cashflow(&self, cf_index: i32) -> String {
-        if cf_index < 0 { return String::from(""); }
+        if cf_index < 0 {
+            return String::from("");
+        }
 
         if !self.engine.init_cashflow(cf_index as u32) {
             return String::from("");
@@ -1575,7 +1633,7 @@ impl Engine {
             }
             Some(o) => {
                 if o.locale_str().is_empty() {
-                    locale_str = calc_mgr.preferences().locale_str();                
+                    locale_str = calc_mgr.preferences().locale_str();
                 } else {
                     locale_str = o.locale_str();
                 }
@@ -1583,7 +1641,12 @@ impl Engine {
             }
         }
 
-        format!("{}|{}|{}", calc_mgr.list_cashflow().name(), locale_str, group)
+        format!(
+            "{}|{}|{}",
+            calc_mgr.list_cashflow().name(),
+            locale_str,
+            group
+        )
     }
 
     /// Initialize and return the selected cashflow's
@@ -1598,7 +1661,9 @@ impl Engine {
     /// * See description.
 
     pub fn init_cashflow_status(&self, cf_index: i32) -> String {
-        if cf_index < 0 { return String::from(""); }
+        if cf_index < 0 {
+            return String::from("");
+        }
 
         let calc_mgr = self.engine.calc_mgr();
         if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
@@ -1645,7 +1710,9 @@ impl Engine {
     /// * See description.
 
     pub fn parse_columns(&self, cf_index: i32, table_type_param: u32) -> Array {
-        if cf_index < 0 { return Array::new(); }
+        if cf_index < 0 {
+            return Array::new();
+        }
 
         let calc_mgr = self.engine.calc_mgr();
         if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
@@ -1683,7 +1750,7 @@ impl Engine {
                 list_column.format() as u32,
                 list_column.decimal_digits() as u32,
                 list_column.column_width() as u32,
-                list_column.column_editable()
+                list_column.column_editable(),
             ));
 
             index += 1;
@@ -1705,7 +1772,9 @@ impl Engine {
     /// * See description.
 
     pub fn parse_descriptors(&self, cf_index: i32, index: u32, table_type_param: u32) -> Array {
-        if cf_index < 0 { return Array::new(); }
+        if cf_index < 0 {
+            return Array::new();
+        }
 
         let calc_mgr = self.engine.calc_mgr();
         if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
@@ -1727,7 +1796,9 @@ impl Engine {
                             let orig_index = o2.index();
                             let mut index: usize = 0;
                             loop {
-                                if !o2.get_element(index) { break; }
+                                if !o2.get_element(index) {
+                                    break;
+                                }
                                 list.push(WasmDescriptor::new(
                                     o2.group(),
                                     o2.name(),
@@ -1760,7 +1831,9 @@ impl Engine {
                             let orig_index = o2.index();
                             let mut index: usize = 0;
                             loop {
-                                if !o2.get_element(index) { break; }
+                                if !o2.get_element(index) {
+                                    break;
+                                }
                                 list.push(WasmDescriptor::new(
                                     o2.group(),
                                     o2.name(),
@@ -1795,7 +1868,9 @@ impl Engine {
     /// * See description.
 
     pub fn parse_parameters(&self, cf_index: i32, index: u32, table_type_param: u32) -> Array {
-        if cf_index < 0 { return Array::new(); }
+        if cf_index < 0 {
+            return Array::new();
+        }
 
         let calc_mgr = self.engine.calc_mgr();
         if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
@@ -1817,9 +1892,13 @@ impl Engine {
                             let orig_index = o2.index();
                             let mut index: usize = 0;
                             loop {
-                                if !o2.get_element(index) { break; }
+                                if !o2.get_element(index) {
+                                    break;
+                                }
                                 list.push(WasmParameter::new(
                                     o2.name(),
+                                    o2.label(),
+                                    o2.description(),
                                     CoreUtility::get_param_type(o2.param_type()).as_str(),
                                     o2.param_integeri(),
                                     o2.param_decimal().to_string().as_str(),
@@ -1847,9 +1926,13 @@ impl Engine {
                             let orig_index = o2.index();
                             let mut index: usize = 0;
                             loop {
-                                if !o2.get_element(index) { break; }
+                                if !o2.get_element(index) {
+                                    break;
+                                }
                                 list.push(WasmParameter::new(
                                     o2.name(),
+                                    o2.label(),
+                                    o2.description(),
                                     CoreUtility::get_param_type(o2.param_type()).as_str(),
                                     o2.param_integeri(),
                                     o2.param_decimal().to_string().as_str(),
@@ -1877,7 +1960,9 @@ impl Engine {
     /// * See description.
 
     pub fn parse_summary(&self, cf_index: i32) -> Array {
-        if cf_index < 0 { return Array::new(); }
+        if cf_index < 0 {
+            return Array::new();
+        }
 
         let calc_mgr = self.engine.calc_mgr();
         if !calc_mgr.list_cashflow().get_element(cf_index as usize) {
@@ -1918,7 +2003,9 @@ impl Engine {
     /// * True if successful.
 
     pub fn remove_cashflow(&self, cf_index: i32) -> bool {
-        if cf_index < 0 { return false; }
+        if cf_index < 0 {
+            return false;
+        }
 
         {
             let calc_mgr = self.engine.calc_mgr();
@@ -1928,7 +2015,7 @@ impl Engine {
             }
         }
 
-        self.engine.calc_mgr_mut().list_cashflow_mut().remove()        
+        self.engine.calc_mgr_mut().list_cashflow_mut().remove()
     }
 
     /// Remove the indicated event for the selected cashflow.
@@ -1944,7 +2031,9 @@ impl Engine {
 
     pub fn remove_event(&self, cf_index: i32, index: u32) -> bool {
         let mut result: bool = false;
-        if cf_index < 0 { return result; }
+        if cf_index < 0 {
+            return result;
+        }
 
         {
             let calc_mgr = self.engine.calc_mgr();
@@ -1954,8 +2043,10 @@ impl Engine {
             }
 
             match calc_mgr.list_cashflow().list_event() {
-                None => { return result; }
-                Some(o) => { 
+                None => {
+                    return result;
+                }
+                Some(o) => {
                     if !o.get_element(index as usize) {
                         return result;
                     }
@@ -1963,16 +2054,21 @@ impl Engine {
             }
         }
 
-        match self.engine.calc_mgr_mut().list_cashflow_mut().list_event_mut() {
-            None => { return result }
+        match self
+            .engine
+            .calc_mgr_mut()
+            .list_cashflow_mut()
+            .list_event_mut()
+        {
+            None => return result,
             Some(o) => {
                 result = o.remove();
             }
         }
 
         match self.engine.balance_cashflow() {
-            Err(_e) => { }
-            Ok(_o) => { }
+            Err(_e) => {}
+            Ok(_o) => {}
         }
 
         result
@@ -1990,7 +2086,9 @@ impl Engine {
     /// * Returns serialized cashflow.
 
     pub fn serialize(&self, cf_index: i32, options: u32) -> String {
-        if cf_index < 0 { return String::from(""); }
+        if cf_index < 0 {
+            return String::from("");
+        }
 
         if !self
             .engine
@@ -2006,7 +2104,7 @@ impl Engine {
         json.serialize(options as usize)
     }
 
-    /// Set the appropriate event list value and 
+    /// Set the appropriate event list value and
     /// return it as a string.
     ///
     /// # Arguments
@@ -2023,29 +2121,38 @@ impl Engine {
     /// * See description.
 
     pub fn set_event_value(
-        &self, 
+        &self,
         col_name_index_param: u32,
         type_param: &str,
         code_param: &str,
         cf_index_param: i32,
         index_param: u32,
-        value_param: &str
+        value_param: &str,
     ) -> String {
-        if cf_index_param < 0 { return String::from(""); }
+        if cf_index_param < 0 {
+            return String::from("");
+        }
 
         {
             let calc_mgr = self.engine.calc_mgr();
 
-            if !calc_mgr.list_cashflow().get_element(cf_index_param as usize) {
+            if !calc_mgr
+                .list_cashflow()
+                .get_element(cf_index_param as usize)
+            {
                 return String::from("");
             }
 
             match calc_mgr.list_cashflow().list_event() {
-                None => { return String::from(""); }
-                Some(o) => { o.get_element(index_param as usize); }
+                None => {
+                    return String::from("");
+                }
+                Some(o) => {
+                    o.get_element(index_param as usize);
+                }
             }
         }
-            
+
         let mut event_date = String::from("");
         let mut sort_order: usize = 0;
 
@@ -2054,8 +2161,8 @@ impl Engine {
             let list_locale = calc_mgr.list_locale();
 
             match calc_mgr.list_cashflow().list_event() {
-                None => { }
-                Some(o) => { 
+                None => {}
+                Some(o) => {
                     event_date = list_locale.format_date_out(o.event_date());
                     sort_order = o.sort_order();
                 }
@@ -2063,12 +2170,17 @@ impl Engine {
         }
 
         let result = CalcManager::util_set_event_value(
-            self.engine.calc_manager(), col_name_index_param as usize, 
-            type_param, code_param, index_param as usize, value_param);
-        
+            self.engine.calc_manager(),
+            col_name_index_param as usize,
+            type_param,
+            code_param,
+            index_param as usize,
+            value_param,
+        );
+
         match self.engine.balance_cashflow() {
             Err(_e) => String::from(""),
-            Ok(_o) => format!("{}|{}|{}", event_date, sort_order, result)
+            Ok(_o) => format!("{}|{}|{}", event_date, sort_order, result),
         }
     }
 
@@ -2085,17 +2197,22 @@ impl Engine {
     /// * True if successful, otherwise false.
 
     pub fn set_extension_values(
-        &self, 
+        &self,
         cf_index_param: i32,
         index_param: u32,
-        ext_param: &str
-    ) -> String {        
-        if cf_index_param < 0 { return String::from(""); }
+        ext_param: &str,
+    ) -> String {
+        if cf_index_param < 0 {
+            return String::from("");
+        }
 
         {
             let calc_mgr = self.engine.calc_mgr();
 
-            if !calc_mgr.list_cashflow().get_element(cf_index_param as usize) {
+            if !calc_mgr
+                .list_cashflow()
+                .get_element(cf_index_param as usize)
+            {
                 return String::from("");
             }
         }
@@ -2105,32 +2222,35 @@ impl Engine {
         {
             let json = CalcJsonDeserialize::new(self.engine.calc_manager());
             match json.deserialize_extension_from_str(ext_param) {
-                Err(_e) => { 
-                    return String::from(""); 
+                Err(_e) => {
+                    return String::from("");
                 }
-                Ok(o) => { 
+                Ok(o) => {
                     ext = o;
                 }
             }
         }
 
         if !CalcManager::util_set_extension_values(
-            self.engine.calc_manager(), index_param as usize, &ext) { 
-            return String::from(""); 
+            self.engine.calc_manager(),
+            index_param as usize,
+            &ext,
+        ) {
+            return String::from("");
         }
 
         self.engine.evaluate_cashflow_event_type_all();
 
         let mut result = String::from("");
-        
+
         {
             let calc_mgr = self.engine.calc_mgr();
             let list_cashflow = calc_mgr.list_cashflow();
             let list_event_opt = list_cashflow.list_event();
 
             match list_event_opt {
-                None => { }
-                Some(o) => { 
+                None => {}
+                Some(o) => {
                     let orig_index = o.index();
                     if o.get_element(index_param as usize) {
                         result = String::from(o.event_type());
@@ -2142,7 +2262,7 @@ impl Engine {
 
         match self.engine.balance_cashflow() {
             Err(_e) => String::from(""),
-            Ok(_o) => result
+            Ok(_o) => result,
         }
     }
 
@@ -2159,7 +2279,9 @@ impl Engine {
     /// * True if successful, otherwise false.
 
     pub fn set_parameter_values(&self, cf_index: i32, index_param: u32, parameters: &str) -> bool {
-        if cf_index < 0 { return false; }
+        if cf_index < 0 {
+            return false;
+        }
 
         {
             let calc_mgr = self.engine.calc_mgr();
@@ -2175,8 +2297,11 @@ impl Engine {
         }
 
         if !CalcManager::util_set_parameter_values(
-            self.engine.calc_manager(), index_param as usize, values) { 
-            return false; 
+            self.engine.calc_manager(),
+            index_param as usize,
+            values,
+        ) {
+            return false;
         }
 
         true
@@ -2203,9 +2328,9 @@ impl Engine {
 
         if cf_index >= 0 {
             match calc_mgr.list_cashflow_mut().preferences_mut() {
-                None => { 
-                    elem_prefs = calc_mgr.preferences_mut(); 
-                } 
+                None => {
+                    elem_prefs = calc_mgr.preferences_mut();
+                }
                 Some(o) => {
                     elem_prefs = o;
                 }
@@ -2235,7 +2360,9 @@ impl Engine {
     /// * Return a string that can be directly loaded into ag-grid.
 
     pub fn table_values(&self, cf_index: i32, table_type_param: u32) -> String {
-        if cf_index < 0 { return String::from(""); }
+        if cf_index < 0 {
+            return String::from("");
+        }
 
         let calc_mgr = self.engine.calc_mgr();
 
@@ -2253,7 +2380,7 @@ impl Engine {
             }
         }
 
-        let list_column =calc_mgr.util_parse_columns(table_type);
+        let list_column = calc_mgr.util_parse_columns(table_type);
 
         let json = CalcJsonSerialize::new(self.engine.calc_manager());
 
@@ -2278,13 +2405,21 @@ impl Engine {
                     if !list_am.get_element(row_index as usize) {
                         break;
                     }
-                    let mut row = json.serialize_extension(list_am.elem_extension(), false, true);
+                    let mut row = json.serialize_extension(
+                        list_am.elem_extension(),
+                        list_am.value(),
+                        list_am.frequency(),
+                        false,
+                        true,
+                    );
 
                     let orig_index = list_column.index();
                     let mut index: usize = 0;
                     loop {
-                        if !list_column.get_element(index) { break; }
-                        let val =calc_mgr.util_am_value(list_column.column(), &list_am);
+                        if !list_column.get_element(index) {
+                            break;
+                        }
+                        let val = calc_mgr.util_am_value(list_column.column(), &list_am);
                         row = format!("{},\"{}\":\"{}\"", row, list_column.col_name(), val);
                         index += 1;
                     }
@@ -2316,13 +2451,21 @@ impl Engine {
                     if !list_am.get_element(row_index as usize) {
                         break;
                     }
-                    let mut row = json.serialize_extension(list_am.elem_extension(), false, true);
+                    let mut row = json.serialize_extension(
+                        list_am.elem_extension(),
+                        list_am.value(),
+                        list_am.frequency(),
+                        false,
+                        true,
+                    );
 
                     let orig_index = list_column.index();
                     let mut index: usize = 0;
                     loop {
-                        if !list_column.get_element(index) { break; }
-                        let val =calc_mgr.util_am_value(list_column.column(), &list_am);
+                        if !list_column.get_element(index) {
+                            break;
+                        }
+                        let val = calc_mgr.util_am_value(list_column.column(), &list_am);
                         row = format!("{},\"{}\":\"{}\"", row, list_column.col_name(), val);
                         index += 1;
                     }
@@ -2353,7 +2496,13 @@ impl Engine {
                                 break;
                             }
 
-                            row = json.serialize_extension(o.elem_extension(), false, true);
+                            row = json.serialize_extension(
+                                o.elem_extension(),
+                                dec!(0.0),
+                                o.frequency(),
+                                false,
+                                true,
+                            );
                             next_name = String::from(o.next_name());
                         }
                     }
@@ -2362,10 +2511,14 @@ impl Engine {
                     let orig_index = list_column.index();
                     let mut index: usize = 0;
                     loop {
-                        if !list_column.get_element(index) { break; }
+                        if !list_column.get_element(index) {
+                            break;
+                        }
                         let val = calc_mgr.util_event_value(list_column.column());
                         row = format!("{},\"{}\":\"{}\"", row, list_column.col_name(), val);
-                        if !next_name_seen { next_name_seen = list_column.col_name() == "Next-name"; }
+                        if !next_name_seen {
+                            next_name_seen = list_column.col_name() == "Next-name";
+                        }
                         index += 1;
                     }
                     list_column.get_element(orig_index);

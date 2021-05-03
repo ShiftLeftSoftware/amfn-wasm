@@ -100,10 +100,28 @@
         <ul id="ulTabs" class="nav nav-tabs" role="tablist"></ul>
 
         <content class="flex-grow-1 max-height">
-            <section class="container-fluid d-flex flex-column max-height">
-                <div id="divEvents" class="vertical-resize"></div>
-                <div id="divAms" class="flex-grow-1"></div>
+            <section id="secMain" class="max-height display-none"> 
+                <div class="container-fluid d-flex flex-column max-height">
+                    <div id="divEvents" class="vertical-resize"></div>
+                    <div id="divAms" class="flex-grow-1"></div>
+                </div>
             </section>
+            <section id="secHelp" class="max-height"> 
+                <div class="container-fluid d-flex align-items-center justify-content-center max-height">
+                    <div class="text-muted">
+                        <div class="display-1 text-center">&lt;&lt;</div>
+                        <ul class="list-unstyled list-group mt-3">
+                            <li><a id="tutorialLoan2" class="list-group-item" href="#" target="_blank"><i class="bi-book"></i></a></li>
+                            <li><a id="tutorialAnnuity2" class="list-group-item" href="#" target="_blank"><i class="bi-book"></i></a></li>
+                            <li><a id="tutorialBond2" class="list-group-item" href="#" target="_blank"><i class="bi-book"></i></a></li>
+                            <li><a id="tutorialInvestment2" class="list-group-item" href="#" target="_blank"><i class="bi-book"></i></a></li>
+                            <li><hr class="list-group-divider"></li>
+                            <li><a id="helpConcepts2" class="list-group-item" href="#" target="_blank"><i class="bi-question-circle"></i></a></li>
+                            <li><a id="helpCashflow2" class="list-group-item" href="#" target="_blank"><i class="bi-question-circle"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>                
         </content>
 
         <footer class="mt-auto">

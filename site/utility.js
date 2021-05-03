@@ -83,6 +83,11 @@ const DAY_COUNT_30 = "Day_Count_Basis_30";
 const DAY_COUNT_30E = "Day_Count_Basis_30E";
 const DAY_COUNT_30EP = "Day_Count_Basis_30EP";
 
+// Resource error constants
+const ERROR_CALCULATE_INTEREST = "Error_Calculate_Interest";
+const ERROR_CALCULATE_PERIODS = "Error_Calculate_Periods";
+const ERROR_CALCULATE_PRINCIPAL = "Error_Calculate_Principal";
+
 // Resource frequency constants.
 const FREQ_NONE = "Frequency_None";
 const FREQ_1_YEAR = "Frequency_1_Year";
@@ -146,7 +151,11 @@ const MODAL_IC_DAYS_IN_YEAR = "Modal_Ic_DaysInYear";
 const MODAL_IC_EFF_FREQ = "Modal_Ic_EffFreq";
 const MODAL_IC_INT_FREQ = "Modal_Ic_IntFreq";
 const MODAL_IC_ROUND_BAL = "Modal_Ic_RoundBal";
-const MODAL_IC_ROUND_DD = "Modal_Ic_RoundDD";            
+const MODAL_IC_ROUND_DD = "Modal_Ic_RoundDD";
+const MODAL_IC_STAT_NAR = "Modal_Ic_Stat_Nar";
+const MODAL_IC_STAT_EAR = "Modal_Ic_Stat_Ear";
+const MODAL_IC_STAT_PR = "Modal_Ic_Stat_Pr";
+const MODAL_IC_STAT_DR = "Modal_Ic_Stat_Dr";
 
 // Resource modal principal change.
 const MODAL_PC_TYPE = "Modal_Pc_Type";
@@ -187,6 +196,11 @@ const MSG_SELECT_CASHFLOW_TEMPLATE = "Msg_Select_Cashflow_Template";
 const MSG_TAB_INDEX = "Msg_Tab_Index";
 const MSG_CHART_DEF = "Msg_Chart_Def";
 const MSG_ENGINE = "Msg_Engine";
+const MSG_LOCALES_LOAD = "Msg_Locales_Load";
+const MSG_TEMPLATES_LOAD = "Msg_Templates_Load";
+const MSG_HELP_LOAD = "Msg_Help_Load";
+const MSG_CASHFLOW_LOAD = "Msg_Cashflow_Load";
+const MSG_CASHFLOW_SAVE = "Msg_Cashflow_Save";
 
 // Resource navigation constants.
 const NAV_FILE = "Nav_File";
@@ -495,13 +509,13 @@ class ChartUtility {
 
         let rowIndex = Updater.refreshEvents(self, eventDate, sortOrder);
         Updater.refreshAmResults(self);
-        Updater.updateTabLabel(self, true);
+        Updater.updateTabLabel(self, self.activeTabIndex, true);
 
         if (paramCount === 0) return;
 
         setTimeout(function() {
             ModalDialog.showParameters(self, rowIndex, TABLE_EVENT);
-        }, 500);
+        }, 100);
     }
 
     /**
@@ -555,9 +569,10 @@ class ChartUtility {
      * Get string resource.
      * @param {object} self Self object.
      * @param {string} name Resource name.
+     * @return {string} The return resource string.
      */
     static getResource(self, name) {
-       return self.engine.get_resource(self.activeTabIndex, name);
+       return self.engine.get_resource(self.activeTabIndex, name); // -1 will return a user locale resource string
     }
 
     /**
@@ -568,7 +583,10 @@ class ChartUtility {
      * @return {number} The event row index.
      */
      static refreshEvents(self, eventDate, sortOrder) {
+        if (self.activeTabIndex < 0) return 0;
+
         let tab = self.tabs[self.activeTabIndex];
+
         tab.grdEventOptions.api.stopEditing();
         tab.grdEventOptions.api.clearFocusedCell();
 
@@ -599,6 +617,8 @@ class ChartUtility {
      * @param {object} self Self object.
      */
      static refreshAmResults(self) {
+        if (self.activeTabIndex < 0) return;
+
         let tab = self.tabs[self.activeTabIndex];
 
         tab.amValues = JSON.parse(self.engine.table_values(self.activeTabIndex, TABLE_AM));        
@@ -617,6 +637,8 @@ class ChartUtility {
      * @param {object} self Self object.
      */
      static refreshStatusLine(self) {
+        if (self.activeTabIndex < 0) return;
+
         let divStatus = document.getElementById("divStatus");
 
         divStatus.innerText = self.engine.get_cashflow_status(
@@ -625,12 +647,14 @@ class ChartUtility {
                     
     /**
      * Update the tab label.
+     * @param {object} self Self object.
+     * @param {number} cfIndex Cashflow index.
      * @param {bool} savePending Save pending.
      */    
-     static updateTabLabel(self, savePending) {
-        if (self.activeTabIndex < 0) return;
+     static updateTabLabel(self, cfIndex, savePending) {
+        if (cfIndex < 0) return;
 
-        let tab = self.tabs[self.activeTabIndex];
+        let tab = self.tabs[cfIndex];
         tab.savePending = savePending;
 
         let spanLabel = tab.divTab.querySelector(".tabLabel");
@@ -667,6 +691,7 @@ class ModalDialog {
             html: true
         });
 
+        document.getElementById("divModal").addEventListener("click", e => ModalDialog.modalClick(e), true); // Capture
         document.getElementById("modalBody").addEventListener("keyup", e => ModalDialog.modalKeyUp(e));
         document.getElementById("modalClose").addEventListener("click", () => ModalDialog.modalClose(false));
         document.getElementById("modalCancel").addEventListener("click", () => ModalDialog.modalClose(false));
@@ -708,12 +733,22 @@ class ModalDialog {
 
         divBackground.style.display = "block";
         divModal.style.display = "block";
+
+        ModalDialog.modalHelpTemps = [];
         
         let elems = document.getElementsByClassName("btnHelp");
         for (let elem of elems) {
             ModalDialog.modalHelpTemps.push(new bootstrap.Popover(elem, {
                 content: ModalDialog.modalHelpContent,
                 title: ModalDialog.modalHelpTitle,
+                customClass: "div-popover",
+                html: true
+            }));
+        }
+        
+        elems = document.getElementsByClassName("btnHelpDefault");
+        for (let elem of elems) {
+            ModalDialog.modalHelpTemps.push(new bootstrap.Popover(elem, {
                 customClass: "div-popover",
                 html: true
             }));
@@ -908,7 +943,24 @@ class ModalDialog {
             gridRow.setDataValue(tab.lastFocused.colDef.col_name, result);
 
             Updater.refreshAmResults(self);
-            Updater.updateTabLabel(self, true);
+            Updater.updateTabLabel(self, self.activeTabIndex, true);
+        }
+    }
+
+    /**
+     * Respond to the modal click capture event.
+     * @param {object} e Event object.
+     */    
+    static modalClick(e) {
+
+        if (e && e.target && (
+            e.target.hasAttribute("aria-describedby") || 
+            e.target.parentElement && e.target.parentElement.hasAttribute("aria-describedby"))) return;
+
+        ModalDialog.modalHelpGeneral.hide();
+
+        for (let help of ModalDialog.modalHelpTemps) {
+            help.hide();
         }
     }
 
@@ -917,6 +969,11 @@ class ModalDialog {
      * @param {object} e Event object.
      */    
     static modalKeyUp(e) {
+
+        if (e.keyCode === 27) {
+            ModalDialog.modalClick(null);
+            return;
+        }
 
         if (e.keyCode !== 13 || e.shiftKey || e.ctrlKey || e.altKey) return;
 
@@ -947,16 +1004,24 @@ class ModalDialog {
      * @param {object} self Self object.
      * @param {string} text The confirmation text.
      * @param {object} confirmFn The function to call if OK.
+     * @param {object} cancelFn The function to call if Cancel.
      * @param {number} index The tab index.
      */    
-     static showConfirm(self, text, confirmFn, index) {
+     static showConfirm(self, text, confirmFn, cancelFn, index) {
 
         ModalDialog.modalShow(Updater.getResource(self, MODAL_CONFIRMATION), HelpConfirm, text, { 
             textCancel: Updater.getResource(self, MODAL_NO),
             textOK: Updater.getResource(self, MODAL_YES),
-            finalFn: (isOK) => {
-                if (!isOK) return;
-                confirmFn(self, index);
+            finalFn: (isOK) => {                        
+                if (isOK) {
+                    setTimeout(function() {
+                        confirmFn(self, index);
+                    }, 100);
+                } else {
+                    setTimeout(function() {
+                        cancelFn(self, index);
+                    }, 100);
+                }
             }
         });    
     }
@@ -1075,7 +1140,7 @@ class ModalDialog {
 
         if ("interest-change" in extension) {
             let ext = extension["interest-change"];
-            ModalDialog.modalShow(Updater.getResource(self, MODAL_INTEREST_CHANGE), HelpInterestChange,
+            let form = 
                 `<div class="row">
                     <div class="col-6">
                         <label for="icMethod" class="col-form-label">${Updater.getResource(self, MODAL_IC_METHOD)}</label>
@@ -1186,9 +1251,51 @@ class ModalDialog {
                     <div class="col-6">
                         <input type="text" id="icRoundDD" class="form-control form-control-sm" value="${ext["round-decimal-digits"]}" ${enable ? '' : 'disabled'}>
                     </div>
-                </div>`,
-                options
-            );
+                </div>`;
+
+            let stat = ext["interest-statistics"];
+            if (stat) {
+                form +=
+                    `<div class="row">
+                        <div class="col-6">
+                            <label for="icStatNar" class="col-form-label">${Updater.getResource(self, MODAL_IC_STAT_NAR)}</label>
+                            <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="nominal-annual-rate"><i class="bi-question-circle"></i></a>
+                        </div>
+                        <div class="col-6">
+                            <input type="text" id="icStatNar class="form-control form-control-sm" value="${stat["nar"]}" disabled>                            
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="icStatEar" class="col-form-label">${Updater.getResource(self, MODAL_IC_STAT_EAR)}</label>
+                            <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="effective-annual-rate"><i class="bi-question-circle"></i></a>
+                        </div>
+                        <div class="col-6">
+                            <input type="text" id="icStatEar class="form-control form-control-sm" value="${stat["ear"]}" disabled>                            
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="icStatPr" class="col-form-label">${Updater.getResource(self, MODAL_IC_STAT_PR)}</label>
+                            <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="periodic-rate"><i class="bi-question-circle"></i></a>
+                        </div>
+                        <div class="col-6">
+                            <input type="text" id="icStatPr class="form-control form-control-sm" value="${stat["pr"]}" disabled>                            
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="icStatDr" class="col-form-label">${Updater.getResource(self, MODAL_IC_STAT_DR)}</label>
+                            <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="daily-rate"><i class="bi-question-circle"></i></a>
+                        </div>
+                        <div class="col-6">
+                            <input type="text" id="icStatDr class="form-control form-control-sm" value="${stat["dr"]}" disabled>                            
+                        </div>
+                    </div>`;
+            }
+
+            ModalDialog.modalShow(Updater.getResource(self, MODAL_INTEREST_CHANGE), HelpInterestChange, form, options);
+
             return;
         }
         
@@ -1332,7 +1439,7 @@ class ModalDialog {
 
                 let valid = event.length > 0;
                 if (!valid) {
-                    Toast.toastError(Updater.getResource(self, MSG_SELECT_TEMPLATE_EVENT));
+                    Toaster.toastError(Updater.getResource(self, MSG_SELECT_TEMPLATE_EVENT));
                     return null;
                 }
 
@@ -1395,7 +1502,7 @@ class ModalDialog {
                 
                 let valid = cfName.length > 0 && cfTemplate.length > 0;
                 if (!valid) {
-                    Toast.toastError(Updater.getResource(self, MSG_SELECT_CASHFLOW_TEMPLATE));
+                    Toaster.toastError(Updater.getResource(self, MSG_SELECT_CASHFLOW_TEMPLATE));
                     return null;
                 }
 
@@ -1428,13 +1535,10 @@ class ModalDialog {
 
         let body =
             `<div class="row">
-                <div class="col-4">
+                <div class="col-6">
                     <strong>${Updater.getResource(self, MODAL_PARAM_NAME)}</strong>
                 </div>
-                <div class="col-4">
-                    <strong>${Updater.getResource(self, MODAL_PARAM_TYPE)}</strong>
-                </div>
-                <div class="col-4">
+                <div class="col-6">
                     <strong>${Updater.getResource(self, MODAL_PARAM_VALUE)}</strong>
                 </div>
             </div>`;
@@ -1444,17 +1548,11 @@ class ModalDialog {
         for (let elem of list) {
             body +=
                 `<div class="row">
-                    <div class="col-4">
-                        ${elem.name}
+                    <div class="col-6">
+                        ${elem.label.length > 0 ? elem.label : elem.name}
+                        <a class="btn btnHelpDefault" role="button" tabindex="-1" data-bs-toggle="popover" title="${Updater.getResource(self, MODAL_PARAMETER_LIST)}" data-bs-content="${elem.description}"><i class="bi-question-circle"></i></a>
                     </div>
-                    <div class="col-4">
-                        <select id="pcType" class="form-select form-select-sm" disabled>
-                            <option ${elem.sym_type === 'integer' ? 'selected' : ''}>integer</option>
-                            <option ${elem.sym_type === 'decimal' ? 'selected' : ''}>decimal</option>
-                            <option ${elem.sym_type === 'string' ? 'selected' : ''}>string</option>
-                        </select>
-                    </div>
-                    <div class="col-4">
+                    <div class="col-6">
                         <input type="text" class="form-control form-control-sm parameter" 
                             value="${elem.sym_type === 'integer' ? elem.int_value : elem.sym_type === 'decimal' ? elem.dec_value : elem.str_value}" 
                             ${enable ? '' : 'disabled'}>
@@ -1487,7 +1585,7 @@ class ModalDialog {
 
                 if (self.engine.set_parameter_values(self.activeTabIndex, rowIndex, data.parameters)) {
                     Updater.refreshAmResults(self);
-                    Updater.updateTabLabel(self, true);        
+                    Updater.updateTabLabel(self, self.activeTabIndex, true);        
                 }
             }
         });
@@ -1587,7 +1685,7 @@ class ModalDialog {
                     if (self.engine.set_preferences(cfIndex, data)) {
                         Updater.refreshEvents(self, "", 0);
                         Updater.refreshAmResults(self);
-                        Updater.updateTabLabel(self, true);        
+                        Updater.updateTabLabel(self, self.activeTabIndex, true);        
                     }
                 }
             }
@@ -1697,7 +1795,7 @@ class ModalDialog {
                     gridRow.setDataValue(tab.lastFocused.colDef.col_name, value);
 
                     Updater.refreshAmResults(self);
-                    Updater.updateTabLabel(self, true);
+                    Updater.updateTabLabel(self, self.activeTabIndex, true);
                 }
             }
         });    
@@ -1781,9 +1879,9 @@ class ModalDialog {
 }
 
 /**
- * Toast helper class.
+ * Toaster class.
  */
-class Toast {
+class Toaster {
 
     /**
      * Show a toast message.
@@ -1820,7 +1918,7 @@ class Toast {
      * @param {string} text The text to show in the toast.
      */    
      static toastInfo(text) {
-        Toast.toast(config.helpTitleInfo, text, "linear-gradient(to right, Blue, DarkBlue)");
+        Toaster.toast(config.helpTitleInfo, text, "linear-gradient(to right, Blue, DarkBlue)");
     }
 
     /**
@@ -1828,7 +1926,7 @@ class Toast {
      * @param {string} text The text to show in the toast.
      */    
      static toastError(text) {
-        Toast.toast(config.helpTitleError, text, "linear-gradient(to right, Red, DarkRed)");
+        Toaster.toast(config.helpTitleError, text, "linear-gradient(to right, Red, DarkRed)");
     }
 }
 

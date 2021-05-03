@@ -52,6 +52,8 @@
             by a tab. Clicking on a tab shows the coresponding cashflow. Each cashflow has an event grid at 
             the top, an amortization grid under the event grid, a status line under the amortization grid,
             and summary information that can be shown when needed.</p>
+        
+            <p><img src="images/cashflow.png"></p>
             
             The AmFn Wasm is an "event-driven" amortization cashflow calculator. The top event grid for a
             cashflow is editable. In contrast, the amortization grid, status line, and summary
@@ -98,46 +100,37 @@
             separated by a plus sign ("+"). For example, "Shift+Enter" means to press the "Shift" 
             and the "Enter" keys simultaneously.</p>
 
-            <div class="row">
-                <div class="col-3">
-                    Keystrokes
-                </div>
-                <div class="col-9">
-                    Description
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-3">
-                    Enter
-                </div>
-                <div class="col-9">
-                    Behaves like a Tab except when positioned in the last column 
-                    of the last row. In that case, a new event is automatically placed into the cashflow if the 
-                    current event specifies a "next event" name. If the current event does not specify a next event 
-                    name, the new event dialog is shown to the user allowing the next event to be explicitly selected.
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-3">
-                    Tab
-                </div>
-                <div class="col-9">
+            <table width="80%" cellspacing="2" cellpadding="2" border="0">
+                <tr>
+                  <th align="left" valign="top" width="30%">Keystrokes</th>
+                  <th align="left" valign="top">Description</th>
+                </tr>
+                <tr>
+                  <td align="left" valign="top" width="30%">Enter</td>
+                  <td align="left" valign="top">
+                    Behaves like a Tab except when positioned in the last column of the last row. In that case, a 
+                    new event is automatically placed into the cashflow if the current event specifies a "next event" 
+                    name. If the current event does not specify a next event name, the new event dialog is shown to 
+                    the user allowing the next event to be explicitly selected.
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" valign="top" width="30%">Tab</td>
+                  <td align="left" valign="top">
                     Selects the next cell in the current row unless the last cell of the current row is reached, in 
                     which case the first cell of the next row is selected. If the last cell of the last row is reached, 
                     the first cell of the first row is then selected.
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-3">
-                    Shift+Tab
-                </div>
-                <div class="col-9">
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" valign="top" width="30%">Shift+Tab</td>
+                  <td align="left" valign="top">
                     Selects the previous cell in the current row unless the first cell of the current row is reached, 
                     in which case the last cell of the previous row is selected. If the first cell of the first row is 
                     reached, the last cell of the last row is then selected.
-                </div>
-            </div>
-            <br/>
+                  </td>
+                </tr>
+            </table>
 
             <h3 id="eventtypes">Basic event types.</h3>
 
@@ -152,98 +145,74 @@
             event (i.e., method, day-count, nominal annual rate, compounding frequency, effective
             frequency, etc.). Interest change events run in perpetuity until the end of the cashflow
             or until explicitly changed.</p>
+        
+            <p><img src="images/interestchange.png"></p>
 
             <h3 id="princhange">Principal change.</h3>
 
             <p>Principal change events account for any change in the principal balance of a cashflow.
             The 4 sub-types of principal change events are as follows:</p>
 
-            <div class="row">
-                <div class="col-3">
-                    Label
-                </div>
-                <div class="col-9">
-                    Description
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-3">
-                    Increase
-                </div>
-                <div class="col-9">
-                    Increase the principal balance of the cashflow by a certain amount (normally used).
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-3">
-                    Decrease
-                </div>
-                <div class="col-9">
-                    Decrease the principal balance of the cashflow by a certain amount (normally used).
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-3">
-                    Positive
-                </div>
-                <div class="col-9">
-                    Assign or overwrite the principal balance of the cashflow by a positive amount (rarely used).
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-3">
-                    Negative
-                </div>
-                <div class="col-9">
-                    Assign or overwrite the principal balance of the cashflow by a negative amount (rarely used).
-                </div>
-            </div>
-            <br/>
+            <p><img src="images/principalchange.png"></p>
+
+            <table width="80%" cellspacing="2" cellpadding="2" border="0">
+                <tr>
+                  <th align="left" valign="top" width="30%">Label</th>
+                  <th align="left" valign="top">Description</th>
+                </tr>
+                <tr>
+                  <td align="left" valign="top" width="30%">Increase</td>
+                  <td align="left" valign="top">
+                      Increase the principal balance of the cashflow by a certain amount (normally used).</td>
+                </tr>
+                <tr>
+                  <td align="left" valign="top" width="30%">Decrease</td>
+                  <td align="left" valign="top">
+                      Decrease the principal balance of the cashflow by a certain amount (normally used).</td>
+                </tr>
+                <tr>
+                  <td align="left" valign="top" width="30%">Positive</td>
+                  <td align="left" valign="top">
+                      Assign or overwrite the principal balance of the cashflow by a positive amount (rarely used).</td>
+                </tr>
+                <tr>
+                  <td align="left" valign="top" width="30%">Negative</td>
+                  <td align="left" valign="top">
+                      Assign or overwrite the principal balance of the cashflow by a negative amount (rarely used).</td>
+                </tr>
+            </table>
 
             <h3 id="curvalue">Current value.</h3>
 
             <p>Current value events indicate the current value of the cashflow at any point in time.
             The 3 kinds of current value events are as follows:</p>
 
-            <div class="row">
-                <div class="col-3">
-                    Label
-                </div>
-                <div class="col-9">
-                    Description
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-3">
-                    Passive
-                </div>
-                <div class="col-9">
-                    A passive current value does not affect the balance of the cashflow. An 
+            <p><img src="images/currentvalue.png"></p>
+
+            <table width="80%" cellspacing="2" cellpadding="2" border="0">
+                <tr>
+                  <th align="left" valign="top" width="30%">Label</th>
+                  <th align="left" valign="top">Description</th>
+                </tr>
+                <tr>
+                  <td align="left" valign="top" width="30%">Passive</td>
+                  <td align="left" valign="top">A passive current value does not affect the balance of the cashflow. An 
                     example would be reporting the balance of a loan as of a specific date 
-                    without causing a normal period to be actively split.
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-3">
-                    Active
-                </div>
-                <div class="col-9">
-                    An active current value event affects the balance of the cashflow. An 
+                    without causing a normal period to be actively split.</td>
+                </tr>
+                <tr>
+                  <td align="left" valign="top" width="30%">Active</td>
+                  <td align="left" valign="top">An active current value event affects the balance of the cashflow. An 
                     example would be an initial investment that reports the balance on an 
-                    annual basis, with no periodic re-investments.
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-3">
-                    Present Value (PV)
-                </div>
-                <div class="col-9">
-                    The Present Value (PV) current value event is a
+                    annual basis, with no periodic re-investments.</td>
+                </tr>
+                <tr>
+                  <td align="left" valign="top" width="30%">Present Value (PV)</td>
+                  <td align="left" valign="top">The Present Value (PV) current value event is a
                     special form of an active current balance event. This event is normally used to
-                    separate the "past" from the "future" as of a certain date.
-                </div>
-            </div>
-            <br/>
+                    separate the "past" from the "future" as of a certain date.</td>
+                </tr>
+            </table>
 
             <h3 id="statvalue">Statistic value.</h3>
 
@@ -253,6 +222,8 @@
             as desired. Statistic value events automatically run in perpetuity until the end of the cashflow
             or until explicitly discontinued by the user.</p>
 
+            <p><img src="images/staticticvalue.png"></p>
+
             <h3 id="preferences">User, template and cashflow preferences.</h3>
 
             <p>Preference elements exist at the user (top-tier), template (middle-tier)
@@ -260,6 +231,8 @@
             preference elements are propagated from the user level to the template level and
             from the template level to the cashflow level, when the user has explicitly specified
             that this action is to occur.</p>
+
+            <p><img src="images/preferences.png"></p>
             
             <p>All preference elements contain various of fields of information, a descriptor list,
             and a parameter list that can be used in a number of ways depending upon the level of the
@@ -296,6 +269,8 @@
             well as within each event of a cashflow. Parameters are used to supply information to
             various expressions. The declarations of parameters are normally defined within a template,
             while the values to the previously defined parameters are usually entered by the user.</p>
+
+            <p><img src="images/parameters.png"></p>
 
             <p>AmFn defines a robust expression facility that comes complete with common functions
             for cashflow oriented tasks, and can even store intermediate results of expressions as

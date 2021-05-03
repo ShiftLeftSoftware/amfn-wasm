@@ -30,8 +30,8 @@
                     <li><a href="#insert">Inserting a new event.</a></li>
                     <li><a href="#delete">Deleting the currently selected event.</a></li>
                     <li><a href="#calculate">Calculating the value of the selected event cell.</a></li>
-                    <li><a href="#expand">Expand/Compress amortization.</a></li>
                     <li><a href="#events">Cashflow events.</a></li>
+                    <li><a href="#expand">Expand/Compress amortization.</a></li>
                     <li><a href="#expandam">Expanded amortization.</a></li>
                     <li><a href="#compressam">Compressed amortization.</a></li>
                     <li><a href="#summary">Cashflow summary.</a></li>
@@ -49,6 +49,8 @@
             <p>A tab represents an open cashflow. Clicking on a tab activates that particular
             cashflow and deactivates any previously active cashflow. Activating a tab shows that
             cashflow's event grid, amortization grid, summary, and status line.</p>
+
+            <p><img src="images/Tabs.png"></p>
             
             <p>Each tab displays the cashflow name, a button that displays the cashflow preferences,
             and another button ("X") that closes the cashflow. When a cashflow has been updated, an asterisk
@@ -60,6 +62,8 @@
             and the template group the cashflow will be based upon. The cashflow name and template group name
             are required fields. Template groups designate an initial template event that will be automatically 
             copied into the cashflow.</p>
+
+            <p><img src="images/NewCashflow.png"></p>
                     
             <h3 id="open">Opening an existing cashflow.</h3>
 
@@ -88,6 +92,8 @@
             Cashflow Insert button. When cashflows are created, they specify a particular
             template group. The template group contains template events for all the types
             of events that can be created from that group.</p>
+
+            <p><img src="images/InsertEvent.png"></p>
             
             <p>The list of template events for that template group is shown to the user. A specific 
             template event can be selected from the list. The template event is then copied into the
@@ -107,16 +113,15 @@
             <p>An event can be deleted from the currently active cashflow by selecting a cell in the
             applicable grid row and using the Delete Event button.</p>
 
+            <p><img src="images/DeleteButton.png"></p>
+
             <h3 id="calculate">Calculating the value of the selected event cell.</h3>
 
             <p>The selected event cell of the active cashflow can be calculated by
             using the Cashflow Calculate button. When a particular column of the cashflow can be 
             calculated, the Calculate Cashflow button will become enabled.
 
-            <h3 id="expand">Expand/Compress amortization.</h3>
-
-            <p>The user can switch between the compressed cashflow view and the expanded
-            amortization view by toggling the "Expand/Compress" button.</p>
+            <p><img src="images/CalculateButton.png"></p>
 
             <h3 id="events">Cashflow events.</h3>
 
@@ -129,6 +134,8 @@
             those columns can vary substantially between cashflows of different types
             (i.e., loans versus investments, etc.).</p>
 
+            <p><img src="images/EventsGrid.png"></p>
+
             <p>A number of columns contain a selection button in the right side of the cell. By pressing
             this button, a dialog or selection list is shown that assists in viewing or editing the
             content of the cell.</p>
@@ -137,6 +144,11 @@
             top-to-bottom manner. While the mouse may be used to position between cells of
             individual events, keystrokes will be used in a large number of cases (if not
             exclusively by some users).</p>
+
+            <h3 id="expand">Expand/Compress amortization.</h3>
+
+            <p>The user can switch between the compressed cashflow view and the expanded
+            amortization view by toggling the "Expand/Compress" button.</p>
                 
             <h3 id="expandam">Expanded amortization.</h3>
 
@@ -145,10 +157,14 @@
             with the event grid shown above this grid (i.e., the expanded amortization grid and
             it's respective dialogs are read-only).</p>
 
+            <p><img src="images/ExpandButton.png"></p>
+
             <p>Each row of the expanded amortization grid represents a separate expanded event, while
             each column represents a different field of an expanded event. The columns that are shown
             for a particular cashflow and the ordering of those columns can vary substantially between
             Cashflows of different types (i.e., loans versus investments, etc.).</p>
+
+            <p><img src="images/ExpandAmGrid.png"></p>
 
             <p>A number of columns contain a selection button in the right side of the cell. By pressing
             this button, a dialog or selection list is shown that assists in viewing the content
@@ -166,10 +182,14 @@
             with the event grid shown above this grid (i.e., the compressed cashflow grid and
             it's respective dialogs are read-only).</p>
 
+            <p><img src="images/CompressButton.png"></p>
+
             <p>Each row of the compressed cashflow grid represents a separate compressed event, while
             each column represents a different field of a compressed event. The columns that are shown
             for a particular cashflow and the ordering of those columns can vary substantially between
             Cashflows of different types (i.e., loans versus investments, etc.).</p>
+
+            <p><img src="images/CompressAmGrid.png"></p>
 
             <p>A number of columns contain a selection button in the right side of the cell. By pressing
             this button, a dialog or selection list is shown that assists in viewing the content
@@ -188,6 +208,8 @@
             item descriptors that were defined for the cashflow (normally created via a template
             group).</p>
 
+            <p><img src="images/SummaryButton.png"></p>
+
             <p>The first column displays the resolved label expression that was declared
             with each summary item. The second column displays the resolved result
             expression that was also declared with each summary item.</p>
@@ -198,6 +220,8 @@
             using the Cashflow Charts dropdown button. A number of chart definitions appear under the 
             charts dropdown.</p>
 
+            <p><img src="images/ChartsButton.png"></p>
+
             <p>Charts definitions operate either on a single cashflow (i.e., the
             active cashflow) or all open cashflows. The icon displayed next to the chart name
             designates the type of chart (single or multiple).</p>
@@ -207,6 +231,8 @@
             <p>The status line view appears at bottom of each cashflow. It represents various
             statistics of the cashflow. The status line is automatically updated whenever the
             event grid is changed.</p>
+
+            <p><img src="images/CashflowStatus.png"></p>
 
             <p>The information that is shown in the status line can vary substantially between
             cashflows of different types (i.e., loans versus investments, etc.). The degree that
