@@ -8,7 +8,7 @@ API Documentation: [latest release](https://docs.rs/amfnwasm)
 
 [Homepage](https://shiftleftsoftware.com)
 
-[LiveDemo](https://shiftleftsoftware.com/amfnwasm/app/index.html)
+[Live](https://shiftleftsoftware.com/amfnwasm/app/index.html)
 
 ## License
 

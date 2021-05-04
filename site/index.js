@@ -1275,36 +1275,6 @@ class EventHelper {
             divSpinner.style.display = "none";
         }
     }
-
-    /**
-     * Respond to the skip periods input value changing.
-     * @param {object} e Input event.
-     * @param {object} self Self event.
-     * @param {object} skipPeriodsChangeInfo Skip periods change info.
-     */  
-    static skipPeriodsInput(e, self, skipPeriodsChangeInfo) {  
-        skipPeriodsChangeInfo.newValue = e.target.value;
-        
-        let rangeValue = document.getElementById("skipPeriodsRangeValue");
-        rangeValue.value = skipPeriodsChangeInfo.newValue;
-
-        ModalDialog.showSkipPeriodsRangeChange(self, skipPeriodsChangeInfo);
-    }    
-
-    /**
-     * Respond to the skip periods slider value changing.
-     * @param {object} e Change event.
-     * @param {object} self Self event.
-     * @param {object} skipPeriodsChangeInfo Skip periods change info.
-     */    
-     static skipPeriodsChange(e, self, skipPeriodsChangeInfo) {
-        skipPeriodsChangeInfo.newValue = e.target.value;
-        
-        let range = document.getElementById("skipPeriodsRange");
-        range.value = skipPeriodsChangeInfo.newValue;
-
-        ModalDialog.showSkipPeriodsRangeChange(self, skipPeriodsChangeInfo);
-    }
 }
 
 /**

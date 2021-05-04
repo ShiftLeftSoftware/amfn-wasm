@@ -123,6 +123,10 @@ footer {
     width:20px;    
 }
 
+.toast-body-shade {
+    background-color: rgba(215,215,215,.85);
+}
+
 .value-cell {
     flex: 1;
     overflow: hidden;

@@ -23,6 +23,7 @@
             <div class="section-inner-nav">			
                 <ul>                
                     <li><a href="#overview">Overview of the AmFn Wasm.</a></li>
+					<li><a href="#combinations">Event combinations.</a></li>
                     <li><a href="#eventkeys">Event grid keyboard conventions.</a></li>
                     <li><a href="#eventtypes">Basic event types.</a></li>
                     <li><a href="#intchange">Interest change.</a></li>
@@ -93,6 +94,33 @@
             <p>AmFn Wasm can be functionally customized to a high degree by it's built-in
             template facility in order to create different functional processes for each type of 
             cashflow such as mortgage loans, consumer loans, bonds, annuities, investments, etc.</p>
+            
+            <h3 id="combinations">Event combinations</h3>
+			
+			<p>A number of approaches can create event combinations meant to handle different scenarios:</p>
+
+			<ol>
+				<li>
+					Combining standard events, as all events are merged into the amortization. For example, 
+					on a loan there might be a normal monthly payment and an annual bump payment. Advantage: 
+					Payments are standard separate events. Disadvantage: More work to recalulate a new 
+					term if the payments amounts change.<br/><br/>
+				</li>				
+				<li>
+					Using event expressions with parameters offers a great deal of flexibility. This is
+					typically accomplished by using template events. For example, the same loan with normal 
+					monthly payments and annual bumps can be handled using this method. Advantage: More 
+					natural to recalulate a new term if the payments amounts change. Disadvantage: Upfront 
+					work to setup in the template if an appropriate template event does not already exist.
+				</li>
+			</ol>
+			
+			<p>An example of the last event combination approach can be found with the "Normal+bump pymt" 
+			event in the "Standard Loan" template. When we insert this event into the cashflow, we'll
+			immediately see the following dialog to initially set the parameters (the event parameters can
+			also be subsequently changed):</p>
+        
+            <p><img src="images/parameters.png"></p>
 
             <h3 id="eventkeys">Event grid keyboard conventions.</h3>
 
@@ -269,8 +297,6 @@
             well as within each event of a cashflow. Parameters are used to supply information to
             various expressions. The declarations of parameters are normally defined within a template,
             while the values to the previously defined parameters are usually entered by the user.</p>
-
-            <p><img src="images/parameters.png"></p>
 
             <p>AmFn defines a robust expression facility that comes complete with common functions
             for cashflow oriented tasks, and can even store intermediate results of expressions as

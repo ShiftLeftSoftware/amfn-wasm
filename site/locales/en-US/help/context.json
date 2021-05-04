@@ -658,7 +658,7 @@
 	},
 	{
 		"group": "Preferences",
-		"name": "encoding",
+		"name": "default-encoding",
 		"value": [
 			"The encoding type that is used to create",
 			"JSON files. A value of \"utf-8\" is the default and is usually sufficient",

@@ -1174,8 +1174,8 @@ impl Engine {
     ///
     /// # Arguments
     ///
-    /// * `date1` - First date in YYYYMMDD format.
-    /// * `date2` - Second date in YYYYMMDD format.
+    /// * `date1` - First date in YYYY-MM-DD format.
+    /// * `date2` - Second date in YYYY-MM-DD format.
     /// * `frequency` - Date frequency.
     /// * `intervals` - Number of intervals of frequency.
     /// * `eom_param` - Adjust successive dates to end of month.
@@ -1185,6 +1185,7 @@ impl Engine {
     /// * Number of intervals (positive or negative).
 
     pub fn date_diff(
+        &self, 
         date1: &str,
         date2: &str,
         frequency: &str,
@@ -1200,6 +1201,41 @@ impl Engine {
             intervals as usize,
             eom_param,
         ) as i32
+    }
+
+    /// Calculates a new date based upon a given date and number of intervals.
+    ///
+    /// # Arguments
+    ///
+    /// * `date_orig` - Original date in YYYY-MM-DD format.
+    /// * `date_param` - Date in YYYY-MM-DD format.
+    /// * `frequency` - Date frequency.
+    /// * `intervals` - Number of intervals of frequency (positive or negative).
+    /// * `eom_param` - Adjust successive dates to end of month.
+    ///
+    /// # Return
+    ///
+    /// * See description.
+
+    pub fn date_new(
+        &self, 
+        date_orig: &str,
+        date_param: &str,
+        frequency: &str,
+        intervals: i32,
+        eom_param: bool,
+    ) -> String {        
+        let freq = CoreUtility::get_frequency(frequency);
+
+        let new_date = CoreUtility::date_newi(
+            CoreUtility::parse_date(date_orig),
+            CoreUtility::parse_date(date_param),
+            freq,
+            intervals,
+            eom_param,
+        );
+
+        self.engine.format_date_out(new_date)
     }
 
     /// Format a date and return the internal format.

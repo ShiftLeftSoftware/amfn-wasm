@@ -174,11 +174,6 @@ const MODAL_SV_FINAL = "Modal_Sv_Final";
 const MODAL_NC_NAME = "Modal_Nc_Name";
 const MODAL_NC_TEMPLATE = "Modal_Nc_Template";
 
-// Resource modal parameters.
-const MODAL_PARAM_NAME = "Modal_Param_Name";
-const MODAL_PARAM_TYPE = "Modal_Param_Type";
-const MODAL_PARAM_VALUE = "Modal_Param_Value";
-
 // Resource modal preferences
 const MODAL_PREF_LOCALE = "Modal_Pref_Locale";
 const MODAL_PREF_CROSS_RATE = "Modal_Pref_Cross_Rate";
@@ -757,6 +752,9 @@ class ModalDialog {
         if (options.inputFn) {
             options.inputFn(options.inputData);
         }
+
+        let firstInput = modalBody.querySelector("input,select");
+        if (firstInput) firstInput.focus();
     }
 
     /**
@@ -1178,7 +1176,7 @@ class ModalDialog {
                         <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="days-in-year"><i class="bi-question-circle"></i></a>
                     </div>
                     <div class="col-6">
-                        <input type="text" id="icDaysInYear" class="form-control form-control-sm" value="${ext["days-in-year"]}" ${enable ? '' : 'disabled'}>
+                        <input type="text" spellcheck="false" id="icDaysInYear" class="form-control form-control-sm" value="${ext["days-in-year"]}" ${enable ? '' : 'disabled'}>
                     </div>
                 </div>
                 <div class="row">
@@ -1249,7 +1247,7 @@ class ModalDialog {
                         <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="round-decimal-digits"><i class="bi-question-circle"></i></a>
                     </div>
                     <div class="col-6">
-                        <input type="text" id="icRoundDD" class="form-control form-control-sm" value="${ext["round-decimal-digits"]}" ${enable ? '' : 'disabled'}>
+                        <input type="text" spellcheck="false" id="icRoundDD" class="form-control form-control-sm" value="${ext["round-decimal-digits"]}" ${enable ? '' : 'disabled'}>
                     </div>
                 </div>`;
 
@@ -1262,7 +1260,7 @@ class ModalDialog {
                             <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="nominal-annual-rate"><i class="bi-question-circle"></i></a>
                         </div>
                         <div class="col-6">
-                            <input type="text" id="icStatNar class="form-control form-control-sm" value="${stat["nar"]}" disabled>                            
+                            <input type="text" spellcheck="false" id="icStatNar class="form-control form-control-sm" value="${stat["nar"]}" disabled>                            
                         </div>
                     </div>
                     <div class="row">
@@ -1271,7 +1269,7 @@ class ModalDialog {
                             <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="effective-annual-rate"><i class="bi-question-circle"></i></a>
                         </div>
                         <div class="col-6">
-                            <input type="text" id="icStatEar class="form-control form-control-sm" value="${stat["ear"]}" disabled>                            
+                            <input type="text" spellcheck="false" id="icStatEar class="form-control form-control-sm" value="${stat["ear"]}" disabled>                            
                         </div>
                     </div>
                     <div class="row">
@@ -1280,7 +1278,7 @@ class ModalDialog {
                             <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="periodic-rate"><i class="bi-question-circle"></i></a>
                         </div>
                         <div class="col-6">
-                            <input type="text" id="icStatPr class="form-control form-control-sm" value="${stat["pr"]}" disabled>                            
+                            <input type="text" spellcheck="false" id="icStatPr class="form-control form-control-sm" value="${stat["pr"]}" disabled>                            
                         </div>
                     </div>
                     <div class="row">
@@ -1289,7 +1287,7 @@ class ModalDialog {
                             <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="daily-rate"><i class="bi-question-circle"></i></a>
                         </div>
                         <div class="col-6">
-                            <input type="text" id="icStatDr class="form-control form-control-sm" value="${stat["dr"]}" disabled>                            
+                            <input type="text" spellcheck="false" id="icStatDr class="form-control form-control-sm" value="${stat["dr"]}" disabled>                            
                         </div>
                     </div>`;
             }
@@ -1308,7 +1306,7 @@ class ModalDialog {
                         <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="name"><i class="bi-question-circle"></i></a>
                     </div>
                     <div class="col-6">
-                        <input type="text" id="svName" class="form-control form-control-sm" value="${ext["name"]}" ${enable ? '' : 'disabled'}>
+                        <input type="text" spellcheck="false" id="svName" class="form-control form-control-sm" value="${ext["name"]}" ${enable ? '' : 'disabled'}>
                     </div>
                 </div>
                 <div class="row">
@@ -1470,7 +1468,7 @@ class ModalDialog {
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="name"><i class="bi-question-circle"></i></a>
                 </div>
                 <div class="col-6">
-                    <input type="text" id="cfName" class="form-control form-control-sm">
+                    <input type="text" spellcheck="false" id="cfName" class="form-control form-control-sm">
                 </div>
             </div>
             <div class="row">
@@ -1533,18 +1531,9 @@ class ModalDialog {
     static showParameters(self, rowIndex, tableType) {
         let enable = tableType === TABLE_EVENT;
 
-        let body =
-            `<div class="row">
-                <div class="col-6">
-                    <strong>${Updater.getResource(self, MODAL_PARAM_NAME)}</strong>
-                </div>
-                <div class="col-6">
-                    <strong>${Updater.getResource(self, MODAL_PARAM_VALUE)}</strong>
-                </div>
-            </div>`;
-
         let list = self.engine.parse_parameters(self.activeTabIndex, rowIndex, tableType);
 
+        let body = "";
         for (let elem of list) {
             body +=
                 `<div class="row">
@@ -1553,11 +1542,11 @@ class ModalDialog {
                         <a class="btn btnHelpDefault" role="button" tabindex="-1" data-bs-toggle="popover" title="${Updater.getResource(self, MODAL_PARAMETER_LIST)}" data-bs-content="${elem.description}"><i class="bi-question-circle"></i></a>
                     </div>
                     <div class="col-6">
-                        <input type="text" class="form-control form-control-sm parameter" 
+                        <input type="text" spellcheck="false" class="form-control form-control-sm parameter" 
                             value="${elem.sym_type === 'integer' ? elem.int_value : elem.sym_type === 'decimal' ? elem.dec_value : elem.str_value}" 
                             ${enable ? '' : 'disabled'}>
                     </div>
-                </div>`;       
+                </div>`; 
         }
 
         ModalDialog.modalShow(Updater.getResource(self, MODAL_PARAMETER_LIST), HelpParameter, body, {
@@ -1607,7 +1596,7 @@ class ModalDialog {
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="locale-str"><i class="bi-question-circle"></i></a>
                 </div>
                 <div class="col-6">
-                    <input type="text" id="prefLocale" class="form-control form-control-sm" value="${pref["locale_str"]}" disabled>
+                    <input type="text" spellcheck="false" id="prefLocale" class="form-control form-control-sm" value="${pref["locale_str"]}" disabled>
                 </div>
             </div>
             <div class="row">
@@ -1616,7 +1605,7 @@ class ModalDialog {
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="group"><i class="bi-question-circle"></i></a>
                 </div>
                 <div class="col-6">
-                    <input type="text" id="prefGroup" class="form-control form-control-sm" value="${pref["group"]}" disabled>
+                    <input type="text" spellcheck="false" id="prefGroup" class="form-control form-control-sm" value="${pref["group"]}" disabled>
                 </div>
             </div>
             <div class="row">
@@ -1625,7 +1614,7 @@ class ModalDialog {
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="cross-rate-code"><i class="bi-question-circle"></i></a>
                 </div>
                 <div class="col-6">
-                    <input type="text" id="prefCrossRate" class="form-control form-control-sm" value="${pref["cross_rate_code"]}" ${cfIndex >= 0 ? '' : 'disabled'}>
+                    <input type="text" spellcheck="false" id="prefCrossRate" class="form-control form-control-sm" value="${pref["cross_rate_code"]}" ${cfIndex >= 0 ? '' : 'disabled'}>
                 </div>
             </div>
             <div class="row">
@@ -1634,7 +1623,7 @@ class ModalDialog {
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="default-encoding"><i class="bi-question-circle"></i></a>
                 </div>
                 <div class="col-6">
-                    <input type="text" id="prefEncoding" class="form-control form-control-sm" value="${pref["default_encoding"]}" ${cfIndex >= 0 ? '' : 'disabled'}>
+                    <input type="text" spellcheck="false" id="prefEncoding" class="form-control form-control-sm" value="${pref["default_encoding"]}" ${cfIndex >= 0 ? '' : 'disabled'}>
                 </div>
             </div>
             <div class="row">
@@ -1658,10 +1647,10 @@ class ModalDialog {
             <div class="row">
                 <div class="col-6">
                     <label for="prefTargetValue" class="col-form-label">${Updater.getResource(self, MODAL_PREF_TARGET_VALUE)}</label>
-                    <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="target"><i class="bi-question-circle"></i></a>
+                    <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="target-value"><i class="bi-question-circle"></i></a>
                 </div>
                 <div class="col-6">
-                    <input type="text" id="prefTargetValue" class="form-control form-control-sm" value="${pref["target"]}" ${cfIndex >= 0 ? '' : 'disabled'}>
+                    <input type="text" spellcheck="false" id="prefTargetValue" class="form-control form-control-sm" value="${pref["target"]}" ${cfIndex >= 0 ? '' : 'disabled'}>
                 </div>
             </div>`, {
                 textCancel: cfIndex >= 0 ? Updater.getResource(self, MODAL_CANCEL) : "",
@@ -1717,17 +1706,18 @@ class ModalDialog {
 
         let startDate = self.engine.format_date_in(row["Date"]);
         let frequency = row["Frequency"];
-        let intervals = parseInt(self.engine.format_integer_in(row["Intervals"]));
+        let periods = row["Periods"] ? parseInt(self.engine.format_integer_in(row["Periods"])) : 1;
+        let intervals = row["Intervals"] ? parseInt(self.engine.format_integer_in(row["Intervals"])) : 1;
         let eom = Updater.getEom(self, rowIndex, tableType);
         let skipPeriods = row["Skip-periods"];
 
         let body = `
             <div class="row">
                 <div class="col-10">
-                    <input type="range" class="form-range" min="0" max="128" value="${skipPeriods.length}" id="skipPeriodsRange"  ${enable ? '' : 'disabled'}>
+                    <input type="range" class="form-range" min="0" max="${periods}" value="${skipPeriods.length}" id="skipPeriodsRange"  ${enable ? '' : 'disabled'}>
                 </div>
                 <div class="col-2">
-                    <input class="max-width" type="number" value="${skipPeriods.length}" id="skipPeriodsRangeValue"  ${enable ? '' : 'disabled'}>
+                    <input class="max-width" type="number" min="0" max="${periods}" value="${skipPeriods.length}" id="skipPeriodsRangeValue"  ${enable ? '' : 'disabled'}>
                 </div>
             </div>
             <div id="divSkipPeriods"></div>
@@ -1736,6 +1726,7 @@ class ModalDialog {
         let skipPeriodsChangeInfo = {
             startDate: startDate,
             frequency: frequency,
+            periods: periods,
             intervals: intervals,
             eom: eom,
             skipPeriods: skipPeriods,
@@ -1750,18 +1741,18 @@ class ModalDialog {
                 ModalDialog.showSkipPeriodsRangeChange(inputData.self, skipPeriodsChangeInfo, true);
 
                 document.getElementById("skipPeriodsRange").addEventListener("input", 
-                    (e) => EventHelper.skipPeriodsInput(e, inputData.self, skipPeriodsChangeInfo));    
+                    (e) => ModalDialog.showSkipPeriodsInput(e, inputData.self, skipPeriodsChangeInfo));    
                 document.getElementById("skipPeriodsRangeValue").addEventListener("change", 
-                    (e) => EventHelper.skipPeriodsChange(e, inputData.self, skipPeriodsChangeInfo));
+                    (e) => ModalDialog.showSkipPeriodsChange(e, inputData.self, skipPeriodsChangeInfo));
             },
             inputData: {
                 self: self
             },
             outputFn: (isOK) => {
                 document.getElementById("skipPeriodsRange").removeEventListener("input", 
-                    (e) => EventHelper.skipPeriodsInput(e, inputData.self, skipPeriodsChangeInfo));
+                    (e) => ModalDialog.showSkipPeriodsInput(e, inputData.self, skipPeriodsChangeInfo));
                 document.getElementById("skipPeriodsRangeValue").addEventListener("change", 
-                    (e) => EventHelper.skipPeriodsChange(e, inputData.self, skipPeriodsChangeInfo));
+                    (e) => ModalDialog.showSkipPeriodsChange(e, inputData.self, skipPeriodsChangeInfo));
     
                 if (!isOK) return {};       
 
@@ -1780,9 +1771,11 @@ class ModalDialog {
                 return {};
             },
             finalFn: (isOK, data) => {    
-                if (!isOK || !data.skipPeriods) return;
+                if (!isOK || !data.hasOwnProperty("skipPeriods")) return;
 
                 skipPeriodsChangeInfo.skipPeriods = data.skipPeriods;
+                let colDef = tab.lastFocused.colDef;
+                let rowIndex = tab.lastFocused.rowIndex;
 
                 let tokens = self.engine.set_event_value(
                     colDef.col_name_index, colDef.col_type, colDef.code,
@@ -1791,14 +1784,44 @@ class ModalDialog {
                 if (tokens.length === 3) {       
                     let value = tokens[2];
 
-                    let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(tab.lastFocused.rowIndex);
-                    gridRow.setDataValue(tab.lastFocused.colDef.col_name, value);
+                    let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(rowIndex);
+                    gridRow.setDataValue(colDef.col_name, value);
 
                     Updater.refreshAmResults(self);
                     Updater.updateTabLabel(self, self.activeTabIndex, true);
                 }
             }
         });    
+    }
+
+    /**
+     * Respond to the skip periods input value changing.
+     * @param {object} e Input event.
+     * @param {object} self Self event.
+     * @param {object} skipPeriodsChangeInfo Skip periods change info.
+     */  
+     static showSkipPeriodsInput(e, self, skipPeriodsChangeInfo) {  
+        skipPeriodsChangeInfo.newValue = e.target.value;
+        
+        let rangeValue = document.getElementById("skipPeriodsRangeValue");
+        rangeValue.value = skipPeriodsChangeInfo.newValue;
+
+        ModalDialog.showSkipPeriodsRangeChange(self, skipPeriodsChangeInfo);
+    }    
+
+    /**
+     * Respond to the skip periods slider value changing.
+     * @param {object} e Change event.
+     * @param {object} self Self event.
+     * @param {object} skipPeriodsChangeInfo Skip periods change info.
+     */    
+     static showSkipPeriodsChange(e, self, skipPeriodsChangeInfo) {
+        skipPeriodsChangeInfo.newValue = e.target.value;
+        
+        let range = document.getElementById("skipPeriodsRange");
+        range.value = skipPeriodsChangeInfo.newValue;
+
+        ModalDialog.showSkipPeriodsRangeChange(self, skipPeriodsChangeInfo);
     }
                     
     /**
@@ -1846,9 +1869,9 @@ class ModalDialog {
                 </div>
             `;
 
-            newDate = self.engine.date_new(
+            newDate = self.engine.format_date_in(self.engine.date_new(
                 skipPeriodsChangeInfo.startDate, newDate, skipPeriodsChangeInfo.frequency, 
-                skipPeriodsChangeInfo.intervals, skipPeriodsChangeInfo.eom);
+                skipPeriodsChangeInfo.intervals, skipPeriodsChangeInfo.eom));
         }
 
         document.getElementById("divSkipPeriods").innerHTML = str;
@@ -1902,7 +1925,7 @@ class Toaster {
                 <strong class="me-auto">${title}</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
-            <div class="toast-body">
+            <div class="toast-body toast-body-shade">
                 ${text}
             </div>
         `;
@@ -1940,19 +1963,41 @@ class ValueBtnRenderer {
      */    
      destroy() {
         if (this.eButton) {
-            this.eButton.removeEventListener("click", e => this.eventListener(e));
+            this.eButton.removeEventListener("click", e => this.eventListener(
+                e, null, null, null, null));
+        }
+        
+        if (this.eGui) {
+            this.eGui.removeEventListener("keyup", e => this.spacebarListener(
+                e, null, null, null, null));
         }
     }
 
     /**
      * Respond to the button click event.
+     * @param {object} e Event object.
      * @param {object} callback The callback function.
      * @param {object} self The caller's scope.
      * @param {number} rowIndex The row index.
      * @param {numbert} gridType The type of grid.
      */    
-     eventListener(callback, self, rowIndex, gridType) {
+     eventListener(e, callback, self, rowIndex, gridType) {
         if (!callback) return;
+
+        callback(self, rowIndex, gridType);
+    }
+
+    /**
+     * Respond to the spacebar entered event.
+     * @param {object} e Event object.
+     * @param {object} callback The callback function.
+     * @param {object} self The caller's scope.
+     * @param {number} rowIndex The row index.
+     * @param {numbert} gridType The type of grid.
+     */    
+     spacebarListener(e, callback, self, rowIndex, gridType) {
+        if (e.keyCode != 32 || !callback) return;
+
         callback(self, rowIndex, gridType);
     }
  
@@ -1980,6 +2025,7 @@ class ValueBtnRenderer {
      init(params) {
         this.eGui = document.createElement("div");
         this.eGui.setAttribute("class", "div-cell");
+        this.eGui.setAttribute("tabindex", "0"); // So we get the keyup event
         
         this.valueCell = document.createElement("span");
         this.valueCell.setAttribute("class", "value-cell");
@@ -1994,7 +2040,10 @@ class ValueBtnRenderer {
         this.valueCell.innerHTML = this.cellValue;
  
         this.btnCell.addEventListener("click", e => this.eventListener(
-            params.callback, params.self, params.rowIndex, params.gridType));
+            e, params.callback, params.self, params.rowIndex, params.gridType));
+
+        this.eGui.addEventListener("keyup", e => this.spacebarListener(
+            e, params.callback, params.self, params.rowIndex, params.gridType));
     }
  
     /**
