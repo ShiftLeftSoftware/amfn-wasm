@@ -36,23 +36,27 @@
             <div class="inner-content">
 
             <h3 id="overview">Bond tutorial overview.</h3>
-
+    
             <p>This tutorial presents a 10-year bond having a day count basis of 30/360. The bond has
             semi-annual compounding and pays a fixed semi-annual coupon amount of 125.00. Additionally,
             a "call" is placed on the bond after 8 years, which shows the value of the bond at that time
             (i.e., in contrast to the par value at maturity).</p>
 
+            <p><em>Please enter the dates given in this tutorial to avoid any automatic date adjustments (e.g.,
+            leap year) that can affect the final cashflow balance.</em></p>
+    
             <p><em>Note: This tutorial meant is for the default en-US locale. If another locale is chosen, the AmFn Wasm
             will handle the date format, decimal format, currency format, and spoken language resources for that
             locale.</em></p>
     
             <h3 id="createbond">Create bond cashflow.</h3>
 
-            <p>Let's begin by selecting the File -> New menu item. A dialog is displayed asking you to enter
+            <p>Let's begin by selecting the File -> New Cashflow menu item. A dialog is displayed asking you to enter
             a cashflow name and select a template for this cash flow. Please enter the name of your cashflow,
             select "Standard bond", and press the Submit button.</p>
             
             <p>A new cash flow is created with a "Price" event preselected for you. Press the Enter key 
+            until you are positioned in the "Date" column and enter 05/15/2021. Next, press the Enter key 
             until you are positioned in the "Value" column and enter 10000 (i.e., i.e., the issue price of 
             the bond is ten thousand). Finally, press the Enter key until you are positioned in the "Frequency" 
             column and select a "6-month" (semi-annual) frequency.</p>
@@ -91,10 +95,11 @@
             <p>Finally, press the Insert button, select Call value, and press the Submit button to create a
             "Call" event. Press the Enter key until you are positioned in the "Date" column and change the 
             date to two years earlier.</p>
-            
-            <p>Notice the Balance column of the Call value within the amortization.</p>
 
             <p><img src="images/bond5.png"></p>
+            
+            <p>In the Call value event within the lower amortization grid, we can see that the Balance 
+			column has a value of 11900.54.</p>
 
         </div>
     </main>

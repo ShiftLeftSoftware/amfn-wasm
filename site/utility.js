@@ -628,6 +628,16 @@ class ChartUtility {
     }
 
     /**
+     * Clear status line.
+     */
+     static clearStatusLine() {
+
+        let divStatus = document.getElementById("divStatus");
+
+        divStatus.innerText = "";  
+    }
+
+    /**
      * Refresh status line.
      * @param {object} self Self object.
      */

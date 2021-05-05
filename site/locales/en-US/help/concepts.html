@@ -23,6 +23,7 @@
             <div class="section-inner-nav">			
                 <ul>                
                     <li><a href="#overview">Overview of the AmFn Wasm.</a></li>
+                    <li><a href="#locales">Locales and initialization.</a></li>
 					<li><a href="#combinations">Event combinations.</a></li>
                     <li><a href="#eventkeys">Event grid keyboard conventions.</a></li>
                     <li><a href="#eventtypes">Basic event types.</a></li>
@@ -46,8 +47,6 @@
             in Rust. While in general, a cashflow represents a movement of money, an amortization cashflow 
             usually involves interest changes. An amortization cashflow can be negative, such
             as car loans, mortgages, etc., or positive, such as annuities, bonds, investments, etc.</p>
-            
-            <h4 id="eventdriven">Event-driven</h4>
 
             <p>The AmFn Wasm can simultaneously handle multiple open cashflows. Each cashflow is represented
             by a tab. Clicking on a tab shows the coresponding cashflow. Each cashflow has an event grid at 
@@ -55,6 +54,8 @@
             and summary information that can be shown when needed.</p>
         
             <p><img src="images/cashflow.png"></p>
+            
+            <h4 id="event-driven">Event-driven</h4>
             
             The AmFn Wasm is an "event-driven" amortization cashflow calculator. The top event grid for a
             cashflow is editable. In contrast, the amortization grid, status line, and summary
@@ -65,37 +66,43 @@
             is a quick and easy task. Another benefit is that events also decrease the amount of user
             input required to create and actively maintain a cashflow.</p>
             
-            <h4 id="continuous">Continuous cashflow</h4>
+            <h4 id="amortization">Amortization schedule</h4>
 
             <p>The continuity of the cashflow is maintained even through certain types of events, such
             as interest rate changes. This preserves any unresolved accrued interest from previous interest 
             rate periods.</p>
-            
-            <h4 id="amortization">Amortization schedule</h4>
-            
+                
             <p>All events are based upon real dates and can occur on "any" date within the cashflow, which
             can also result in stub periods and odd days interest. This allows for powerful "whatever
             scenarios" within cashflows that can easily service increasingly competitive, consumer
             oriented markets and financial products.</p>
 
-            <p>Anytime event fields are updated by the user, the amortization grid, status line, and summary
+            <p>When event fields are updated by the user, the amortization grid, status line, and summary
             information are all automatically recalculated.</p>
-            
-            <h4 id="locales">Locales</h4>
-
-            <p>Multiple locale information is consistently used throughout AmFn Wasm, along with applicable
-            ISO (International Standards Organization) standards, to allow for the simultaneous calculation
-            and display of different currencies, date formats, number formats, and spoken languages. The 
-            AmFn Wasm is internationalized and globalized, thus allowing it to be
-            adapted to another spoken language, all from external locale definitions.</p>
-            
+                
             <h4 id="templates">Templates</h4>
 
             <p>AmFn Wasm can be functionally customized to a high degree by it's built-in
             template facility in order to create different functional processes for each type of 
             cashflow such as mortgage loans, consumer loans, bonds, annuities, investments, etc.</p>
             
-            <h3 id="combinations">Event combinations</h3>
+            <h3 id="locales">Locales and initialization.</h3>
+
+            <p>Multiple locale information is consistently used throughout AmFn Wasm, along with applicable
+            ISO (International Standards Organization) standards, to allow for the simultaneous calculation
+            and display of different currencies, date formats, number formats, and spoken languages. The 
+            AmFn Wasm is internationalized and globalized, thus allowing it to be
+            adapted to another spoken language, all from external locale definitions.</p>
+
+            <p>A locale is an externally defined collection of JSON and other files under the "locales" folder 
+            followed by the locale string (e.g., "locales/en-US"). The locale's files include the user preferences,
+            core locale information, templates, help, and tutorials.</p>
+    
+            <p>When the AmFn Wasm is initialized, it attempts to determine an appropriate locale by
+            checking "navigator.languages" against the available locales. In the event a locale
+            cannot be found, the default available locale will be used ("en-US").</p>
+            
+            <h3 id="combinations">Event combinations.</h3>
 			
 			<p>A number of approaches can create event combinations meant to handle different scenarios:</p>
 

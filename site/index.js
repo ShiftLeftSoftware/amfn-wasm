@@ -894,6 +894,8 @@ class EventHelper {
         if (secHelp.classList.contains("display-none")) {
             secHelp.classList.remove("display-none");
         }
+
+        Updater.clearStatusLine();
     }
     
     /**

@@ -36,7 +36,7 @@
             <div class="inner-content">
 
             <h3 id="overview">Annuity tutorial overview.</h3>
-
+    
             <p>This tutorial presents an annuity with an initial premium, a semi-annual compounding and a
             guaranteed interest period of 10 years at 6% under the simple interest method (i.e., interest
             is not compounded back into the principal). Thereafter the renewal interest rate is set at 3.5%
@@ -44,17 +44,21 @@
             a periodic semi-annual premium of 600.00 is made for the first 10 years. Following that, a
             semi-annual withdrawal of 1200.00 is paid for the next 10 years with a remaining balance thereafter.</p>
 
+            <p><em>Please enter the dates given in this tutorial to avoid any automatic date adjustments (e.g.,
+            leap year) that can affect the final cashflow balance.</em></p>
+    
             <p><em>Note: This tutorial meant is for the default en-US locale. If another locale is chosen, the AmFn Wasm
             will handle the date format, decimal format, currency format, and spoken language resources for that
             locale.</em></p>
     
             <h3 id="createannuity">Create annuity cashflow.</h3>
 
-            <p>Let's begin by selecting the File -> New menu item. A dialog is displayed asking you to enter
+            <p>Let's begin by selecting the File -> New Cashflow menu item. A dialog is displayed asking you to enter
             a cashflow name and select a template for this cash flow. Please enter the name of your cashflow,
             select "Standard annuity", and press the Submit button.</p>
             
             <p>A new cash flow is created with a "Initial premium" event preselected for you. Press the Enter key 
+                until you are positioned in the "Date" column and enter 05/15/2021. Next, press the Enter key 
             until you are positioned in the "Value" column and enter 10000 (i.e., ten thousand). Finally,
             Press the Enter key until you are positioned in the "Frequency" column and select a "6-month"
             (semi-annual) frequency.</p>
@@ -99,7 +103,7 @@
 
             <p><img src="images/annuity5.png"></p>
 
-            <p>On the status line we can see that 21352.11 remains in the annuity.</p>
+            <p>On the status line we can see that 21532.11 remains in the annuity.</p>
 
         </div>
     </main>

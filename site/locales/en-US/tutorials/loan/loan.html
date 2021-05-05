@@ -37,23 +37,27 @@
             <div class="inner-content">
 
             <h3 id="overview">Loan tutorial overview.</h3>
-
+    
             <p>This tutorial creates a loan with an odd-days period (i.e., a stub period). The tutorial then
             applies an annual bump payment for 10 years, which could represent an annual bonus. Finally,
             the periods of the regular payment event is calculated to reduce the term of the loan. The overall Annual
             Percentage Rate (APR) and associated Reg-Z information are also calculated and shown in the summary.</p>
 
+            <p><em>Please enter the dates given in this tutorial to avoid any automatic date adjustments (e.g.,
+            leap year) that can affect the final cashflow balance.</em></p>
+    
             <p><em>Note: This tutorial meant is for the default en-US locale. If another locale is chosen, the AmFn Wasm
             will handle the date format, decimal format, currency format, and spoken language resources for that
             locale.</em></p>
 
             <h3 id="createloan">Create loan cashflow.</h3>
 
-            <p>Let's begin by selecting the File -> New menu item. A dialog is displayed asking you to enter
+            <p>Let's begin by selecting the File -> New Cashflow menu item. A dialog is displayed asking you to enter
             a cashflow name and select a template for this cash flow. Please enter the name of your cashflow,
             select "Standard loan", and press the Submit button.</p>
             
             <p>A new cash flow is created with a "Loan" event preselected for you. Press the Enter key 
+            until you are positioned in the "Date" column and enter 05/15/2021. Press the Enter key 
             until you are positioned in the "Value" column and enter 200000 (i.e., two hundred thousand).</p>
 
             <p><img src="images/loan1.png"></p>
@@ -89,9 +93,10 @@
             <p>Press the Insert button, which will show the event that can be created into the cashflow
             from the loan template. Select the "Normal payment" event and press the Submit button.</p>
 
-            <p>Press the Enter key until you are positioned in the "Value" column and enter 5000 (i.e., 
-            Five thousand). Press the Enter key once and enter 10 periods. Finally, press the Enter
-            key once and select a "1-year" frequency (i.e., annual bump payments).</p>
+            <p>Press the Enter key until you are positioned in the "Date" column and enter the same date
+			as the regular payment. Press the Enter key until your are positioned on the "Value" column 
+			and enter 5000 (i.e., Five thousand). Press the Enter key once and enter 10 periods. Finally, 
+			press the Enter key once and select a "1-year" frequency (i.e., annual bump payments).</p>
 
             <p><img src="images/loan5.png"></p>
 
