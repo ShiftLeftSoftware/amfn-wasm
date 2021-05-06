@@ -959,7 +959,7 @@ class EventHelper {
             tab.eventValues[tab.lastFocused.rowIndex][tab.lastFocused.colDef.col_name]) return;
 
         Updater.focusEventGrid(tab);
-        
+
         setTimeout(function() {
             if (!tab.grdEventOptions.api.tabToNextCell()) {
                 EventHelper.nextInsert();
@@ -976,6 +976,10 @@ class EventHelper {
             cashflowManager.activeTabIndex < 0 || e.oldValue === e.newValue) return;
 
         let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
+
+        if (tab.lastFocused.value === // Insure we have changed
+            tab.eventValues[tab.lastFocused.rowIndex][tab.lastFocused.colDef.col_name]) return;
+
         let field = e.column.colDef.field;
 
         let colDef = null;
@@ -995,18 +999,24 @@ class EventHelper {
         let eventDate = tokens[0];
         let sortOrder = parseInt(tokens[1]);
         let value = tokens[2];
+        let refreshEvts = false;
 
-        if (colDef.col_name === FIELD_DATE) eventDate = value;
-        if (colDef.col_name === FIELD_SORT) sortOrder = value;
-
-        if (colDef.col_name === FIELD_DATE || colDef.col_name === FIELD_SORT) {
-            Updater.refreshEvents(cashflowManager, eventDate, sortOrder);
-        } else {
-            let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(e.rowIndex);
-            gridRow.setDataValue(colDef.col_name, value);
+        switch (colDef.col_name) {
+            case FIELD_DATE: 
+                eventDate = value;
+                refreshEvts = true;
+                break;
+            case FIELD_SORT:
+                sortOrder = value;
+                refreshEvts = true;
+                break;
         }
 
-        Updater.focusEventGrid(tab); // Insure it's the same cell   
+        if (refreshEvts) {
+            Updater.refreshEvents(cashflowManager, eventDate, sortOrder);
+        }
+
+        Updater.focusEventGrid(tab);
                 
         setTimeout(function() {        
             if (e.rowIndex === tab.lastFocused.rowIndex && e.column === tab.lastFocused.column) { 
