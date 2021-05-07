@@ -48,7 +48,8 @@ class CashflowManager {
 
         this.engine = new Engine();
         this.initialized = false;
-
+        this.enterKeySeen = false;
+    
         this.tabs = [];
         this.activeTabIndex = -1;
     
@@ -385,12 +386,11 @@ class CashflowManager {
      * @param {string} grdAm The amortization grid.
      * @param {string} amColumns The amortization columns.
      * @param {string} amValues The amortization values.
-     * @param {string} summary The summary elements.
      * @param {string} status The status expression.
      * @param {string} chartDefs The chart definitions.
      */    
      addTab(cfName, cfGroup, cfLabel, divTab, grdEvent, eventColumns, 
-        eventValues, grdAm, amColumns, amValues, summary, status, chartDefs) {
+        eventValues, grdAm, amColumns, amValues, status, chartDefs) {
     
         let eventElem = JSON.parse(eventValues);
         let amElem = JSON.parse(amValues);
@@ -436,7 +436,6 @@ class CashflowManager {
             grdAmOptions: grdAmOptions,
             amColumns: amColumns,
             amValues: amElem,
-            summary: summary,
             status: status,
             chartDefs: chartDefs,
             lastFocused: {
@@ -707,15 +706,13 @@ class CashflowManager {
         let eventValues = this.engine.table_values(index, TABLE_EVENT);
         let amColumns = this.engine.parse_columns(index, TABLE_AM);
         let amValues = this.engine.table_values(index, TABLE_AM);
-        let summary = this.engine.parse_summary(index);
     
         let chartDefs = this.engine.get_chart_definitions(index);
     
         ChartUtility.loadChartDefs(chartDefs);
         
         this.addTab(name, group, label, divTab, grdEvent, eventColumns, 
-            eventValues, grdAm, amColumns, amValues, summary, 
-            status, chartDefs);   
+            eventValues, grdAm, amColumns, amValues, status, chartDefs);   
     
         this.enableCashflowMenu(true);
     
@@ -950,13 +947,18 @@ class EventHelper {
      * @param {object} e Keydown event.
      */    
     static eventKeyDown(e) {
+        cashflowManager.enterKeySeen = false;
+
         if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;    
 
         let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
         if (e.keyCode !== 13 || e.shiftKey || e.ctrlKey || e.altKey || !tab.lastFocused.colDef) return;
 
         if (tab.lastFocused.value !== // Change event will fire next
-            tab.eventValues[tab.lastFocused.rowIndex][tab.lastFocused.colDef.col_name]) return;
+            tab.eventValues[tab.lastFocused.rowIndex][tab.lastFocused.colDef.col_name]) {
+                cashflowManager.enterKeySeen = true;
+                return;
+        }
 
         Updater.focusEventGrid(tab);
 
@@ -972,15 +974,17 @@ class EventHelper {
      * @param {object} e Change event.
      */    
     static eventValueChanged(e) {
+        let enterKeySeen = cashflowManager.enterKeySeen;
+        cashflowManager.enterKeySeen = false;
+
         if (!cashflowManager.engineInitialized() || 
             cashflowManager.activeTabIndex < 0 || e.oldValue === e.newValue) return;
 
         let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
+        let field = e.column.colDef.field;
 
         if (tab.lastFocused.value === // Insure we have changed
-            tab.eventValues[tab.lastFocused.rowIndex][tab.lastFocused.colDef.col_name]) return;
-
-        let field = e.column.colDef.field;
+            tab.eventValues[e.rowIndex][field]) return;
 
         let colDef = null;
         for (let cd of tab.eventColumns) {
@@ -1014,12 +1018,15 @@ class EventHelper {
 
         if (refreshEvts) {
             Updater.refreshEvents(cashflowManager, eventDate, sortOrder);
+        } else {
+            let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(e.rowIndex);
+            gridRow.setDataValue(field, value);    
         }
 
         Updater.focusEventGrid(tab);
                 
         setTimeout(function() {        
-            if (e.rowIndex === tab.lastFocused.rowIndex && e.column === tab.lastFocused.column) { 
+            if (enterKeySeen && e.rowIndex === tab.lastFocused.rowIndex && e.column === tab.lastFocused.column) { 
                 if (!tab.grdEventOptions.api.tabToNextCell()) {
                     EventHelper.nextInsert();
                 }
@@ -1032,17 +1039,12 @@ class EventHelper {
 
     /**
      * Callback for files input.
-     * @param {array} files The array of files input.
+     * @param {string} name The file name.
+     * @param {object} file The file object.
      */    
-    static fileInput(files) {
-
-        if (files.length < 1) {
-            Toaster.toastError(Updater.getResource(cashflowManager, MSG_SELECT_FILE));
-            return;
-        }
+    static fileInput(name, file) {
     
         let reader = new FileReader();
-        let fileName = files[0];
     
         reader.onload = (e) => {   
             let result = cashflowManager.engine.deserialize(reader.result);
@@ -1051,10 +1053,10 @@ class EventHelper {
                 return;
             }  
 
-            cashflowManager.loadCashflow(fileName);
+            cashflowManager.loadCashflow(name);
         };
     
-        reader.readAsText(fileName, config.encoding);
+        reader.readAsText(file, config.encoding);
     }
 
     /**
@@ -1211,8 +1213,10 @@ class EventHelper {
         if (!cashflowManager.engineInitialized() || cashflowManager.activeTabIndex < 0) return;
     
         let tab = cashflowManager.tabs[cashflowManager.activeTabIndex];
+
+        let summary = cashflowManager.engine.parse_summary(cashflowManager.activeTabIndex);
     
-        ModalDialog.showSummary(cashflowManager);
+        ModalDialog.showSummary(cashflowManager, summary);
         Updater.focusEventGrid(tab);
     }
     
@@ -1311,7 +1315,14 @@ class EventHelper {
     ModalDialog.modalInit();
     
     document.getElementById("fileInput").addEventListener("change", (e) => { 
-        EventHelper.fileInput(e.target.files); 
+        if (e.target.files.length < 1) {
+            Toaster.toastError(Updater.getResource(cashflowManager, MSG_SELECT_FILE));
+            return;
+        }
+
+        let name = e.target.value.replace(/\\/g, "/").split('/').pop();
+
+        EventHelper.fileInput(name, e.target.files[0]); 
         e.target.value = ""; 
     });
 

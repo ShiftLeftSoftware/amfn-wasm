@@ -5,6 +5,7 @@
   "private": false,
   "scripts": {
     "build": "webpack",
+    "buildprod": "webpack --config webprod.config.js",
     "serve": "webpack-dev-server"
   },
   "dependencies": {

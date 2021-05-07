@@ -1890,12 +1890,12 @@ class ModalDialog {
     /**
      * Show a cashflow summary in a modal dialog.
      * @param {object} self Self object.
+     * @param {object} summary Summary items.
      */    
-    static showSummary(self) {
-        let tab = self.tabs[self.activeTabIndex];
+    static showSummary(self, summary) {
         let body = "";
 
-        for (let sum of tab.summary) {
+        for (let sum of summary) {
             body +=
                 `<div class="row">
                     <div class="col-6">
