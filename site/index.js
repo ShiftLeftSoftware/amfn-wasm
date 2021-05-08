@@ -1021,12 +1021,11 @@ class EventHelper {
         } else {
             let gridRow = tab.grdEventOptions.api.getDisplayedRowAtIndex(e.rowIndex);
             gridRow.setDataValue(field, value);    
+            Updater.focusEventGrid(tab);
         }
-
-        Updater.focusEventGrid(tab);
                 
         setTimeout(function() {        
-            if (enterKeySeen && e.rowIndex === tab.lastFocused.rowIndex && e.column === tab.lastFocused.column) { 
+            if (!refreshEvts && enterKeySeen && e.rowIndex === tab.lastFocused.rowIndex && e.column === tab.lastFocused.column) { 
                 if (!tab.grdEventOptions.api.tabToNextCell()) {
                     EventHelper.nextInsert();
                 }
@@ -1034,7 +1033,7 @@ class EventHelper {
 
             Updater.refreshAmResults(cashflowManager);
             Updater.updateTabLabel(cashflowManager, cashflowManager.activeTabIndex, true);
-            }, 100);
+        }, 100);
     }
 
     /**
