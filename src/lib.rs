@@ -1766,7 +1766,7 @@ impl Engine {
         }
 
         let mut ary_column: Vec<WasmElemColumn> = Vec::new();
-        let list_column = calc_mgr.util_parse_columns(table_type);
+        let list_column = self.engine.parse_columns(table_type);
         let mut index: usize = 0;
 
         loop {
@@ -2006,7 +2006,7 @@ impl Engine {
         }
 
         let mut ary_summary: Vec<WasmElemSummary> = Vec::new();
-        let list_summary = calc_mgr.util_parse_summary();
+        let list_summary = self.engine.parse_summary();
         let mut index: usize = 0;
 
         loop {
@@ -2205,8 +2205,7 @@ impl Engine {
             }
         }
 
-        let result = CalcManager::util_set_event_value(
-            self.engine.calc_manager(),
+        let result = self.engine.set_event_value(
             col_name_index_param as usize,
             type_param,
             code_param,
@@ -2267,8 +2266,7 @@ impl Engine {
             }
         }
 
-        if !CalcManager::util_set_extension_values(
-            self.engine.calc_manager(),
+        if !self.engine.set_extension_values(
             index_param as usize,
             &ext,
         ) {
@@ -2332,8 +2330,7 @@ impl Engine {
             values.push(String::from(param));
         }
 
-        if !CalcManager::util_set_parameter_values(
-            self.engine.calc_manager(),
+        if !self.engine.set_parameter_values(
             index_param as usize,
             values,
         ) {
@@ -2416,7 +2413,7 @@ impl Engine {
             }
         }
 
-        let list_column = calc_mgr.util_parse_columns(table_type);
+        let list_column = self.engine.parse_columns(table_type);
 
         let json = CalcJsonSerialize::new(self.engine.calc_manager());
 
@@ -2455,7 +2452,7 @@ impl Engine {
                         if !list_column.get_element(index) {
                             break;
                         }
-                        let val = calc_mgr.util_am_value(list_column.column(), &list_am);
+                        let val = self.engine.am_value(list_column.column(), &list_am);
                         row = format!("{},\"{}\":\"{}\"", row, list_column.col_name(), val);
                         index += 1;
                     }
@@ -2501,7 +2498,7 @@ impl Engine {
                         if !list_column.get_element(index) {
                             break;
                         }
-                        let val = calc_mgr.util_am_value(list_column.column(), &list_am);
+                        let val = self.engine.am_value(list_column.column(), &list_am);
                         row = format!("{},\"{}\":\"{}\"", row, list_column.col_name(), val);
                         index += 1;
                     }
@@ -2550,7 +2547,7 @@ impl Engine {
                         if !list_column.get_element(index) {
                             break;
                         }
-                        let val = calc_mgr.util_event_value(list_column.column());
+                        let val = self.engine.event_value(list_column.column());
                         row = format!("{},\"{}\":\"{}\"", row, list_column.col_name(), val);
                         if !next_name_seen {
                             next_name_seen = list_column.col_name() == "Next-name";
