@@ -1185,7 +1185,7 @@ impl Engine {
     /// * Number of intervals (positive or negative).
 
     pub fn date_diff(
-        &self, 
+        &self,
         date1: &str,
         date2: &str,
         frequency: &str,
@@ -1218,13 +1218,13 @@ impl Engine {
     /// * See description.
 
     pub fn date_new(
-        &self, 
+        &self,
         date_orig: &str,
         date_param: &str,
         frequency: &str,
         intervals: i32,
         eom_param: bool,
-    ) -> String {        
+    ) -> String {
         let freq = CoreUtility::get_frequency(frequency);
 
         let new_date = CoreUtility::date_newi(
@@ -2266,10 +2266,7 @@ impl Engine {
             }
         }
 
-        if !self.engine.set_extension_values(
-            index_param as usize,
-            &ext,
-        ) {
+        if !self.engine.set_extension_values(index_param as usize, &ext) {
             return String::from("");
         }
 
@@ -2330,10 +2327,10 @@ impl Engine {
             values.push(String::from(param));
         }
 
-        if !self.engine.set_parameter_values(
-            index_param as usize,
-            values,
-        ) {
+        if !self
+            .engine
+            .set_parameter_values(index_param as usize, values)
+        {
             return false;
         }
 
