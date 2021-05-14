@@ -53,24 +53,27 @@ class CashflowManager {
         this.tabs = [];
         this.activeTabIndex = -1;
     
-        this.initLocaleStrAry = navigator.languages.slice();
-        this.initLocaleStrAry.push(defaultLocaleStr);
+        let initLocaleStrAry = navigator.languages.slice();
+        initLocaleStrAry.push(defaultLocaleStr);
 
-        this.initLocale();
+        this.initLocale(initLocaleStrAry);
     }    
 
     /**
      * Fetch and deserialize the next locale in the list (if present).
      */    
-     initLocale() {
+     initLocale(initLocaleStrAry) {
 
-        let localeStr = this.initLocaleStrAry.shift();
-        if (!localeStr) return;
+        let localeStr = initLocaleStrAry.shift();
+        if (!localeStr) {
+            Toaster.toastError(Updater.getResource(this, MSG_LOCALES_LOAD));
+            return;
+        }
 
         let url = localeFolder + localeStr + localePreferences;        
         fetch(url).then(response => {
             if (!response.ok) {
-                Toaster.toastError(result);
+                this.initLocale(initLocaleStrAry);
                 return;
             }
 
