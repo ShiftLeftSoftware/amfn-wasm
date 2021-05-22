@@ -204,11 +204,10 @@ class CashflowManager {
                     }
                 }
 
-                if (savePending) {
-                    e.preventDefault();
-                }
+                if (!savePending) return;
 
-                e.returnValue = "";
+                e.preventDefault();
+                return e.returnValue = "";
             });
                     
             Toaster.toastInfo(Updater.getResource(this, MSG_INITIALIZED) + config.localeStr);
@@ -690,19 +689,14 @@ class CashflowManager {
             secHelp.classList.add("display-none");
         }
     
-        let secMain = document.getElementById("secMain"); 
-        if (secMain.classList.contains("display-none")) {
-            secMain.classList.remove("display-none");
-        }
-    
         let divEvents = document.getElementById("divEvents"); 
         let grdEvent = document.createElement("div");
-        grdEvent.setAttribute("class", "nav-item ag-theme-balham max-element display-none");
+        grdEvent.setAttribute("class", "nav-item ag-theme-balham grid-container display-none");
         divEvents.appendChild(grdEvent);
     
         let divAms = document.getElementById("divAms"); 
         let grdAm = document.createElement("div");
-        grdAm.setAttribute("class", "nav-item ag-theme-balham max-element display-none");
+        grdAm.setAttribute("class", "nav-item ag-theme-balham grid-container display-none");
         divAms.appendChild(grdAm);
         
         let eventColumns = this.engine.parse_columns(index, TABLE_EVENT);
@@ -884,11 +878,6 @@ class EventHelper {
         }
 
         self.enableCashflowMenu(false);
-
-        let secMain = document.getElementById("secMain"); 
-        if (!secMain.classList.contains("display-none")) {
-            secMain.classList.add("display-none");
-        }
 
         let secHelp = document.getElementById("secHelp");
         if (secHelp.classList.contains("display-none")) {
@@ -1257,21 +1246,7 @@ class EventHelper {
 
         let blob = new Blob([text], { type: "application/json" });
     
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-            window.navigator.msSaveOrOpenBlob(blob, fileName);
-
-            Updater.updateTabLabel(self, cfIndex, false);
-            return;
-        }
-    
-        let a = document.createElement("a");
-        document.body.appendChild(a);
-        a.style.display = "none";
-        a.href = URL.createObjectURL(blob);
-        a.download = fileName;
-    
-        a.click();
-        a.remove();
+        saveAs(blob, fileName);
 
         Updater.updateTabLabel(self, cfIndex, false);
     }    

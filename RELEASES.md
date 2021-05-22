@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.3.3 - 2021-05-15
+
+* Upgrade JavaScript for compatibility with additional browsers (e.g., Safari)
+
+[0.3.3]: https://github.com/ShiftLeftSoftware/amfn-wasm/releases/v0.3.3
+
 ## 0.3.2 - 2021-05-15
 
 * Simplify structure; eliminate unneeded RefCells

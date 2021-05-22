@@ -105,6 +105,37 @@ footer {
     border-radius: 6px 0 6px 6px;
 }
 
+.grid-event {
+    position: relative;
+    min-height: 10vh;
+    height: 30vh;
+    overflow: hidden;
+    resize: vertical;    
+}
+
+.grid-am {
+    position: relative;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.grid-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.help-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);    
+}
+
 .max-element {
     height: 100%;
     width: 100%;
@@ -131,11 +162,4 @@ footer {
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.vertical-resize {
-    min-height: 10vh;
-    height: 30vh;
-    overflow: hidden;
-    resize: vertical;    
 }

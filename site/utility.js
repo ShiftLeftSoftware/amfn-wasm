@@ -667,29 +667,31 @@ class ChartUtility {
     }
 }
 
+// The following global declarations should be static within the ModalDialog class once stable.
+
+// The modal help group.
+let modalHelpGroup = "";
+// The modal output function.
+let modalOutputFn = null;
+// The modal final function.
+let modalFinalFn = null;
+
+// The modal general help object.
+let modalHelpGeneral = null;
+// The modal temporary help objects.
+let modalHelpTemps = [];
+
 /**
  * Modal dialog helper class.
  */
 class ModalDialog {
-
-    // The modal help group.
-    static modalHelpGroup = "";
-    // The modal output function.
-    static modalOutputFn = null;
-    // The modal final function.
-    static modalFinalFn = null;
-
-    // The modal general help object.
-    static modalHelpGeneral = null;
-    // The modal temporary help objects.
-    static modalHelpTemps = [];
 
     /**
      * Initialize the modal dialog events.
      */    
     static modalInit() {
         let elem = document.getElementById("modalHelp");
-        ModalDialog.modalHelpGeneral = new bootstrap.Popover(elem, {
+        modalHelpGeneral = new bootstrap.Popover(elem, {
             content: ModalDialog.modalHelpContent,
             title: ModalDialog.modalHelpTitle,
             customClass: "div-popover",
@@ -706,11 +708,11 @@ class ModalDialog {
     /**
      * Show a modal dialog.
      * @param {string} title The modal dialog title.
-     * @param {string} modalHelpGroup The modal help group.
+     * @param {string} helpGroup The modal help group.
      * @param {object} body The modal dialog body.
      * @param {object} options The options structure.
      */    
-     static modalShow(title, modalHelpGroup, body, options = {}) {
+     static modalShow(title, helpGroup, body, options = {}) {
 
         let modalTitle = document.getElementById("modalTitle");
         let modalBody = document.getElementById("modalBody");
@@ -718,9 +720,9 @@ class ModalDialog {
         modalTitle.innerHTML = title;
         modalBody.innerHTML = body;
 
-        ModalDialog.modalHelpGroup = modalHelpGroup;
-        ModalDialog.modalOutputFn = options.outputFn;
-        ModalDialog.modalFinalFn = options.finalFn;
+        modalHelpGroup = helpGroup;
+        modalOutputFn = options.outputFn;
+        modalFinalFn = options.finalFn;
 
         let btnCancel = document.getElementById("modalCancel");
         let btnOK = document.getElementById("modalOK");
@@ -739,11 +741,11 @@ class ModalDialog {
         divBackground.style.display = "block";
         divModal.style.display = "block";
 
-        ModalDialog.modalHelpTemps = [];
+        modalHelpTemps = [];
         
         let elems = document.getElementsByClassName("btnHelp");
         for (let elem of elems) {
-            ModalDialog.modalHelpTemps.push(new bootstrap.Popover(elem, {
+            modalHelpTemps.push(new bootstrap.Popover(elem, {
                 content: ModalDialog.modalHelpContent,
                 title: ModalDialog.modalHelpTitle,
                 customClass: "div-popover",
@@ -753,7 +755,7 @@ class ModalDialog {
         
         elems = document.getElementsByClassName("btnHelpDefault");
         for (let elem of elems) {
-            ModalDialog.modalHelpTemps.push(new bootstrap.Popover(elem, {
+            modalHelpTemps.push(new bootstrap.Popover(elem, {
                 customClass: "div-popover",
                 html: true
             }));
@@ -773,17 +775,17 @@ class ModalDialog {
      */    
      static modalClose(isOK) {
 
-        ModalDialog.modalHelpGeneral.hide();
+        modalHelpGeneral.hide();
 
-        for (let help of ModalDialog.modalHelpTemps) {
+        for (let help of modalHelpTemps) {
             help.dispose();
         }
 
-        ModalDialog.modalHelpTemps = [];
+        modalHelpTemps = [];
 
         let result = null;
-        if (ModalDialog.modalOutputFn) {
-            result = ModalDialog.modalOutputFn(isOK);
+        if (modalOutputFn) {
+            result = modalOutputFn(isOK);
             if (!result) return;
         }
 
@@ -799,11 +801,11 @@ class ModalDialog {
         modalTitle.innerHTML = "";
         modalBody.innerHTML = "";
 
-        let finalFn = ModalDialog.modalFinalFn;
+        let finalFn = modalFinalFn;
 
-        ModalDialog.modalHelpGroup = "";
-        ModalDialog.modalOutputFn = null;
-        ModalDialog.modalFinalFn = null;
+        modalHelpGroup = "";
+        modalOutputFn = null;
+        modalFinalFn = null;
 
         if (finalFn) {
             result = finalFn(isOK, result); // A recursive call to modalShow can be done here
@@ -814,7 +816,7 @@ class ModalDialog {
      * Called for help content with a modal dialog.
      */    
     static modalHelpContent() {
-        let helpGroup = ModalDialog.modalHelpGroup;
+        let helpGroup = modalHelpGroup;
         let helpKey = this.dataset.help;
 
         let helpElem = null;
@@ -840,7 +842,7 @@ class ModalDialog {
      * Called for help title with a modal dialog.
      */    
      static modalHelpTitle() {
-        let helpGroup = ModalDialog.modalHelpGroup;
+        let helpGroup = modalHelpGroup;
         let helpKey = this.dataset.help;
  
         return helpGroup + "/" + helpKey;
@@ -965,9 +967,9 @@ class ModalDialog {
             e.target.hasAttribute("aria-describedby") || 
             e.target.parentElement && e.target.parentElement.hasAttribute("aria-describedby"))) return;
 
-        ModalDialog.modalHelpGeneral.hide();
+        modalHelpGeneral.hide();
 
-        for (let help of ModalDialog.modalHelpTemps) {
+        for (let help of modalHelpTemps) {
             help.hide();
         }
     }

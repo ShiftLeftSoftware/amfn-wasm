@@ -98,15 +98,13 @@
 
         <ul id="ulTabs" class="nav nav-tabs" role="tablist"></ul>
 
-        <content class="flex-grow-1 max-height">
-            <section id="secMain" class="max-height display-none"> 
-                <div class="container-fluid d-flex flex-column max-height">
-                    <div id="divEvents" class="vertical-resize"></div>
-                    <div id="divAms" class="flex-grow-1"></div>
-                </div>
+        <content class="flex-grow-1 d-flex flex-column position-relative">
+            <section id="secMain" class="container-fluid flex-grow-1 d-flex flex-column"> 
+                <div id="divEvents" class="grid-event"></div>
+                <div id="divAms" class="grid-am"></div>
             </section>
-            <section id="secHelp" class="max-height"> 
-                <div class="container-fluid d-flex align-items-center justify-content-center max-height">
+            <section id="secHelp" class="help-container"> 
+                <div class="container-fluid">
                     <div class="text-muted">
                         <div class="display-1 text-center">&lt;&lt;</div>
                         <ul class="list-unstyled list-group mt-3">
@@ -140,6 +138,7 @@
         <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
         <script src="node_modules/ag-grid-community/dist/ag-grid-community.min.js"></script>
         <script src="node_modules/chart.js/dist/Chart.bundle.min.js"></script>
+        <script src="node_modules/file-saver/dist/FileSaver.min.js"></script>
         <script src="node_modules/amfnwasm/amfnwasm.js"></script>
         <script src="./utility.js"></script>
         <script src="./index.js"></script>
