@@ -347,10 +347,12 @@ class CashflowManager {
         }
     
         this.activeTabIndex = index;
-        this.setExpand(this.tabs[this.activeTabIndex].expanded);
+        let tab = this.tabs[this.activeTabIndex];
+
+        this.setExpand(tab.expanded);
     
         let chartDefHtml = "";
-        for (let chartDef of this.tabs[this.activeTabIndex].chartDefs) {  
+        for (let chartDef of tab.chartDefs) {  
             let chartIcon = chartDef.allCashflows ? "bi-share" : "bi-graph-up";  
             chartDefHtml += `<li><a class="dropdown-item chart-item" href="#" data-name="` + 
                 chartDef.name + `"><i class="` + chartIcon + `"></i> ` + chartDef.description + `</a></li>`;
@@ -370,10 +372,21 @@ class CashflowManager {
             if (!tab.grdAm.classList.contains("display-none")) tab.grdAm.classList.add("display-none");
         }
     
-        this.tabs[this.activeTabIndex].grdEvent.classList.remove("display-none");
-        this.tabs[this.activeTabIndex].grdAm.classList.remove("display-none");
+        tab.grdEvent.classList.remove("display-none");
+        tab.grdAm.classList.remove("display-none");
     
         Updater.refreshStatusLine(this);  
+
+        let enable = !!tab.lastFocused.colDef;
+        let enableCalc = false;
+        
+        if (enable) {
+            let field = tab.lastFocused.colDef.col_name;
+            enableCalc = field === FIELD_VALUE || field === FIELD_PERIODS;
+        }
+
+        cashflowManager.enableClass("btnDelete", "disabled", enable);    
+        cashflowManager.enableClass("btnCalculate", "disabled", enable && enableCalc);    
     }
 
     /**
