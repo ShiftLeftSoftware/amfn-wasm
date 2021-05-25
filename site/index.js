@@ -61,6 +61,7 @@ class CashflowManager {
 
     /**
      * Fetch and deserialize the next locale in the list (if present).
+     * @param {array} initLocaleStrAry Locale string array.
      */    
      initLocale(initLocaleStrAry) {
 
@@ -118,8 +119,20 @@ class CashflowManager {
                                         Toaster.toastError(Updater.getResource(this, MSG_HELP_LOAD));
                                         return;
                                     }
-                        
-                                    response.text().then(text => this.initEngine(localeStr, text));
+                                    
+                                    response.text().then(text => {                                                                
+                                        config.helpForms = JSON.parse(text);
+                                        
+                                        let queryParams = new URLSearchParams(window.location.search);
+                                        let clearLists = queryParams.has("clear");
+                                        let urls = queryParams.getAll("url");
+
+                                        if (clearLists) {
+                                            this.engine.clear_lists();
+                                        }
+
+                                        this.initUrls(localeStr, urls);
+                                    });
                                 });
                             });
                         });
@@ -130,18 +143,48 @@ class CashflowManager {
     }
 
     /**
+     * Initialize additional urls.
+     * @param {string} localeStr Locale string.
+     * @param {array} urls Additional urls.
+     */    
+    initUrls(localeStr, urls) {
+        let url = urls.shift();
+        if (!url) {
+            this.initEngine(localeStr);
+            return;
+        }
+
+        fetch(url).then(response => {
+            if (!response.ok) {
+                Toaster.toastError(Updater.getResource(this, MSG_LOCALES_LOAD));
+                this.initEngine(localeStr);
+                return;
+            }
+            
+            response.text().then(text => {                                                                
+                let result = this.engine.deserialize(text);
+                if (result.length > 0) {
+                    Toaster.toastError(result);
+                    this.initEngine(localeStr);
+                    return;
+                }  
+
+                this.initUrls(localeStr, urls);
+            });
+        });
+    }
+
+    /**
      * Initialize the AmFn engine.
      * @param {string} localeStr Locale string.
-     * @param {string} text Text from help context fetch.
      */    
-    initEngine(localeStr, text) {
+    initEngine(localeStr) {
         let initInfo =  this.engine.init().split('|');
         if (initInfo.length === 3) {    
             config.localeStr = initInfo[0];                
             config.encoding = initInfo[1];                
             config.decimalDigits = parseInt(initInfo[2]);
 
-            config.helpForms = JSON.parse(text);
             config.helpTitleInfo = Updater.getResource(this, HELP_TITLE_INFO);
             config.helpTitleError = Updater.getResource(this, HELP_TITLE_ERROR);
 

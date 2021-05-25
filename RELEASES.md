@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.3.5 - 2021-05-28
+
+* Allow custom templates, etc.
+
+[0.3.5]: https://github.com/ShiftLeftSoftware/amfn-wasm/releases/v0.3.5
+
 ## 0.3.4 - 2021-05-24
 
 * Upgrade Bootstrap 5 Beta 3 to Bootstrap 5.0.1 stable release

@@ -1356,6 +1356,15 @@ impl Engine {
         }
     }
 
+    /// Clear the cashflows and template group lists.
+
+    pub fn clear_lists(&self) {
+
+        self.engine.calc_mgr().list_locale().select_cashflow_locale("");
+        self.engine.calc_mgr_mut().list_cashflow_mut().clear();
+        self.engine.calc_mgr_mut().list_template_group_mut().clear();
+    }
+
     /// Deserialize and ingest the json input.
     ///
     /// # Arguments
