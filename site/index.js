@@ -52,20 +52,30 @@ class CashflowManager {
     
         this.tabs = [];
         this.activeTabIndex = -1;
-    
-        let initLocaleStrAry = navigator.languages.slice();
-        initLocaleStrAry.push(defaultLocaleStr);
+                                        
+        let queryParams = new URLSearchParams(window.location.search);
+        let clearLists = queryParams.has("clear");
+        let locales = queryParams.getAll("locale");
+        let urls = queryParams.getAll("url");
 
-        this.initLocale(initLocaleStrAry);
+        if (locales.length === 0) {
+            locales = navigator.languages.slice();
+        }
+
+        locales.push(defaultLocaleStr);
+
+        this.initLocale(clearLists, locales, urls);
     }    
 
     /**
      * Fetch and deserialize the next locale in the list (if present).
-     * @param {array} initLocaleStrAry Locale string array.
+     * @param {array} clearLists Clear cashflows and templates.
+     * @param {array} locales Locales string array.
+     * @param {array} urls Urls array.
      */    
-     initLocale(initLocaleStrAry) {
+     initLocale(clearLists, locales, urls) {
 
-        let localeStr = initLocaleStrAry.shift();
+        let localeStr = locales.shift();
         if (!localeStr) {
             Toaster.toastError(Updater.getResource(this, MSG_LOCALES_LOAD));
             return;
@@ -74,7 +84,7 @@ class CashflowManager {
         let url = localeFolder + localeStr + localePreferences;        
         fetch(url).then(response => {
             if (!response.ok) {
-                this.initLocale(initLocaleStrAry);
+                this.initLocale(clearLists, locales, urls);
                 return;
             }
 
@@ -122,10 +132,6 @@ class CashflowManager {
                                     
                                     response.text().then(text => {                                                                
                                         config.helpForms = JSON.parse(text);
-                                        
-                                        let queryParams = new URLSearchParams(window.location.search);
-                                        let clearLists = queryParams.has("clear");
-                                        let urls = queryParams.getAll("url");
 
                                         if (clearLists) {
                                             this.engine.clear_lists();
@@ -156,7 +162,7 @@ class CashflowManager {
 
         fetch(url).then(response => {
             if (!response.ok) {
-                Toaster.toastError(Updater.getResource(this, MSG_LOCALES_LOAD));
+                Toaster.toastError(Updater.getResource(this, MSG_TEMPLATES_LOAD));
                 this.initEngine(localeStr);
                 return;
             }
