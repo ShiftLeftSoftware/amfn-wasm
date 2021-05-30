@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.3.6 - 2021-06-01
+
+* Update JavaScript to use ECMA modules.
+
+[0.3.6]: https://github.com/ShiftLeftSoftware/amfn-wasm/releases/v0.3.6
+
 ## 0.3.5 - 2021-05-28
 
 * Allow custom templates, etc.
