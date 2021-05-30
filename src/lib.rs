@@ -917,7 +917,7 @@ impl Engine {
     ///
     /// * Return the locale string, encoding, and default decimal digits.
 
-    pub fn init(&mut self) -> String {
+    pub fn init_engine(&mut self) -> String {
         let mut encoding = String::from(amfnengine::DEFAULT_ENCODING);
         let mut decimal_digits = amfnengine::DEFAULT_DECIMAL_DIGITS;
 
