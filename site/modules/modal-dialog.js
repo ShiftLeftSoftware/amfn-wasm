@@ -9,6 +9,8 @@
     except according to those terms.
 */
 
+import * as bootstrap from "bootstrap";
+
 import * as constant from "./constant";
 import * as global from "./global";
 import * as chartUtility from "./chart-utility";
@@ -34,19 +36,20 @@ const { WasmElemPreferences } = wasm_bindgen;
         // The modal temporary help objects.
         this.modalHelpTemps = [];
 
-        // The modal general help object.
+        // The modal general help object.        
+        let _this = this;
         this.modalHelpGeneral = new bootstrap.Popover(document.getElementById("modalHelp"), {
-            content: modalHelpContent,
-            title: modalHelpTitle,
+            content: function() { return _this.modalHelpContent(this); },
+            title: function() { return _this.modalHelpTitle(this); },
             customClass: "div-popover",
             html: true
         });
 
-        document.getElementById("divModal").addEventListener("click", e => modalClick(e), true); // Capture
-        document.getElementById("modalBody").addEventListener("keyup", e => modalKeyUp(e));
-        document.getElementById("modalClose").addEventListener("click", () => modalClose(false));
-        document.getElementById("modalCancel").addEventListener("click", () => modalClose(false));
-        document.getElementById("modalOK").addEventListener("click", () => modalClose(true));
+        document.getElementById("divModal").addEventListener("click", e => this.modalClick(e), true); // Capture
+        document.getElementById("modalBody").addEventListener("keyup", e => this.modalKeyUp(e));
+        document.getElementById("modalClose").addEventListener("click", () => this.modalClose(false));
+        document.getElementById("modalCancel").addEventListener("click", () => this.modalClose(false));
+        document.getElementById("modalOK").addEventListener("click", () => this.modalClose(true));
     }
 
     /**
@@ -87,11 +90,12 @@ const { WasmElemPreferences } = wasm_bindgen;
 
         this.modalHelpTemps = [];
         
+        let _this = this;
         let elems = document.getElementsByClassName("btnHelp");
         for (let elem of elems) {
             this.modalHelpTemps.push(new bootstrap.Popover(elem, {
-                content: modalHelpContent,
-                title: modalHelpTitle,
+                content: function() { return _this.modalHelpContent(this); },
+                title: function() { return _this.modalHelpTitle(this); },
                 customClass: "div-popover",
                 html: true
             }));
@@ -158,14 +162,15 @@ const { WasmElemPreferences } = wasm_bindgen;
 
     /**
      * Called for help content with a modal dialog.
+     * @param {object} elem Element for popover.
      */    
-    modalHelpContent() {
+    modalHelpContent(elem) {
         let helpGroup = this.modalHelpGroup;
-        let helpKey = this.dataset.help;
+        let helpKey = elem.dataset.help;
 
         let helpElem = null;
         for (let elem of global.config.helpForms) {
-            if (elem.group === helpGroup && elem.name == helpKey) {
+            if (elem.group === helpGroup && elem.name === helpKey) {
                 helpElem = elem;
                 break;
             }
@@ -184,10 +189,12 @@ const { WasmElemPreferences } = wasm_bindgen;
 
     /**
      * Called for help title with a modal dialog.
+     * @param {object} elem Element for popover.
      */    
-    modalHelpTitle() {
+    modalHelpTitle(elem) {
+
         let helpGroup = this.modalHelpGroup;
-        let helpKey = this.dataset.help;
+        let helpKey = elem.dataset.help;
 
         return helpGroup + "/" + helpKey;
     }
@@ -223,13 +230,13 @@ const { WasmElemPreferences } = wasm_bindgen;
             let ext = extension["current-value"];
 
             let cvEom = document.getElementById("cvEom");
-            ext["eom"] = cvEom.getAttribute("checked") ? true : false;
+            ext["eom"] = cvEom.checked ? true : false;
 
             let cvPassive = document.getElementById("cvPassive");
-            ext["passive"] = cvPassive.getAttribute("checked") ? true : false;
+            ext["passive"] = cvPassive.checked ? true : false;
 
             let cvPresent = document.getElementById("cvPresent");
-            ext["present"] = cvPresent.getAttribute("checked") ? true : false;
+            ext["present"] = cvPresent.checked ? true : false;
         } else if ("interest-change" in extension) {
             let ext = extension["interest-change"];
 
@@ -262,10 +269,10 @@ const { WasmElemPreferences } = wasm_bindgen;
             ext["name"] = svName.value;
 
             let svEom = document.getElementById("svEom");
-            ext["eom"] = svEom.getAttribute("checked") ? true : false;
+            ext["eom"] = svEom.checked ? true : false;
 
             let svFinal = document.getElementById("svFinal");
-            ext["final"] = svFinal.getAttribute("checked") ? true : false;
+            ext["final"] = svFinal.checked ? true : false;
         } else {
             let ext = extension["principal-change"];
 
@@ -273,19 +280,19 @@ const { WasmElemPreferences } = wasm_bindgen;
             ext["principal-type"] = pcType.options[pcType.selectedIndex].value
 
             let pcEom = document.getElementById("pcEom");
-            ext["eom"] = pcEom.getAttribute("checked") ? true : false;
+            ext["eom"] = pcEom.checked ? true : false;
 
             let pcPrinFirst = document.getElementById("pcPrinFirst");
-            ext["principal-first"] = pcPrinFirst.getAttribute("checked") ? true : false;
+            ext["principal-first"] = pcPrinFirst.checked ? true : false;
 
             let pcBalStats = document.getElementById("pcBalStats");
-            ext["statistic"] = pcBalStats.getAttribute("checked") ? true : false;
+            ext["statistics"] = pcBalStats.checked ? true : false;
 
             let pcAuxiliary = document.getElementById("pcAuxiliary");
-            ext["auxiliary"] = pcAuxiliary.getAttribute("checked") ? true : false;
+            ext["auxiliary"] = pcAuxiliary.checked ? true : false;
 
             let pcAuxPassive = document.getElementById("pcAuxPassive");
-            ext["passive"] = pcAuxPassive.getAttribute("checked") ? true : false;
+            ext["passive"] = pcAuxPassive.checked ? true : false;
         }
 
         return extension;
@@ -340,13 +347,13 @@ const { WasmElemPreferences } = wasm_bindgen;
     modalKeyUp(e) {
 
         if (e.keyCode === 27) { // Escape
-            modalClick(null);
+            this.modalClick(null);
             return;
         }
 
         if (e.keyCode !== 13 || e.shiftKey || e.ctrlKey || e.altKey) return;
 
-        modalClose(true);
+        this.modalClose(true);
     }
 
     /**
@@ -358,7 +365,7 @@ const { WasmElemPreferences } = wasm_bindgen;
         let body =
             `<canvas id="canvasChart" class="max-element"></canvas>`;
 
-        modalShow(chartDef.description, constant.HelpChart, body, { 
+        this.modalShow(chartDef.description, constant.HelpChart, body, { 
             largeModal: true,
             inputFn: chartUtility.inputChartFn,
             inputData: {
@@ -378,7 +385,7 @@ const { WasmElemPreferences } = wasm_bindgen;
      */    
     showConfirm(self, text, confirmFn, cancelFn, index) {
 
-        modalShow(updater.getResource(self, constant.MODAL_CONFIRMATION), constant.HelpConfirm, text, { 
+        this.modalShow(updater.getResource(self, constant.MODAL_CONFIRMATION), constant.HelpConfirm, text, { 
             textCancel: updater.getResource(self, constant.MODAL_NO),
             textOK: updater.getResource(self, constant.MODAL_YES),
             finalFn: (isOK) => {                        
@@ -403,7 +410,7 @@ const { WasmElemPreferences } = wasm_bindgen;
      */    
     showDescriptors(self, rowIndex, tableType) {
         let body =
-            `<div class="row">
+            `<div class="row align-items-center">
                 <div class="col-2">
                     <strong>${updater.getResource(self, constant.MODAL_DESC_GROUP)}</strong>
                 </div>
@@ -428,7 +435,7 @@ const { WasmElemPreferences } = wasm_bindgen;
         
         for (let elem of list) {
             body +=
-                `<div class="row">
+                `<div class="row align-items-center">
                     <div class="col-2">
                         ${elem.group}
                     </div>
@@ -450,7 +457,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                 </div>`;
         }
 
-        modalShow(updater.getResource(self, constant.MODAL_DESCRIPTOR_LIST), constant.HelpDescriptor, body, { largeModal: true });    
+        this.modalShow(updater.getResource(self, constant.MODAL_DESCRIPTOR_LIST), constant.HelpDescriptor, body, { largeModal: true });    
     }
 
     /**
@@ -474,32 +481,32 @@ const { WasmElemPreferences } = wasm_bindgen;
         
         if ("current-value" in extension) {
             let ext = extension["current-value"];
-            modalShow(updater.getResource(self, constant.MODAL_CURRENT_VALUE), constant.HelpCurrentValue,
-                `<div class="row">
+            this.modalShow(updater.getResource(self, constant.MODAL_CURRENT_VALUE), constant.HelpCurrentValue,
+                `<div class="row align-items-center">
                     <div class="col-6">
                         <label for="cvEom" class="col-form-label">${updater.getResource(self, constant.MODAL_CV_EOM)}</label>
                         <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="eom"><i class="bi-question-circle"></i></a>
                     </div>
                     <div class="col-6">
-                        <input class="form-check-input" type="checkbox" id="cvEom" ${ext["eom"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                        <input class="form-check-input" type="checkbox" id="cvEom" ${ext["eom"] ? 'checked' : ''} ${enable ? '' : 'disabled'}>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row align-items-center">
                     <div class="col-6">
                         <label for="cvPassive" class="col-form-label">${updater.getResource(self, constant.MODAL_CV_PASSIVE)}</label>
                         <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="passive"><i class="bi-question-circle"></i></a>
                     </div>
                     <div class="col-6">
-                        <input class="form-check-input" type="checkbox" id="cvPassive" ${ext["passive"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                        <input class="form-check-input" type="checkbox" id="cvPassive" ${ext["passive"] ? 'checked' : ''} ${enable ? '' : 'disabled'}>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row align-items-center">
                     <div class="col-6">
                         <label for="cvPresent" class="col-form-label">${updater.getResource(self, constant.MODAL_CV_PRESENT)}</label>
                         <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="present"><i class="bi-question-circle"></i></a>
                     </div>
                     <div class="col-6">
-                        <input class="form-check-input" type="checkbox" id="cvPresent" ${ext["present"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                        <input class="form-check-input" type="checkbox" id="cvPresent" ${ext["present"] ? 'checked' : ''} ${enable ? '' : 'disabled'}>
                     </div>
                 </div>`,
                 options
@@ -510,7 +517,7 @@ const { WasmElemPreferences } = wasm_bindgen;
         if ("interest-change" in extension) {
             let ext = extension["interest-change"];
             let form = 
-                `<div class="row">
+                `<div class="row align-items-center">
                     <div class="col-6">
                         <label for="icMethod" class="col-form-label">${updater.getResource(self, constant.MODAL_IC_METHOD)}</label>
                         <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="interest-method"><i class="bi-question-circle"></i></a>
@@ -522,7 +529,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                         </select>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row align-items-center">
                     <div class="col-6">
                         <label for="icDayCount" class="col-form-label">${updater.getResource(self, constant.MODAL_IC_DAY_COUNT)}</label>
                         <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="day-count-basis"><i class="bi-question-circle"></i></a>
@@ -541,7 +548,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                         </select>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row align-items-center">
                     <div class="col-6">
                         <label for="icDaysInYear" class="col-form-label">${updater.getResource(self, constant.MODAL_IC_DAYS_IN_YEAR)}</label>
                         <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="days-in-year"><i class="bi-question-circle"></i></a>
@@ -550,7 +557,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                         <input type="text" spellcheck="false" id="icDaysInYear" class="form-control form-control-sm" value="${ext["days-in-year"]}" ${enable ? '' : 'disabled'}>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row align-items-center">
                     <div class="col-6">
                         <label for="icEffFreq" class="col-form-label">${updater.getResource(self, constant.MODAL_IC_EFF_FREQ)}</label>
                         <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="effective-frequency"><i class="bi-question-circle"></i></a>
@@ -573,7 +580,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                         </select>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row align-items-center">
                     <div class="col-6">
                         <label for="icIntFreq" class="col-form-label">${updater.getResource(self, constant.MODAL_IC_INT_FREQ)}</label>
                         <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="interest-frequency"><i class="bi-question-circle"></i></a>
@@ -596,7 +603,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                     </select>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row align-items-center">
                     <div class="col-6">
                         <label for="icRoundBal" class="col-form-label">${updater.getResource(self, constant.MODAL_IC_ROUND_BAL)}</label>
                         <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="round-balance"><i class="bi-question-circle"></i></a>
@@ -606,13 +613,13 @@ const { WasmElemPreferences } = wasm_bindgen;
                             <option value="none" ${ext["round-balance"] === 'none' ? 'selected' : ''}>${updater.getResource(self, constant.ROUNDING_NONE)}</option>
                             <option value="bankers" ${ext["round-balance"] === 'bankers' ? 'selected' : ''}>${updater.getResource(self, constant.ROUNDING_BANKERS)}</option>
                             <option value="bias-up" ${ext["round-balance"] === 'bias-up' ? 'selected' : ''}>${updater.getResource(self, constant.ROUNDING_BIAS_UP)}</option>
-                            <option value="bias-down" ${ext["round-balance"] === 'bias-down' ? 'selected' : ''}>${updater.getResource(self, vROUNDING_BIAS_DOWN)}</option>
+                            <option value="bias-down" ${ext["round-balance"] === 'bias-down' ? 'selected' : ''}>${updater.getResource(self, constant.ROUNDING_BIAS_DOWN)}</option>
                             <option value="up" ${ext["round-balance"] === 'up' ? 'selected' : ''}>${updater.getResource(self, constant.ROUNDING_UP)}</option>
                             <option value="truncate" ${ext["round-balance"] === 'truncate' ? 'selected' : ''}>${updater.getResource(self, constant.ROUNDING_TRUNCATE)}</option>
                         </select>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row align-items-center">
                     <div class="col-6">
                         <label for="icRoundDD" class="col-form-label">${updater.getResource(self, constant.MODAL_IC_ROUND_DD)}</label>
                         <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="round-decimal-digits"><i class="bi-question-circle"></i></a>
@@ -625,7 +632,7 @@ const { WasmElemPreferences } = wasm_bindgen;
             let stat = ext["interest-statistics"];
             if (stat) {
                 form +=
-                    `<div class="row">
+                    `<div class="row align-items-center">
                         <div class="col-6">
                             <label for="icStatNar" class="col-form-label">${updater.getResource(self, constant.MODAL_IC_STAT_NAR)}</label>
                             <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="nominal-annual-rate"><i class="bi-question-circle"></i></a>
@@ -634,7 +641,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                             <input type="text" spellcheck="false" id="icStatNar class="form-control form-control-sm" value="${stat["nar"]}" disabled>                            
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row align-items-center">
                         <div class="col-6">
                             <label for="icStatEar" class="col-form-label">${updater.getResource(self, constant.MODAL_IC_STAT_EAR)}</label>
                             <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="effective-annual-rate"><i class="bi-question-circle"></i></a>
@@ -643,7 +650,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                             <input type="text" spellcheck="false" id="icStatEar class="form-control form-control-sm" value="${stat["ear"]}" disabled>                            
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row align-items-center">
                         <div class="col-6">
                             <label for="icStatPr" class="col-form-label">${updater.getResource(self, constant.MODAL_IC_STAT_PR)}</label>
                             <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="periodic-rate"><i class="bi-question-circle"></i></a>
@@ -652,7 +659,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                             <input type="text" spellcheck="false" id="icStatPr class="form-control form-control-sm" value="${stat["pr"]}" disabled>                            
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row align-items-center">
                         <div class="col-6">
                             <label for="icStatDr" class="col-form-label">${updater.getResource(self, constant.MODAL_IC_STAT_DR)}</label>
                             <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="daily-rate"><i class="bi-question-circle"></i></a>
@@ -663,15 +670,15 @@ const { WasmElemPreferences } = wasm_bindgen;
                     </div>`;
             }
 
-            modalShow(updater.getResource(self, MODAL_INTEREST_CHANGE), constant.HelpInterestChange, form, options);
+            this.modalShow(updater.getResource(self, constant.MODAL_INTEREST_CHANGE), constant.HelpInterestChange, form, options);
 
             return;
         }
         
         if ("statistic-value" in extension) {
             let ext = extension["statistic-value"];
-            modalShow(updater.getResource(self, constant.MODAL_STATISTIC_CHANGE), constant.HelpStatisticValue,
-                `<div class="row">
+            this.modalShow(updater.getResource(self, constant.MODAL_STATISTIC_CHANGE), constant.HelpStatisticValue,
+                `<div class="row align-items-center">
                     <div class="col-6">
                         <label for="svName" class="col-form-label">${updater.getResource(self, constant.MODAL_SV_NAME)}</label>
                         <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="name"><i class="bi-question-circle"></i></a>
@@ -680,22 +687,22 @@ const { WasmElemPreferences } = wasm_bindgen;
                         <input type="text" spellcheck="false" id="svName" class="form-control form-control-sm" value="${ext["name"]}" ${enable ? '' : 'disabled'}>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row align-items-center">
                     <div class="col-6">
                         <label for="svEom" class="col-form-label">${updater.getResource(self, constant.MODAL_SV_EOM)}</label>
                         <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="eom"><i class="bi-question-circle"></i></a>
                     </div>
                     <div class="col-6">
-                        <input class="form-check-input" type="checkbox" id="svEom" ${ext["eom"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                        <input class="form-check-input" type="checkbox" id="svEom" ${ext["eom"] ? 'checked' : ''} ${enable ? '' : 'disabled'}>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row align-items-center">
                     <div class="col-6">
                         <label for="svFinal" class="col-form-label">${updater.getResource(self, constant.MODAL_SV_FINAL)}</label>
                         <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="final"><i class="bi-question-circle"></i></a>
                     </div>
                     <div class="col-6">
-                        <input class="form-check-input" type="checkbox" id="svFinal" ${ext["final"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                        <input class="form-check-input" type="checkbox" id="svFinal" ${ext["final"] ? 'checked' : ''} ${enable ? '' : 'disabled'}>
                     </div>
                 </div>`,
                 options
@@ -704,8 +711,8 @@ const { WasmElemPreferences } = wasm_bindgen;
         }
 
         let ext = extension["principal-change"];
-        modalShow(updater.getResource(self, constant.MODAL_PRINCIPAL_CHANGE), constant.HelpPrincipalChange,
-            `<div class="row">
+        this.modalShow(updater.getResource(self, constant.MODAL_PRINCIPAL_CHANGE), constant.HelpPrincipalChange,
+            `<div class="row align-items-center">
                 <div class="col-6">
                     <label for="pcType" class="col-form-label">${updater.getResource(self, constant.MODAL_PC_TYPE)}</label>
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="principal-type"><i class="bi-question-circle"></i></a>
@@ -719,49 +726,49 @@ const { WasmElemPreferences } = wasm_bindgen;
                     </select>
                 </div>
             </div>
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-6">
                     <label for="pcEom" class="col-form-label">${updater.getResource(self, constant.MODAL_PC_EOM)}</label>
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="eom"><i class="bi-question-circle"></i></a>
                 </div>
                 <div class="col-6">
-                    <input class="form-check-input" type="checkbox" id="pcEom" ${ext["eom"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                    <input class="form-check-input" type="checkbox" id="pcEom" ${ext["eom"] ? 'checked' : ''} ${enable ? '' : 'disabled'}>
                 </div>
             </div>
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-6">
                     <label for="pcPrinFirst" class="col-form-label">${updater.getResource(self, constant.MODAL_PC_PRIN_FIRST)}</label>
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="principal-first"><i class="bi-question-circle"></i></a>
                 </div>
                 <div class="col-6">
-                    <input class="form-check-input" type="checkbox" id="pcPrinFirst" ${ext["principal-first"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                    <input class="form-check-input" type="checkbox" id="pcPrinFirst" ${ext["principal-first"] ? 'checked' : ''} ${enable ? '' : 'disabled'}>
                 </div>
             </div>
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-6">
                     <label for="pcBalStats" class="col-form-label">${updater.getResource(self, constant.MODAL_PC_BAL_STAT)}</label>
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="statistics"><i class="bi-question-circle"></i></a>
                 </div>
                 <div class="col-6">
-                    <input class="form-check-input" type="checkbox" id="pcBalStats" ${ext["statistics"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                    <input class="form-check-input" type="checkbox" id="pcBalStats" ${ext["statistics"] ? 'checked' : ''} ${enable ? '' : 'disabled'}>
                 </div>
             </div>
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-6">
                     <label for="pcAuxiliary" class="col-form-label">${updater.getResource(self, constant.MODAL_PC_AUXILIARY)}</label>
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="auxiliary"><i class="bi-question-circle"></i></a>
                 </div>
                 <div class="col-6">
-                    <input class="form-check-input" type="checkbox" id="pcAuxiliary" ${ext["auxiliary"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                    <input class="form-check-input" type="checkbox" id="pcAuxiliary" ${ext["auxiliary"] ? 'checked' : ''} ${enable ? '' : 'disabled'}>
                 </div>
             </div>
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-6">
                     <label for="pcAuxPassive" class="col-form-label">${updater.getResource(self, constant.MODAL_PC_AUX_PASSIVE)}</label>
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="passive"><i class="bi-question-circle"></i></a>
                 </div>
                 <div class="col-6">
-                    <input class="form-check-input" type="checkbox" id="pcAuxPassive" ${ext["passive"] === 'true' ? 'checked' : ''} ${enable ? '' : 'disabled'}>
+                    <input class="form-check-input" type="checkbox" id="pcAuxPassive" ${ext["passive"] ? 'checked' : ''} ${enable ? '' : 'disabled'}>
                 </div>
             </div>`,
             options
@@ -791,7 +798,8 @@ const { WasmElemPreferences } = wasm_bindgen;
             ++index;
         }
 
-        modalShow(updater.getResource(self, constant.MODAL_INSERT_EVENT), constant.HelpInsertEvent, body, {
+        let _this = this;
+        this.modalShow(updater.getResource(self, constant.MODAL_INSERT_EVENT), constant.HelpInsertEvent, body, {
             textCancel: updater.getResource(self, constant.MODAL_CANCEL),
             textOK: updater.getResource(self, constant.MODAL_SUBMIT),
             outputFn: (isOK) => {
@@ -819,7 +827,7 @@ const { WasmElemPreferences } = wasm_bindgen;
             finalFn(isOK, data) {
                 if (!isOK || !data.event) return;
 
-                createTemplateEventsShowParameters(self, data.event);
+                _this.createTemplateEventsShowParameters(self, data.event);
             }
         });
     }
@@ -833,7 +841,7 @@ const { WasmElemPreferences } = wasm_bindgen;
         let templateGroups = self.engine.get_template_names();
 
         let body = 
-            `<div class="row">
+            `<div class="row align-items-center">
                 <div class="col-6">
                     <label for="cfName" class="col-form-label">${updater.getResource(self, constant.MODAL_NC_NAME)}</label>
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="name"><i class="bi-question-circle"></i></a>
@@ -842,7 +850,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                     <input type="text" spellcheck="false" id="cfName" class="form-control form-control-sm">
                 </div>
             </div>
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-6">
                     <label for="cfTemplate" class="col-form-label">${updater.getResource(self, constant.MODAL_NC_TEMPLATE)}</label>
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="template"><i class="bi-question-circle"></i></a>
@@ -860,7 +868,8 @@ const { WasmElemPreferences } = wasm_bindgen;
                 </div>
             </div>`;
 
-        modalShow(updater.getResource(self, constant.MODAL_NEW_CASHFLOW), constant.HelpNewCashflow, body, {
+        let _this = this;
+        this.modalShow(updater.getResource(self, constant.MODAL_NEW_CASHFLOW), constant.HelpNewCashflow, body, {
             textCancel: updater.getResource(self, constant.MODAL_CANCEL),
             textOK: updater.getResource(self, constant.MODAL_SUBMIT),
             outputFn: (isOK) => {
@@ -887,7 +896,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                 if (initialName.length > 0) {
                     self.loadCashflow(data.cfName);
                     if (initialName === "*") return;                    
-                    createTemplateEventsShowParameters(self, initialName);
+                    _this.createTemplateEventsShowParameters(self, initialName);
                 }
             }
         });
@@ -907,7 +916,7 @@ const { WasmElemPreferences } = wasm_bindgen;
         let body = "";
         for (let elem of list) {
             body +=
-                `<div class="row">
+                `<div class="row align-items-center">
                     <div class="col-6">
                         ${elem.label.length > 0 ? elem.label : elem.name}
                         <a class="btn btnHelpDefault" role="button" tabindex="-1" data-bs-toggle="popover" title="${updater.getResource(self, constant.MODAL_PARAMETER_LIST)}" data-bs-content="${elem.description}"><i class="bi-question-circle"></i></a>
@@ -920,7 +929,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                 </div>`; 
         }
 
-        modalShow(updater.getResource(self, constant.MODAL_PARAMETER_LIST), constant.HelpParameter, body, {
+        this.modalShow(updater.getResource(self, constant.MODAL_PARAMETER_LIST), constant.HelpParameter, body, {
             textCancel: enable ? updater.getResource(self, constant.MODAL_CANCEL) : "",
             textOK: enable ? updater.getResource(self, constant.MODAL_SUBMIT) : updater.getResource(self, constant.MODAL_OK),
             outputFn: (isOK) => {
@@ -960,8 +969,8 @@ const { WasmElemPreferences } = wasm_bindgen;
 
         let pref = self.engine.get_preferences(cfIndex);
 
-        modalShow(updater.getResource(self, cfIndex < 0 ? constant.MODAL_USER_PREFERENCES : constant.MODAL_CASHFLOW_PREFERENCES), constant.HelpPreferences,
-            `<div class="row">
+        this.modalShow(updater.getResource(self, cfIndex < 0 ? constant.MODAL_USER_PREFERENCES : constant.MODAL_CASHFLOW_PREFERENCES), constant.HelpPreferences,
+            `<div class="row align-items-center">
                 <div class="col-6">
                     <label for="prefLocale" class="col-form-label">${updater.getResource(self, constant.MODAL_PREF_LOCALE)}</label>
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="locale-str"><i class="bi-question-circle"></i></a>
@@ -970,7 +979,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                     <input type="text" spellcheck="false" id="prefLocale" class="form-control form-control-sm" value="${pref["locale_str"]}" disabled>
                 </div>
             </div>
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-6">
                     <label for="prefGroup" class="col-form-label">${updater.getResource(self, constant.MODAL_PREF_GROUP)}</label>
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="group"><i class="bi-question-circle"></i></a>
@@ -979,7 +988,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                     <input type="text" spellcheck="false" id="prefGroup" class="form-control form-control-sm" value="${pref["group"]}" disabled>
                 </div>
             </div>
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-6">
                     <label for="prefCrossRate" class="col-form-label">${updater.getResource(self, constant.MODAL_PREF_CROSS_RATE)}</label>
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="cross-rate-code"><i class="bi-question-circle"></i></a>
@@ -988,7 +997,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                     <input type="text" spellcheck="false" id="prefCrossRate" class="form-control form-control-sm" value="${pref["cross_rate_code"]}" ${cfIndex >= 0 ? '' : 'disabled'}>
                 </div>
             </div>
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-6">
                     <label for="prefEncoding" class="col-form-label">${updater.getResource(self, constant.MODAL_PREF_ENCODING)}</label>
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="default-encoding"><i class="bi-question-circle"></i></a>
@@ -997,7 +1006,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                     <input type="text" spellcheck="false" id="prefEncoding" class="form-control form-control-sm" value="${pref["default_encoding"]}" ${cfIndex >= 0 ? '' : 'disabled'}>
                 </div>
             </div>
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-6">
                     <label for="prefFiscalYear" class="col-form-label">${updater.getResource(self, constant.MODAL_PREF_FISCAL_YEAR)}</label>
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="fiscal-year-start"><i class="bi-question-circle"></i></a>
@@ -1006,7 +1015,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                     <input type="number" id="prefFiscalYear" class="form-control form-control-sm" value="${pref["fiscal_year_start"]}" ${cfIndex >= 0 ? '' : 'disabled'}>
                 </div>
             </div>
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-6">
                     <label for="prefDecimalDigits" class="col-form-label">${updater.getResource(self, constant.MODAL_PREF_DECIMAL_DIGITS)}</label>
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="decimal-digits"><i class="bi-question-circle"></i></a>
@@ -1015,7 +1024,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                     <input type="number" id="prefDecimalDigits" class="form-control form-control-sm" value="${pref["decimal_digits"]}" ${cfIndex >= 0 ? '' : 'disabled'}>
                 </div>
             </div>
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-6">
                     <label for="prefTargetValue" class="col-form-label">${updater.getResource(self, constant.MODAL_PREF_TARGET_VALUE)}</label>
                     <a class="btn btnHelp" role="button" tabindex="-1" data-bs-toggle="popover" data-help="target-value"><i class="bi-question-circle"></i></a>
@@ -1083,7 +1092,7 @@ const { WasmElemPreferences } = wasm_bindgen;
         let skipPeriods = row["Skip-periods"];
 
         let body = `
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-10">
                     <input type="range" class="form-range" min="0" max="${periods}" value="${skipPeriods.length}" id="skipPeriodsRange"  ${enable ? '' : 'disabled'}>
                 </div>
@@ -1105,25 +1114,26 @@ const { WasmElemPreferences } = wasm_bindgen;
             tableType: tableType
         };
 
-        modalShow(updater.getResource(self, constant.MODAL_SKIP_PERIODS), constant.HelpSkipPeriods, body, {
+        let _this = this;
+        this.modalShow(updater.getResource(self, constant.MODAL_SKIP_PERIODS), constant.HelpSkipPeriods, body, {
             textCancel: updater.getResource(self, constant.MODAL_CANCEL),
             textOK: updater.getResource(self, constant.MODAL_SUBMIT),
             inputFn: (inputData) => {
-                showSkipPeriodsRangeChange(inputData.self, skipPeriodsChangeInfo, true);
+                _this.showSkipPeriodsRangeChange(inputData.self, skipPeriodsChangeInfo, true);
 
                 document.getElementById("skipPeriodsRange").addEventListener("input", 
-                    (e) => showSkipPeriodsInput(e, inputData.self, skipPeriodsChangeInfo));    
+                    (e) => _this.showSkipPeriodsInput(e, inputData.self, skipPeriodsChangeInfo));    
                 document.getElementById("skipPeriodsRangeValue").addEventListener("change", 
-                    (e) => showSkipPeriodsChange(e, inputData.self, skipPeriodsChangeInfo));
+                    (e) => _this.showSkipPeriodsChange(e, inputData.self, skipPeriodsChangeInfo));
             },
             inputData: {
                 self: self
             },
             outputFn: (isOK) => {
                 document.getElementById("skipPeriodsRange").removeEventListener("input", 
-                    (e) => showSkipPeriodsInput(e, inputData.self, skipPeriodsChangeInfo));
+                    (e) => _this.showSkipPeriodsInput(e, inputData.self, skipPeriodsChangeInfo));
                 document.getElementById("skipPeriodsRangeValue").addEventListener("change", 
-                    (e) => showSkipPeriodsChange(e, inputData.self, skipPeriodsChangeInfo));
+                    (e) => _this.showSkipPeriodsChange(e, inputData.self, skipPeriodsChangeInfo));
 
                 if (!isOK) return {};       
 
@@ -1177,7 +1187,7 @@ const { WasmElemPreferences } = wasm_bindgen;
         let rangeValue = document.getElementById("skipPeriodsRangeValue");
         rangeValue.value = skipPeriodsChangeInfo.newValue;
 
-        showSkipPeriodsRangeChange(self, skipPeriodsChangeInfo);
+        this.showSkipPeriodsRangeChange(self, skipPeriodsChangeInfo);
     }    
 
     /**
@@ -1192,7 +1202,7 @@ const { WasmElemPreferences } = wasm_bindgen;
         let range = document.getElementById("skipPeriodsRange");
         range.value = skipPeriodsChangeInfo.newValue;
 
-        showSkipPeriodsRangeChange(self, skipPeriodsChangeInfo);
+        this.showSkipPeriodsRangeChange(self, skipPeriodsChangeInfo);
     }
                     
     /**
@@ -1229,7 +1239,7 @@ const { WasmElemPreferences } = wasm_bindgen;
 
         for (let index = 0; index < skipPeriodsChangeInfo.newValue; ++index) {
             str += `
-                <div class="row">
+                <div class="row align-items-center">
                     <div class="col-6">
                         <label for="chkSkipPeriods${index}" class="col-form-label">${self.engine.format_date_out(newDate)}</label>
                     </div>
@@ -1258,7 +1268,7 @@ const { WasmElemPreferences } = wasm_bindgen;
 
         for (let sum of summary) {
             body +=
-                `<div class="row">
+                `<div class="row align-items-center">
                     <div class="col-6">
                         ${sum.label}
                     </div>
@@ -1268,7 +1278,7 @@ const { WasmElemPreferences } = wasm_bindgen;
                 </div>`        
         }
 
-        modalShow(updater.getResource(self, constant.MODAL_CASHFLOW_SUMMARY), constant.HelpSummary, body);
+        this.modalShow(updater.getResource(self, constant.MODAL_CASHFLOW_SUMMARY), constant.HelpSummary, body);
     }
 
 }

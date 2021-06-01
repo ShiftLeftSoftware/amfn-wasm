@@ -9,6 +9,8 @@
     except according to those terms.
 */
 
+import * as bootstrap from "bootstrap";
+
 import * as global from "./global";
 
 /**

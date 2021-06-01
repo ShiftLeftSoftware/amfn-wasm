@@ -9,6 +9,8 @@
     except according to those terms.
 */
 
+import { saveAs } from "file-saver";
+
 import * as constant from "./constant";
 import * as global from "./global";
 import * as updater from "./updater";
@@ -438,7 +440,7 @@ export function saveCashflow(self, cfIndex) {
 
     let blob = new Blob([text], { type: "application/json" });
 
-    saveAs(blob, fileName);
+    saveAs(blob, fileName + ".json");
 
     updater.updateTabLabel(self, cfIndex, false);
 }    

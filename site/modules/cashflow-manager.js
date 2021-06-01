@@ -9,6 +9,8 @@
     except according to those terms.
 */
 
+import * as agGrid from "ag-grid-community";
+
 import * as constant from "./constant";
 import * as global from "./global";
 import * as chartUtility from "./chart-utility";
@@ -257,7 +259,7 @@ export class CashflowManager {
     descriptorCB(self, rowIndex, gridType) {
         if (self.activeTabIndex < 0 || rowIndex < 0) return;
     
-        this.modalDialog.showDescriptors(self, rowIndex, gridType);
+        self.modalDialog.showDescriptors(self, rowIndex, gridType);
     }
     
     /**
@@ -272,17 +274,17 @@ export class CashflowManager {
         let tab = self.tabs[self.activeTabIndex];
     
         if (gridType === constant.TABLE_EVENT) {
-            this.modalDialog.showExtension(self, rowIndex, constant.TABLE_EVENT,
+            self.modalDialog.showExtension(self, rowIndex, constant.TABLE_EVENT,
                 {
                     textCancel: updater.getResource(self, constant.MODAL_CANCEL),
                     textOK: updater.getResource(self, constant.MODAL_SUBMIT),
                     outputFn: (isOK) => {
                         if (!isOK) return {};        
-                        return this.modalDialog.extensionOutput(self, rowIndex);
+                        return self.modalDialog.extensionOutput(self, rowIndex);
                     },        
                     finalFn: (isOK, data) => {
                         if (!isOK) return;
-                        this.modalDialog.extensionFinal(self, rowIndex, data);
+                        self.modalDialog.extensionFinal(self, rowIndex, data);
                         updater.focusEventGrid(tab);                        
                     }
                 }
@@ -290,7 +292,7 @@ export class CashflowManager {
             return;
         }
 
-        this.modalDialog.showExtension(self, rowIndex, constant.TABLE_AM);
+        self.modalDialog.showExtension(self, rowIndex, constant.TABLE_AM);
     }
 
     /**
@@ -340,7 +342,7 @@ export class CashflowManager {
     parameterCB(self, rowIndex, gridType) {
         if (self.activeTabIndex < 0 || rowIndex < 0) return;
     
-        this.modalDialog.showParameters(self, rowIndex, gridType);
+        self.modalDialog.showParameters(self, rowIndex, gridType);
     }
     
     /**
@@ -354,7 +356,7 @@ export class CashflowManager {
 
         let tab = self.tabs[self.activeTabIndex];
     
-        this.modalDialog.showSkipPeriods(self, rowIndex, gridType);
+        self.modalDialog.showSkipPeriods(self, rowIndex, gridType);
         updater.focusEventGrid(tab);
     }
 

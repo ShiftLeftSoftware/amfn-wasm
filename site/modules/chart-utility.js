@@ -9,6 +9,8 @@
     except according to those terms.
 */
 
+import { Chart } from "chart.js";
+
 import * as constant from "./constant";
 
 // From the book "Show Me the Numbers: Designing Tables and Graphs to Enlighten" 

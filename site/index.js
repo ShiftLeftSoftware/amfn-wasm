@@ -10,7 +10,6 @@
 */
      
 import * as eventHelper from "./modules/event-helper";
-import * as modalDialog from "./modules/modal-dialog";
 import * as toaster from "./modules/toaster";
 import { CashflowManager } from "./modules/cashflow-manager";
 
@@ -45,8 +44,6 @@ const amfnWasmRust = "./node_modules/amfnwasm/amfnwasm_bg.wasm";
         document.getElementById("btnSummary").addEventListener("click", () => eventHelper.menuSummary(cashflowManager));
     
         document.getElementById("menuUserPreferences").addEventListener("click", () => eventHelper.menuUserPreferences(cashflowManager)); 
-    
-        modalDialog.modalInit();
         
         document.getElementById("fileInput").addEventListener("change", (e) => { 
             if (e.target.files.length < 1) {
