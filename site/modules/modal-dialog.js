@@ -15,7 +15,7 @@ import * as chartUtility from "./chart-utility.js";
 import * as updater from "./updater.js";
 import * as toaster from "./toaster.js";
 
-const { WasmElemPreferences } = wasm_bindgen;
+const { WasmElemPreferences } = window.wasm_bindgen;
 
 /**
  * Modal dialog class.

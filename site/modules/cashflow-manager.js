@@ -19,7 +19,7 @@ import * as toaster from "./toaster.js";
 import { ModalDialog } from "./modal-dialog.js";
 import { ValueBtnRenderer } from "./value-btn.js";
 
-const { Engine } = wasm_bindgen;
+const { Engine } = window.wasm_bindgen;
 
 /**
  * Cashflow manager class.
