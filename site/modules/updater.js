@@ -9,7 +9,7 @@
     except according to those terms.
 */
 
-import * as constant from "./constant";
+import * as constant from "./constant.js";
 
 /**
  * Create template events and refresh display.

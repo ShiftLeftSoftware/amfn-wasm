@@ -9,17 +9,15 @@
     except according to those terms.
 */
 
-import * as agGrid from "ag-grid-community";
+import * as constant from "./constant.js";
+import * as global from "./global.js";
+import * as chartUtility from "./chart-utility.js";
+import * as eventHelper from "./event-helper.js";
+import * as updater from "./updater.js";
+import * as toaster from "./toaster.js";
 
-import * as constant from "./constant";
-import * as global from "./global";
-import * as chartUtility from "./chart-utility";
-import * as eventHelper from "./event-helper";
-import * as updater from "./updater";
-import * as toaster from "./toaster";
-
-import { ModalDialog } from "./modal-dialog";
-import { ValueBtnRenderer } from "./value-btn";
+import { ModalDialog } from "./modal-dialog.js";
+import { ValueBtnRenderer } from "./value-btn.js";
 
 const { Engine } = wasm_bindgen;
 

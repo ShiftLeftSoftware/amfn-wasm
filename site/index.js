@@ -9,9 +9,9 @@
     except according to those terms.
 */
      
-import * as eventHelper from "./modules/event-helper";
-import * as toaster from "./modules/toaster";
-import { CashflowManager } from "./modules/cashflow-manager";
+import * as eventHelper from "./modules/event-helper.js";
+import * as toaster from "./modules/toaster.js";
+import { CashflowManager } from "./modules/cashflow-manager.js";
 
 // AmFn Wasm - Rust
 const amfnWasmRust = "./node_modules/amfnwasm/amfnwasm_bg.wasm";

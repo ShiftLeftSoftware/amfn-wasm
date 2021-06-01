@@ -9,9 +9,7 @@
     except according to those terms.
 */
 
-import * as bootstrap from "bootstrap";
-
-import * as global from "./global";
+import * as global from "./global.js";
 
 /**
  * Show a toast message.

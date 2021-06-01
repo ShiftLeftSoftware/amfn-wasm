@@ -9,9 +9,7 @@
     except according to those terms.
 */
 
-import { Chart } from "chart.js";
-
-import * as constant from "./constant";
+import * as constant from "./constant.js";
 
 // From the book "Show Me the Numbers: Designing Tables and Graphs to Enlighten" 
 const chartColors = [

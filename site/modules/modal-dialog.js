@@ -9,13 +9,11 @@
     except according to those terms.
 */
 
-import * as bootstrap from "bootstrap";
-
-import * as constant from "./constant";
-import * as global from "./global";
-import * as chartUtility from "./chart-utility";
-import * as updater from "./updater";
-import * as toaster from "./toaster";
+import * as constant from "./constant.js";
+import * as global from "./global.js";
+import * as chartUtility from "./chart-utility.js";
+import * as updater from "./updater.js";
+import * as toaster from "./toaster.js";
 
 const { WasmElemPreferences } = wasm_bindgen;
 

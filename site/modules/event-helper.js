@@ -9,12 +9,10 @@
     except according to those terms.
 */
 
-import { saveAs } from "file-saver";
-
-import * as constant from "./constant";
-import * as global from "./global";
-import * as updater from "./updater";
-import * as toaster from "./toaster";
+import * as constant from "./constant.js";
+import * as global from "./global.js";
+import * as updater from "./updater.js";
+import * as toaster from "./toaster.js";
 
 /**
  * Close the indicated tab function.
