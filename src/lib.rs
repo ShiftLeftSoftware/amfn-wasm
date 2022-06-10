@@ -85,7 +85,7 @@ impl WasmParameter {
     /// Getter for name property
     #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
-        String::from(self.name.as_str())
+        self.name.clone()
     }
 
     /// Setter for name property
@@ -97,7 +97,7 @@ impl WasmParameter {
     /// Getter for label property
     #[wasm_bindgen(getter)]
     pub fn label(&self) -> String {
-        String::from(self.label.as_str())
+        self.label.clone()
     }
 
     /// Setter for label property
@@ -109,7 +109,7 @@ impl WasmParameter {
     /// Getter for description property
     #[wasm_bindgen(getter)]
     pub fn description(&self) -> String {
-        String::from(self.description.as_str())
+        self.description.clone()
     }
 
     /// Setter for description property
@@ -121,7 +121,7 @@ impl WasmParameter {
     /// Getter for sym_type property
     #[wasm_bindgen(getter)]
     pub fn sym_type(&self) -> String {
-        String::from(self.sym_type.as_str())
+        self.sym_type.clone()
     }
 
     /// Setter for sym_type property
@@ -145,7 +145,7 @@ impl WasmParameter {
     /// Getter for dec_value property
     #[wasm_bindgen(getter)]
     pub fn dec_value(&self) -> String {
-        String::from(self.dec_value.as_str())
+        self.dec_value.clone()
     }
 
     /// Setter for dec_value property
@@ -157,7 +157,7 @@ impl WasmParameter {
     /// Getter for str_value property
     #[wasm_bindgen(getter)]
     pub fn str_value(&self) -> String {
-        String::from(self.str_value.as_str())
+        self.str_value.clone()
     }
 
     /// Setter for str_value property
@@ -235,7 +235,7 @@ impl WasmDescriptor {
     /// Getter for group property
     #[wasm_bindgen(getter)]
     pub fn group(&self) -> String {
-        String::from(self.group.as_str())
+        self.group.clone()
     }
 
     /// Setter for group property
@@ -247,7 +247,7 @@ impl WasmDescriptor {
     /// Getter for name property
     #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
-        String::from(self.name.as_str())
+        self.name.clone()
     }
 
     /// Setter for name property
@@ -259,7 +259,7 @@ impl WasmDescriptor {
     /// Getter for desc_type property
     #[wasm_bindgen(getter)]
     pub fn desc_type(&self) -> String {
-        String::from(self.desc_type.as_str())
+        self.desc_type.clone()
     }
 
     /// Setter for desc_type property
@@ -271,7 +271,7 @@ impl WasmDescriptor {
     /// Getter for code property
     #[wasm_bindgen(getter)]
     pub fn code(&self) -> String {
-        String::from(self.code.as_str())
+        self.code.clone()
     }
 
     /// Setter for code property
@@ -283,7 +283,7 @@ impl WasmDescriptor {
     /// Getter for value property
     #[wasm_bindgen(getter)]
     pub fn value(&self) -> String {
-        String::from(self.value.as_str())
+        self.value.clone()
     }
 
     /// Setter for value property
@@ -295,7 +295,7 @@ impl WasmDescriptor {
     /// Getter for value_expr property
     #[wasm_bindgen(getter)]
     pub fn value_expr(&self) -> String {
-        String::from(self.value_expr.as_str())
+        self.value_expr.clone()
     }
 
     /// Setter for value_expr property
@@ -363,7 +363,7 @@ impl WasmElemChart {
     /// Getter for name property
     #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
-        String::from(self.name.as_str())
+        self.name.clone()
     }
 
     /// Setter for name property
@@ -375,7 +375,7 @@ impl WasmElemChart {
     /// Getter for value property
     #[wasm_bindgen(getter)]
     pub fn value(&self) -> String {
-        String::from(self.value.as_str())
+        self.value.clone()
     }
 
     /// Setter for value property
@@ -473,7 +473,7 @@ impl WasmElemColumn {
     /// Getter for col_name property
     #[wasm_bindgen(getter)]
     pub fn col_name(&self) -> String {
-        String::from(self.col_name.as_str())
+        self.col_name.clone()
     }
 
     /// Setter for col_name property
@@ -497,7 +497,7 @@ impl WasmElemColumn {
     /// Getter for col_header property
     #[wasm_bindgen(getter)]
     pub fn col_header(&self) -> String {
-        String::from(self.col_header.as_str())
+        self.col_header.clone()
     }
 
     /// Setter for col_header property
@@ -509,7 +509,7 @@ impl WasmElemColumn {
     /// Getter for col_description property
     #[wasm_bindgen(getter)]
     pub fn col_description(&self) -> String {
-        String::from(self.col_description.as_str())
+        self.col_description.clone()
     }
 
     /// Setter for col_description property
@@ -521,7 +521,7 @@ impl WasmElemColumn {
     /// Getter for group property
     #[wasm_bindgen(getter)]
     pub fn group(&self) -> String {
-        String::from(self.group.as_str())
+        self.group.clone()
     }
 
     /// Setter for group property
@@ -533,7 +533,7 @@ impl WasmElemColumn {
     /// Getter for name property
     #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
-        String::from(self.name.as_str())
+        self.name.clone()
     }
 
     /// Setter for name property
@@ -545,7 +545,7 @@ impl WasmElemColumn {
     /// Getter for col_type property
     #[wasm_bindgen(getter)]
     pub fn col_type(&self) -> String {
-        String::from(self.col_type.as_str())
+        self.col_type.clone()
     }
 
     /// Setter for col_type property
@@ -557,7 +557,7 @@ impl WasmElemColumn {
     /// Getter for code property
     #[wasm_bindgen(getter)]
     pub fn code(&self) -> String {
-        String::from(self.code.as_str())
+        self.code.clone()
     }
 
     /// Setter for code property
@@ -677,7 +677,7 @@ impl WasmElemPreferences {
     /// Getter for locale_str property
     #[wasm_bindgen(getter)]
     pub fn locale_str(&self) -> String {
-        String::from(self.locale_str.as_str())
+        self.locale_str.clone()
     }
 
     /// Setter for locale_str property
@@ -689,7 +689,7 @@ impl WasmElemPreferences {
     /// Getter for group property
     #[wasm_bindgen(getter)]
     pub fn group(&self) -> String {
-        String::from(self.group.as_str())
+        self.group.clone()
     }
 
     /// Setter for group property
@@ -701,7 +701,7 @@ impl WasmElemPreferences {
     /// Getter for cross_rate_code property
     #[wasm_bindgen(getter)]
     pub fn cross_rate_code(&self) -> String {
-        String::from(self.cross_rate_code.as_str())
+        self.cross_rate_code.clone()
     }
 
     /// Setter for cross_rate_code property
@@ -713,7 +713,7 @@ impl WasmElemPreferences {
     /// Getter for default_encoding property
     #[wasm_bindgen(getter)]
     pub fn default_encoding(&self) -> String {
-        String::from(self.default_encoding.as_str())
+        self.default_encoding.clone()
     }
 
     /// Setter for default_encoding property
@@ -749,7 +749,7 @@ impl WasmElemPreferences {
     /// Getter for target property
     #[wasm_bindgen(getter)]
     pub fn target(&self) -> String {
-        String::from(self.target.as_str())
+        self.target.clone()
     }
 
     /// Setter for target property
@@ -811,7 +811,7 @@ impl WasmElemSummary {
     /// Getter for name property
     #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
-        String::from(self.name.as_str())
+        self.name.clone()
     }
 
     /// Setter for name property
@@ -823,7 +823,7 @@ impl WasmElemSummary {
     /// Getter for label property
     #[wasm_bindgen(getter)]
     pub fn label(&self) -> String {
-        String::from(self.label.as_str())
+        self.label.clone()
     }
 
     /// Setter for label property
@@ -835,7 +835,7 @@ impl WasmElemSummary {
     /// Getter for label_expr property
     #[wasm_bindgen(getter)]
     pub fn label_expr(&self) -> String {
-        String::from(self.label_expr.as_str())
+        self.label_expr.clone()
     }
 
     /// Setter for label_expr property
@@ -847,7 +847,7 @@ impl WasmElemSummary {
     /// Getter for result property
     #[wasm_bindgen(getter)]
     pub fn result(&self) -> String {
-        String::from(self.result.as_str())
+        self.result.clone()
     }
 
     /// Setter for result property
@@ -859,7 +859,7 @@ impl WasmElemSummary {
     /// Getter for result_expr property
     #[wasm_bindgen(getter)]
     pub fn result_expr(&self) -> String {
-        String::from(self.result_expr.as_str())
+        self.result_expr.clone()
     }
 
     /// Setter for result_expr property

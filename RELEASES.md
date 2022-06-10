@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.3.7 - 2022-06-10
+
+* More complete use of clone.
+
+[0.3.7]: https://github.com/ShiftLeftSoftware/amfn-wasm/releases/v0.3.7
+
 ## 0.3.6 - 2021-06-01
 
 * Update JavaScript to use ECMA modules.

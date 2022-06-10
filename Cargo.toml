@@ -1,6 +1,6 @@
 [package]
 name = "amfnwasm"
-version = "0.3.6"
+version = "0.3.7"
 authors = ["ShiftLeft Software"]
 description = "Amortization Functions (AmFn) Web Assembly"
 homepage = "https://shiftleftsoftware.com"
