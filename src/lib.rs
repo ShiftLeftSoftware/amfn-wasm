@@ -1089,9 +1089,11 @@ impl Engine {
                     if !o.get_element(index) {
                         break;
                     }
+
                     if !events.is_empty() {
                         events.push('|');
                     }
+
                     let new_date = o.event_date();
                     events.push_str(
                         format!(
@@ -1102,18 +1104,16 @@ impl Engine {
                         )
                         .as_str(),
                     );
+
                     events.push('~');
                     events.push_str(o.sort_order().to_string().as_str());
                     events.push('~');
-                    let param_count: usize;
-                    match o.list_parameter() {
-                        None => {
-                            param_count = 0;
-                        }
-                        Some(o) => {
-                            param_count = o.count();
-                        }
-                    }
+
+                    let param_count: usize = match o.list_parameter() {
+                        None => 0,
+                        Some(o) => o.count(),
+                    };
+
                     events.push_str(param_count.to_string().as_str());
                     index += 1;
                 }
@@ -1359,8 +1359,10 @@ impl Engine {
     /// Clear the cashflows and template group lists.
 
     pub fn clear_lists(&self) {
-
-        self.engine.calc_mgr().list_locale().select_cashflow_locale("");
+        self.engine
+            .calc_mgr()
+            .list_locale()
+            .select_cashflow_locale("");
         self.engine.calc_mgr_mut().list_cashflow_mut().clear();
         self.engine.calc_mgr_mut().list_template_group_mut().clear();
     }
@@ -1764,15 +1766,10 @@ impl Engine {
             return Array::new();
         }
 
-        let table_type: TableType;
-        match table_type_param {
-            TABLE_AM => {
-                table_type = TableType::Amortization;
-            }
-            _ => {
-                table_type = TableType::Event;
-            }
-        }
+        let table_type: TableType = match table_type_param {
+            TABLE_AM => TableType::Amortization,
+            _ => TableType::Event,
+        };
 
         let mut ary_column: Vec<WasmElemColumn> = Vec::new();
         let list_column = self.engine.parse_columns(table_type);
@@ -2409,15 +2406,10 @@ impl Engine {
             return String::from("");
         }
 
-        let table_type: TableType;
-        match table_type_param {
-            TABLE_AM => {
-                table_type = TableType::Amortization;
-            }
-            _ => {
-                table_type = TableType::Event;
-            }
-        }
+        let table_type: TableType = match table_type_param {
+            TABLE_AM => TableType::Amortization,
+            _ => TableType::Event,
+        };
 
         let list_column = self.engine.parse_columns(table_type);
 
@@ -2425,19 +2417,14 @@ impl Engine {
 
         match table_type_param {
             TABLE_AM => {
-                let mut list_am: ListAmortization;
                 let mut cresult = String::from("");
-                match calc_mgr
+                let mut list_am: ListAmortization = match calc_mgr
                     .list_cashflow()
                     .create_cashflow_output(true, false, false, false, true)
                 {
-                    Err(_e) => {
-                        return cresult;
-                    }
-                    Ok(o) => {
-                        list_am = o;
-                    }
-                }
+                    Err(_e) => return cresult,
+                    Ok(o) => o,
+                };
 
                 let mut row_index: usize = 0;
                 loop {
@@ -2527,9 +2514,7 @@ impl Engine {
                     let mut row = String::from("");
                     let mut next_name = String::from("");
                     match calc_mgr.list_cashflow().list_event() {
-                        None => {
-                            String::from("");
-                        }
+                        None => {}
                         Some(o) => {
                             if !o.get_element(row_index as usize) {
                                 break;

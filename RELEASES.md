@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.3.8 - 2022-06-14
+
+* Upgrade Rust compiler to 1.61.0 and fix new clippy warnings.
+
+[0.3.8]: https://github.com/ShiftLeftSoftware/amfn-wasm/releases/v0.3.8
+
 ## 0.3.7 - 2022-06-10
 
 * More complete use of clone.
